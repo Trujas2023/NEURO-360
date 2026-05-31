@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Bitácora</title>
+    <link rel="manifest" href="manifest.json">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js');
+      }
+    </script>
+</head>
+<body>
+    <div id="historial">
+        <h2>Historial de hoy</h2>
+        <ul id="listaRegistros"></ul>
+        <button id="btnLimpiar" style="background-color: #ff4757; color: white; width: 100%; padding: 10px; border: none;">
+            Limpiar Historial
+        </button>
+    </div>
+    
+    <!-- Aquí sigue tu <form id="registroForm"> ... -->
+    <script src="app.js"></script>
+</body>
+</html>
+
+<body>
+     <form id="registroForm">
+   <fieldset>
+        <legend>🩺 Salud y Bienestar</legend>
+        <label>Fecha:</label>
+        <input type="date" name="fecha" required>
+
+        <label>Sueño (horas/calidad):</label>
+        <input type="text" name="sueno">
+
+        <label>Digestión:</label>
+        <select name="digestion">
+            <option value="Normal">Normal</option>
+            <option value="Dura">Dura</option>
+            <option value="Líquida">Líquida</option>
+        </select>
+    </fieldset>
+
+    <fieldset>
+        <legend>📅 Actividades y Escuela</legend>
+        <label>Colegio / Escuela:</label>
+        <input type="text" name="colegio">
+
+        <label>Terapia:</label>
+        <input type="text" name="terapia">
+
+        <label>Alberca:</label>
+        <input type="text" name="alberca">
+    </fieldset>
+
+    <fieldset>
+        <legend>📝 Notas Finales</legend>
+        <textarea name="otras" placeholder="¿Algo importante que resaltar?"></textarea>
+    </fieldset>
+
+    <button type="submit">Guardar bitácora completa</button>
+</form>
+</body>
+</html>
