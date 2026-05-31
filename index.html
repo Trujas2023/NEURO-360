@@ -1,10 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=
-  <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,48 +19,24 @@
             Limpiar Historial
         </button>
     </div>
-    
-    <!-- Aquí sigue tu <form id="registroForm"> ... -->
+
+    <form id="registroForm">
+        <fieldset>
+            <legend>Salud y Bienestar</legend>
+            <label>Fecha:</label>
+            <input type="date" name="fecha" required>
+            <label>Sueño (horas/calidad):</label>
+            <input type="text" name="sueno">
+            <label>Digestión:</label>
+            <select name="digestion">
+                <option value="Normal">Normal</option>
+                <option value="Dura">Dura</option>
+                <option value="Liquida">Líquida</option>
+            </select>
+        </fieldset>
+        <!-- ... resto de tu formulario ... -->
+    </form>
+
     <script src="app.js"></script>
-</body>
-</html>
-
-<body>
-     <form id="registroForm">
-   <fieldset>
-        <legend>🩺 Salud y Bienestar</legend>
-        <label>Fecha:</label>
-        <input type="date" name="fecha" required>
-
-        <label>Sueño (horas/calidad):</label>
-        <input type="text" name="sueno">
-
-        <label>Digestión:</label>
-        <select name="digestion">
-            <option value="Normal">Normal</option>
-            <option value="Dura">Dura</option>
-            <option value="Líquida">Líquida</option>
-        </select>
-    </fieldset>
-
-    <fieldset>
-        <legend>📅 Actividades y Escuela</legend>
-        <label>Colegio / Escuela:</label>
-        <input type="text" name="colegio">
-
-        <label>Terapia:</label>
-        <input type="text" name="terapia">
-
-        <label>Alberca:</label>
-        <input type="text" name="alberca">
-    </fieldset>
-
-    <fieldset>
-        <legend>📝 Notas Finales</legend>
-        <textarea name="otras" placeholder="¿Algo importante que resaltar?"></textarea>
-    </fieldset>
-
-    <button type="submit">Guardar bitácora completa</button>
-</form>
 </body>
 </html>
