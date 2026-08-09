@@ -7,6 +7,7 @@ import {
   saveProfiles,
   setActiveProfileId as persistActiveProfileId,
 } from '@services/storage';
+import { cleanupProfileData } from '@services/storage/profileDataRegistry';
 import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
 import type { ChildProfile, ChildProfilePreferences } from '@shared/types';
 import { createId } from '@shared/utils/id';
@@ -92,6 +93,11 @@ export function ProfilesProvider({ children }: { children: ReactNode }) {
         saveProfiles(next);
         return next;
       });
+
+      // Borra también, de forma aislada, cualquier dato guardado exclusivamente
+      // para este perfil (tarjetas AAC hoy; otros datos por perfil en el futuro),
+      // sin tocar el almacenamiento de ningún otro perfil.
+      await cleanupProfileData(id);
 
       if (activeProfileId === id) {
         setActiveProfileId(null);

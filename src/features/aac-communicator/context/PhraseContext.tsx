@@ -10,6 +10,8 @@ interface PhraseContextValue {
   phrase: AacCard[];
   /** Habla la tarjeta de inmediato y la agrega a la barra de frase (un solo toque). */
   addCard: (card: AacCard) => void;
+  /** Quita una tarjeta puntual de la frase (no necesariamente la última). */
+  removeAt: (index: number) => void;
   removeLast: () => void;
   clear: () => void;
   speakPhrase: () => void;
@@ -37,6 +39,10 @@ export function PhraseProvider({ children }: { children: ReactNode }) {
     [soundEnabled],
   );
 
+  const removeAt = useCallback((index: number) => {
+    setPhrase((current) => current.filter((_, cardIndex) => cardIndex !== index));
+  }, []);
+
   const removeLast = useCallback(() => {
     setPhrase((current) => current.slice(0, -1));
   }, []);
@@ -53,8 +59,8 @@ export function PhraseProvider({ children }: { children: ReactNode }) {
   }, [phrase, soundEnabled]);
 
   const value = useMemo<PhraseContextValue>(
-    () => ({ phrase, addCard, removeLast, clear, speakPhrase }),
-    [phrase, addCard, removeLast, clear, speakPhrase],
+    () => ({ phrase, addCard, removeAt, removeLast, clear, speakPhrase }),
+    [phrase, addCard, removeAt, removeLast, clear, speakPhrase],
   );
 
   return <PhraseContext.Provider value={value}>{children}</PhraseContext.Provider>;

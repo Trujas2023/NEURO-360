@@ -9,7 +9,12 @@ a la siguiente.
   constructor de frases y texto a voz (Fase 4), y personalización básica de
   tarjetas con foto por perfil (parte de Fase 5). Pendiente para más
   adelante: grabación de voz personalizada y selector de idioma en la UI.
-- [ ] Fase 4 — Constructor de frases y voz *(ver nota en Fase 3)*.
+- [x] **Fase 4 — Constructor de frases y voz.** Sobre la base de la Fase 3:
+  eliminar una tarjeta individual de la frase (no solo la última), botón
+  🔊 Hablar, y una cola de reproducción que serializa las llamadas a
+  `expo-speech` para que toques rápidos no generen audio superpuesto.
+  Antes de esta fase se corrigió un dato huérfano: al eliminar un perfil
+  ahora también se borran sus tarjetas AAC (`services/storage/profileDataRegistry.ts`).
 - [ ] Fase 5 — Personalización para padres *(tarjetas ya cubiertas en Fase 3; falta grabación de voz y otras preferencias)*.
 - [ ] Fase 6 — Primer juego sensorial.
 - [ ] Fase 7 — Resto de juegos.

@@ -1,4 +1,5 @@
 import { getItem, removeItem, setItem } from '@services/storage/asyncStorage';
+import { registerProfileDataCleanup } from '@services/storage/profileDataRegistry';
 
 import type { AacCard } from '../types';
 
@@ -23,3 +24,7 @@ export async function saveAacCards(profileId: string, cards: AacCard[]): Promise
 export async function removeAacCards(profileId: string): Promise<void> {
   await removeItem(cardsKey(profileId));
 }
+
+// Borra las tarjetas AAC del perfil cuando `ProfilesContext` elimina ese
+// perfil, para no dejar datos huérfanos en AsyncStorage.
+registerProfileDataCleanup(removeAacCards);

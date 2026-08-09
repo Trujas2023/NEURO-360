@@ -141,3 +141,25 @@ sin tocar el resto de la Fase 2. Puntos de diseño relevantes:
   `services/storage/asyncStorage.ts` ahora captura `JSON.parse` inválido y
   devuelve `null` en vez de lanzar, beneficiando también a los
   repositorios de perfiles y PIN de la Fase 2.
+
+## Estado de la Fase 4
+
+Antes de esta fase se corrigió un dato huérfano detectado en la Fase 3: al
+eliminar un perfil, sus tarjetas AAC quedaban en AsyncStorage sin
+referencia. Se agregó `services/storage/profileDataRegistry.ts` (registro
+de limpieza por perfil) y `aacCardsRepository.ts` se registra ahí; así
+`ProfilesContext.deleteProfile` limpia los datos del perfil eliminado sin
+que el feature `profiles` tenga que importar `aac-communicator`
+directamente, y sin afectar a los demás perfiles.
+
+Sobre esa base, la Fase 4 extiende el constructor de frases ya existente:
+
+- `PhraseContext` suma `removeAt(index)` para quitar una tarjeta puntual de
+  la frase (además de `removeLast` y `clear`, que se conservan); `PhraseBar`
+  hace que cada palabra de la frase sea tocable para quitarla.
+- `services/audio/speech.ts` serializa las llamadas a `expo-speech` en una
+  cola de un solo elemento: cada `speak()` espera a que el anterior termine
+  de detenerse antes de empezar, así toques rápidos y sucesivos nunca
+  producen audio superpuesto.
+- El botón de reproducir la frase pasa a mostrar el emoji 🔊 pedido en esta
+  fase (antes ▶️), sin cambiar su comportamiento.

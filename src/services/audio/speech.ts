@@ -8,6 +8,14 @@ export interface SpeakOptions {
 }
 
 /**
+ * Cola de un solo elemento: cada llamada a `speak` se encadena después de
+ * que la anterior terminó de detener el motor nativo, así toques rápidos
+ * y sucesivos nunca disparan dos reproducciones superpuestas (la más
+ * reciente siempre gana, sin solaparse con la anterior).
+ */
+let pending: Promise<void> = Promise.resolve();
+
+/**
  * Texto a voz local del dispositivo (sin servicios externos de pago).
  * Español por defecto; `language` queda abierto para agregar otros
  * idiomas más adelante sin cambiar esta API.
@@ -17,10 +25,16 @@ export function speak(text: string, options: SpeakOptions = {}): void {
   if (!trimmed) {
     return;
   }
-  Speech.stop();
-  Speech.speak(trimmed, { language: options.language ?? DEFAULT_SPEECH_LANGUAGE });
+
+  const language = options.language ?? DEFAULT_SPEECH_LANGUAGE;
+  pending = pending
+    .catch(() => {})
+    .then(async () => {
+      await Speech.stop();
+      Speech.speak(trimmed, { language });
+    });
 }
 
 export function stopSpeaking(): void {
-  Speech.stop();
+  pending = pending.catch(() => {}).then(() => Speech.stop());
 }

@@ -1,13 +1,17 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { BigButton } from '@shared/components';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { usePhrase } from '../context/PhraseContext';
 
-/** Barra superior donde el niño arma la frase tocando tarjetas. */
+/**
+ * Barra superior donde el niño arma la frase tocando tarjetas. Cada
+ * palabra de la frase es a su vez tocable para quitarla individualmente
+ * (además de "Borrar" la última y "Limpiar" todas).
+ */
 export function PhraseBar() {
-  const { phrase, removeLast, clear, speakPhrase } = usePhrase();
+  const { phrase, removeAt, removeLast, clear, speakPhrase } = usePhrase();
   const isEmpty = phrase.length === 0;
 
   return (
@@ -22,16 +26,26 @@ export function PhraseBar() {
           <Text style={styles.placeholder}>Toca tarjetas para armar una frase</Text>
         ) : (
           phrase.map((card, index) => (
-            <View key={`${card.id}-${index}`} style={[styles.chip, { borderColor: card.color }]}>
+            <Pressable
+              key={`${card.id}-${index}`}
+              onPress={() => removeAt(index)}
+              accessibilityRole="button"
+              accessibilityLabel={`Quitar "${card.label}" de la frase`}
+              style={({ pressed }) => [
+                styles.chip,
+                { borderColor: card.color, opacity: pressed ? 0.6 : 1 },
+              ]}
+            >
               <Text style={styles.chipText}>{card.label}</Text>
-            </View>
+              <Text style={styles.chipRemove}>✕</Text>
+            </Pressable>
           ))
         )}
       </ScrollView>
 
       <View style={styles.actions}>
         <View style={styles.actionButton}>
-          <BigButton label="Hablar" emoji="▶️" onPress={speakPhrase} disabled={isEmpty} />
+          <BigButton label="Hablar" emoji="🔊" onPress={speakPhrase} disabled={isEmpty} />
         </View>
         <View style={styles.actionButton}>
           <BigButton label="Borrar" emoji="⌫" variant="secondary" onPress={removeLast} disabled={isEmpty} />
@@ -64,16 +78,24 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.background,
     borderWidth: 2,
     borderRadius: radius.md,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
+    minHeight: 44,
   },
   chipText: {
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
+  },
+  chipRemove: {
+    marginLeft: spacing.xs,
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
   },
   actions: {
     flexDirection: 'row',

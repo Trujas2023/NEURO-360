@@ -1,7 +1,9 @@
 # aac-communicator
 
 Comunicador visual "Mi Voz": tarjetas grandes con imagen/pictograma, texto
-y voz; barra de frase; lectura en voz alta. Implementado en la Fase 3.
+y voz; barra de frase; lectura en voz alta. Implementado en la Fase 3 y
+extendido en la Fase 4 (quitar una tarjeta individual de la frase, botón
+🔊 Hablar, y protección contra audio superpuesto en `@services/audio/speech`).
 
 ## Estructura
 
@@ -13,12 +15,15 @@ y voz; barra de frase; lectura en voz alta. Implementado en la Fase 3.
   vez por perfil (ver `hooks/useAacCards.ts`).
 - `storage/aacCardsRepository.ts`: persistencia por perfil sobre
   `@services/storage/asyncStorage` (una clave de AsyncStorage por
-  `profileId`, así los perfiles nunca comparten tarjetas).
+  `profileId`, así los perfiles nunca comparten tarjetas). Se registra en
+  `@services/storage/profileDataRegistry` para que sus tarjetas se borren
+  automáticamente cuando `ProfilesContext` elimina ese perfil.
 - `hooks/useAacCards.ts`: CRUD + siembra automática; lo usan tanto las
   pantallas de Modo Niño como las de administración en Modo Adulto.
-- `context/PhraseContext.tsx`: estado de la barra de frase en construcción.
-  Se monta y desmonta junto con `navigation/AacNavigator.tsx`, así que se
-  reinicia solo al salir de "Mi Voz".
+- `context/PhraseContext.tsx`: estado de la barra de frase en construcción
+  (`addCard`, `removeAt`, `removeLast`, `clear`, `speakPhrase`). Se monta y
+  desmonta junto con `navigation/AacNavigator.tsx`, así que se reinicia
+  solo al salir de "Mi Voz".
 - `components/`: `CategoryTile`, `AacCardTile`, `AacCardVisual` (foto o
   emoji), `PhraseBar`, `AacLayout` (envoltorio compartido de las pantallas
   de Modo Niño).
