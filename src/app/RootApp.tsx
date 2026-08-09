@@ -1,43 +1,23 @@
+import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { APP_NAME } from '@shared/constants/app';
-import { colors, spacing, typography } from '@shared/theme';
+import { RootNavigator } from '@app/navigation/RootNavigator';
+import { ProfilesProvider } from '@features/profiles/context/ProfilesContext';
 
 /**
- * Composición raíz de la app. En Fase 1 solo confirma que la arquitectura
- * (alias, tema, constantes compartidas) queda cableada de punta a punta.
- * La Fase 2 sustituye esta pantalla por el navegador raíz y la selección
- * de perfil / modo.
+ * Composición raíz de la app: proveedores globales (área segura, perfiles)
+ * y el navegador raíz definido en Fase 2.
  */
 export default function RootApp() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{APP_NAME}</Text>
-      <Text style={styles.subtitle}>Fase 1: arquitectura del proyecto ✔</Text>
-      <StatusBar style="dark" />
-    </View>
+    <SafeAreaProvider>
+      <ProfilesProvider>
+        <NavigationContainer>
+          <RootNavigator />
+          <StatusBar style="dark" />
+        </NavigationContainer>
+      </ProfilesProvider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.lg,
-  },
-  title: {
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  subtitle: {
-    marginTop: spacing.md,
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-});

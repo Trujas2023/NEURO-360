@@ -4,7 +4,7 @@ El desarrollo avanza por fases; cada una se entrega y valida antes de pasar
 a la siguiente.
 
 - [x] **Fase 1 — Arquitectura del proyecto.**
-- [ ] Fase 2 — Sistema de navegación y perfiles.
+- [x] **Fase 2 — Sistema de navegación y perfiles.**
 - [ ] Fase 3 — Comunicador AAC.
 - [ ] Fase 4 — Constructor de frases y voz.
 - [ ] Fase 5 — Personalización para padres.

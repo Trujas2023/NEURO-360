@@ -1,5 +1,8 @@
 # components
 
-Componentes visuales reutilizables (botones grandes, tarjetas, layouts
-accesibles) compartidos entre el comunicador, los juegos y el modo adulto.
-Se irán agregando a partir de la Fase 2.
+Componentes visuales reutilizables compartidos entre el comunicador, los
+juegos y el modo adulto.
+
+- `BigButton`: botón grande y accesible (variantes primary/secondary/ghost/danger).
+- `ScreenContainer`: fondo y márgenes consistentes con área segura.
+- `ProfileAvatar`: foto de perfil o avatar de inicial como respaldo.

@@ -17,6 +17,9 @@ export const colors = {
   warning: '#E8B86D',
   danger: '#E08C8C',
   border: '#E5DFD3',
+  lavender: '#B9A7E0',
+  blush: '#F0AFC0',
+  onPrimary: '#FFFFFF',
 } as const;
 
 export type ColorToken = keyof typeof colors;

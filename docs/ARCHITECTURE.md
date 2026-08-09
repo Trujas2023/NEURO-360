@@ -43,20 +43,23 @@ babel.config.js          # preset de Expo + alias de módulos (@app, @shared, ..
 tsconfig.json            # TypeScript estricto + paths de alias
 
 src/
-  app/                    # composición raíz (providers, futura navegación)
+  app/                    # composición raíz, navegación y pantallas de shell
+    navigation/            # RootStackParamList + RootNavigator (Fase 2)
+    screens/                # Welcome, Home (Modo Niño), ComingSoon (Fase 2)
+    RootApp.tsx             # providers + NavigationContainer
   features/
     aac-communicator/     # Fase 3-4 — comunicador "Mi Voz"
     sensory-games/         # Fase 6-7 — "Juega & Regula"
-    profiles/              # Fase 2 — perfiles y cambio de modo
-    parent-mode/            # Fase 8 — configuración protegida por PIN
+    profiles/              # Fase 2 — perfiles, selector y alta/edición
+    parent-mode/            # Fase 2 (PIN + admin básica) — Fase 8 la amplía
   shared/
-    components/           # componentes de UI reutilizables
+    components/           # componentes de UI reutilizables (BigButton, ...)
     theme/                 # colores, espaciado, tipografía
-    constants/              # constantes de app (nombre, modos)
+    constants/              # constantes de app (nombre, modos, perfiles)
     hooks/                  # hooks compartidos
     types/                  # tipos de dominio compartidos
   services/
-    storage/                # Fase 9 — persistencia offline-first
+    storage/                # Fase 2 — perfiles/PIN vía AsyncStorage; Fase 9 lo amplía
     audio/                  # Fase 4-5 — texto a voz y grabaciones
 
 assets/
@@ -90,3 +93,17 @@ linting/formatting y esta documentación. `RootApp.tsx` es un placeholder
 que confirma que el cableado funciona de punta a punta; no implementa
 navegación ni pantallas de producto — eso corresponde a la Fase 2 en
 adelante, según `docs/ROADMAP.md`.
+
+## Estado de la Fase 2
+
+Se implementa el sistema de navegación (`@react-navigation/native` +
+native-stack) y la gestión de perfiles sobre la arquitectura de la Fase 1,
+sin modificar su estructura de carpetas ni sus tokens de tema (solo se
+agregan tokens de color nuevos y campos a `ChildProfile` de forma
+aditiva). Incluye: Bienvenida, selector de perfil, alta/edición de perfil
+(nombre, foto o color de avatar, preferencias básicas), Modo Niño (acceso a
+"Mi Voz" y "Juega & Regula", ambos con pantalla `ComingSoon` hasta sus
+fases correspondientes) y Modo Adulto protegido por PIN con administración
+básica de perfiles. La persistencia usa
+`@react-native-async-storage/async-storage` a través de
+`src/services/storage`.

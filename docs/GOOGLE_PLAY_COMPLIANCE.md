@@ -13,16 +13,22 @@ tiempo y deben reconfirmarse antes de enviar la app a revisión.
 - **Sin publicidad ni SDKs de terceros con fines publicitarios**: no se
   instalará ningún SDK de ads, analítica de comportamiento o atribución.
 - **Sin recopilación de datos innecesaria**: no hay ubicación, contactos,
-  cámara/micrófono de fondo, red social ni chat. Cualquier acceso a
-  cámara/micrófono que se agregue en fases posteriores (p. ej. fotos y
-  grabaciones de voz personalizadas del comunicador, Fase 5) será:
-  - iniciado explícitamente por un adulto en Modo Adulto,
-  - almacenado únicamente en el dispositivo (offline-first, Fase 9),
+  red social ni chat. El único acceso a cámara/galería es la foto de
+  avatar del perfil infantil (Fase 2, `expo-image-picker`) y es:
+  - iniciado explícitamente por un adulto, solo alcanzable dentro de Modo
+    Adulto (protegido por PIN desde la Fase 2),
+  - almacenado únicamente en el dispositivo (offline-first),
   - sin subida a servidores propios ni de terceros.
-- **`android.permissions` en `app.json` se mantiene vacío** salvo que una
-  función concreta lo requiera; los permisos de cámara/micrófono se
-  agregarán mediante los config plugins correspondientes (`expo-image-picker`,
-  `expo-av`/`expo-audio`) recién en la fase que los implemente, no antes.
+  El mismo criterio aplicará a las grabaciones de voz personalizadas del
+  comunicador (Fase 5).
+- **`android.permissions` en `app.json` se mantiene vacío**; los permisos
+  de cámara/galería los agrega automáticamente el config plugin de
+  `expo-image-picker` (declarado en `app.json`) al generar el proyecto
+  nativo, sin permisos adicionales declarados a mano.
+- **PIN de Modo Adulto (Fase 2)**: es una barrera parental (fricción para
+  evitar que un niño entre por accidente a la configuración o cree/edite
+  perfiles), no un mecanismo de seguridad criptográfica; se guarda en el
+  almacenamiento local igual que el resto de los datos offline-first.
 - **Target/compile SDK fijados explícitamente** vía el plugin
   `expo-build-properties` en `app.json` (`compileSdkVersion`,
   `targetSdkVersion` = 36, `minSdkVersion` = 24), para no depender del
@@ -35,10 +41,10 @@ tiempo y deben reconfirmarse antes de enviar la app a revisión.
 
 ## Pendiente para fases posteriores
 
-- **Fase 8 (Modo adulto)**: la pantalla de configuración protegida por PIN
-  es también el lugar natural para exponer, cuando corresponda, enlaces a
-  política de privacidad y ajustes de datos, como exige la Data Safety
-  section de Play Console.
+- **Fase 8 (Modo adulto)**: la pantalla de Modo Adulto (protegida por PIN
+  desde la Fase 2) es también el lugar natural para exponer, cuando
+  corresponda, enlaces a política de privacidad y ajustes de datos, como
+  exige la Data Safety section de Play Console.
 - **Fase 9 (almacenamiento offline)**: documentar explícitamente qué datos
   se guardan (perfiles, vocabulario, fotos, audios) y confirmar que nada
   sale del dispositivo, como base para completar el formulario de

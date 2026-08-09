@@ -7,10 +7,20 @@ import type { AppMode } from '@shared/constants/app';
  * desde la Fase 1.
  */
 
+export interface ChildProfilePreferences {
+  /** Si está apagado, el comunicador y los juegos deben evitar sonido (Fase 3+). */
+  soundEnabled: boolean;
+  /** Si está activo, las pantallas deben minimizar animaciones (Fase 6+). */
+  reduceMotion: boolean;
+}
+
 export interface ChildProfile {
   id: string;
   name: string;
+  /** Foto elegida por un adulto. Si falta, se muestra un avatar con inicial y avatarColor. */
   avatarUri?: string;
+  avatarColor: string;
+  preferences: ChildProfilePreferences;
   createdAt: string;
 }
 
