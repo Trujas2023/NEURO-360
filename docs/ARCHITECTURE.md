@@ -48,7 +48,15 @@ src/
     screens/                # Welcome, Home (Modo Niño), ComingSoon (Fase 2)
     RootApp.tsx             # providers + NavigationContainer
   features/
-    aac-communicator/     # Fase 3-4 — comunicador "Mi Voz"
+    aac-communicator/     # Fase 3 — comunicador "Mi Voz" (ver README del feature)
+      types.ts              # AacCategory, AacCard
+      constants/             # categorías iniciales + vocabulario sembrado
+      storage/                # persistencia por perfil (aacCardsRepository)
+      hooks/                   # useAacCards (CRUD + siembra)
+      context/                  # PhraseContext (barra de frase en curso)
+      components/                # CategoryTile, AacCardTile, PhraseBar, ...
+      navigation/                 # AacNavigator (stack anidado de Modo Niño)
+      screens/                     # AacHome/AacCategory (niño) + Manager/CardForm (adulto)
     sensory-games/         # Fase 6-7 — "Juega & Regula"
     profiles/              # Fase 2 — perfiles, selector y alta/edición
     parent-mode/            # Fase 2 (PIN + admin básica) — Fase 8 la amplía
@@ -60,7 +68,7 @@ src/
     types/                  # tipos de dominio compartidos
   services/
     storage/                # Fase 2 — perfiles/PIN vía AsyncStorage; Fase 9 lo amplía
-    audio/                  # Fase 4-5 — texto a voz y grabaciones
+    audio/                  # Fase 3 — texto a voz (speech.ts); Fase 5 agrega grabaciones
 
 assets/
   images/, sounds/, fonts/  # medios estáticos del bundle
@@ -107,3 +115,29 @@ fases correspondientes) y Modo Adulto protegido por PIN con administración
 básica de perfiles. La persistencia usa
 `@react-native-async-storage/async-storage` a través de
 `src/services/storage`.
+
+## Estado de la Fase 3
+
+Sustituye la pantalla `ComingSoon` de "Mi Voz" por el comunicador AAC real,
+sin tocar el resto de la Fase 2. Puntos de diseño relevantes:
+
+- **Aislamiento por perfil real, no solo por tipo**: las tarjetas se
+  guardan en AsyncStorage con una clave por `profileId`
+  (`sense-play/aac/cards/<id>`), igual que perfiles y PIN. Nunca se leen ni
+  escriben tarjetas de un perfil que no sea el pedido explícitamente.
+- **Navegador anidado**: `AacNavigator` se monta como una sola pantalla del
+  `RootNavigator` (ruta `AacCommunicator`) y trae su propio
+  `PhraseContext`, que así se crea y destruye junto con la sesión de "Mi
+  Voz" sin necesitar limpieza manual.
+- **Separación Modo Niño / Modo Adulto reforzada**: `AacHomeScreen` y
+  `AacCategoryScreen` (Modo Niño) no importan nada de edición; crear,
+  editar, eliminar, marcar favorito o reordenar tarjetas vive únicamente en
+  `AacManagerScreen`/`AacCardFormScreen`, alcanzables solo después del PIN
+  de `PinGateScreen` (Fase 2).
+- **Texto a voz local**: `services/audio/speech.ts` envuelve `expo-speech`
+  (sin servicios externos de pago), español por defecto, con la API
+  preparada para otros idiomas más adelante.
+- **Extensión aditiva del endurecimiento de errores**: `getItem` en
+  `services/storage/asyncStorage.ts` ahora captura `JSON.parse` inválido y
+  devuelve `null` en vez de lanzar, beneficiando también a los
+  repositorios de perfiles y PIN de la Fase 2.

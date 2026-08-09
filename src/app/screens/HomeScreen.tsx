@@ -39,7 +39,7 @@ export function HomeScreen({ navigation }: Props) {
         <BigButton
           label="Mi Voz"
           emoji="🗣️"
-          onPress={() => navigation.navigate('ComingSoon', { title: 'Mi Voz', emoji: '🗣️' })}
+          onPress={() => navigation.navigate('AacCommunicator')}
           accessibilityHint="Abre el comunicador de tarjetas"
         />
         <View style={styles.spacer} />

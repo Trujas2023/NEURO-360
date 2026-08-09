@@ -14,13 +14,17 @@ tiempo y deben reconfirmarse antes de enviar la app a revisión.
   instalará ningún SDK de ads, analítica de comportamiento o atribución.
 - **Sin recopilación de datos innecesaria**: no hay ubicación, contactos,
   red social ni chat. El único acceso a cámara/galería es la foto de
-  avatar del perfil infantil (Fase 2, `expo-image-picker`) y es:
+  avatar del perfil infantil (Fase 2) y, desde la Fase 3, la fotografía
+  opcional de las tarjetas del comunicador (`expo-image-picker`, misma
+  dependencia, sin instalar nada nuevo). En ambos casos es:
   - iniciado explícitamente por un adulto, solo alcanzable dentro de Modo
     Adulto (protegido por PIN desde la Fase 2),
-  - almacenado únicamente en el dispositivo (offline-first),
+  - almacenado únicamente en el dispositivo (offline-first; las tarjetas
+    además quedan aisladas por perfil, nunca se mezclan entre niños),
   - sin subida a servidores propios ni de terceros.
   El mismo criterio aplicará a las grabaciones de voz personalizadas del
-  comunicador (Fase 5).
+  comunicador (Fase 5). El texto a voz de la Fase 3 (`expo-speech`) se
+  ejecuta localmente en el dispositivo, sin servicio externo.
 - **`android.permissions` en `app.json` se mantiene vacío**; los permisos
   de cámara/galería los agrega automáticamente el config plugin de
   `expo-image-picker` (declarado en `app.json`) al generar el proyecto

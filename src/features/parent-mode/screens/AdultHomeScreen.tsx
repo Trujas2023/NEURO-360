@@ -42,6 +42,14 @@ export function AdultHomeScreen({ navigation }: Props) {
             <Text style={styles.rowName}>{profile.name}</Text>
             <View style={styles.rowActions}>
               <BigButton
+                label="Tarjetas"
+                emoji="🗣️"
+                variant="secondary"
+                fullWidth={false}
+                onPress={() => navigation.navigate('AacManager', { profileId: profile.id })}
+              />
+              <View style={styles.rowActionSpacer} />
+              <BigButton
                 label="Editar"
                 variant="secondary"
                 fullWidth={false}
@@ -111,6 +119,8 @@ const styles = StyleSheet.create({
   },
   rowActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: spacing.xs,
     marginTop: spacing.sm,
     width: '100%',
   },

@@ -3,6 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ComingSoonScreen } from '@app/screens/ComingSoonScreen';
 import { HomeScreen } from '@app/screens/HomeScreen';
 import { WelcomeScreen } from '@app/screens/WelcomeScreen';
+import { AacNavigator } from '@features/aac-communicator/navigation/AacNavigator';
+import { AacCardFormScreen } from '@features/aac-communicator/screens/AacCardFormScreen';
+import { AacManagerScreen } from '@features/aac-communicator/screens/AacManagerScreen';
 import { AdultHomeScreen } from '@features/parent-mode/screens/AdultHomeScreen';
 import { PinGateScreen } from '@features/parent-mode/screens/PinGateScreen';
 import { ProfileFormScreen } from '@features/profiles/screens/ProfileFormScreen';
@@ -31,6 +34,9 @@ export function RootNavigator() {
       <Stack.Screen name="ComingSoon" component={ComingSoonScreen} />
       <Stack.Screen name="PinGate" component={PinGateScreen} />
       <Stack.Screen name="AdultHome" component={AdultHomeScreen} />
+      <Stack.Screen name="AacCommunicator" component={AacNavigator} />
+      <Stack.Screen name="AacManager" component={AacManagerScreen} />
+      <Stack.Screen name="AacCardForm" component={AacCardFormScreen} />
     </Stack.Navigator>
   );
 }

@@ -10,3 +10,11 @@ export const APP_MODES = {
 } as const;
 
 export type AppMode = (typeof APP_MODES)[keyof typeof APP_MODES];
+
+/**
+ * Idioma por defecto del texto a voz (Fase 3). Se guarda como constante
+ * centralizada para que agregar selección de idioma por perfil en el
+ * futuro solo implique leer ese valor desde las preferencias en vez de
+ * este default fijo.
+ */
+export const DEFAULT_SPEECH_LANGUAGE = 'es-ES';

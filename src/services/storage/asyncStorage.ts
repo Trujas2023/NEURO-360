@@ -6,7 +6,12 @@ export async function getItem<T>(key: string): Promise<T | null> {
   if (raw === null) {
     return null;
   }
-  return JSON.parse(raw) as T;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    // Dato corrupto o de un formato anterior: se ignora en lugar de romper la app.
+    return null;
+  }
 }
 
 export async function setItem<T>(key: string, value: T): Promise<void> {
