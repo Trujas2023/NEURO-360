@@ -273,3 +273,36 @@ PIN de Modo Adulto, favoritos, `app.json`, ni el package name/bundle id
   `react-hooks/purity`/`react-hooks/refs` — son manejadores de eventos
   reales (toques), no código que corre durante el render; el linter no
   puede seguir esa indirección a través de `PanResponder.create`.
+
+### Corrección — audio sensorial real (sin TTS como efecto de sonido)
+
+La primera entrega de Mundo Sensorial usaba texto a voz (`expo-speech`)
+con onomatopeyas como sustituto de efectos de sonido, por no contar con
+archivos de audio propios. Se corrigió por completo:
+
+- **`assets/sounds/sensory/*.wav`** (10 archivos, mono 22.05 kHz/16 bits,
+  generados una sola vez con síntesis local, sin descargar nada de
+  internet): `bubble_pop.wav`, `bird.wav`, `water_drop.wav`, `waves.wav`,
+  `bell.wav`, `drum.wav`, `clap.wav`, `cat.wav`, `car_horn.wav`,
+  `sparkle.wav`. Todos con ataque/caída suaves y volumen normalizado
+  moderado, sin picos ni clics.
+- **`src/shared/types/assets.d.ts`** (nuevo): declaración ambiental
+  `declare module '*.wav'` para poder importar los WAV como módulo
+  (Metro los resuelve a un id numérico, igual que las imágenes).
+- **`constants/soundAssets.ts`** (nuevo): centraliza los `import` de los
+  10 archivos vía el alias `@assets/*` ya existente en `babel.config.js`
+  y `tsconfig.json`.
+- **`hooks/useSensoryFeedback.ts`**: `playCue(text, ...)` (texto a voz) se
+  reemplazó por `playSound(asset, ...)`, que reproduce el archivo local
+  con `createAudioPlayer` de `expo-audio` — la misma librería que ya usa
+  el comunicador AAC (`services/audio/playback.ts`) para grabaciones de
+  voz. Cada reproductor es de corta vida y se libera al terminar.
+- **Llamadores actualizados**: `BubblesGame` (pop), `FollowTheLightGame`
+  (destello positivo al tocar la luz) y `TouchAndListenScreen`/
+  `constants/touchAndListenSounds.ts` (los 8 sonidos causa-efecto, ahora
+  con campo `asset` en vez de `cue`).
+- Se preservan los controles ya existentes de sonido ON/OFF, vibración,
+  volumen y modo reducido de estímulos: siguen decidiendo si `playSound`
+  suena o no, exactamente igual que antes con `playCue`.
+- No se agregó ninguna dependencia nueva: `expo-audio` ya era parte del
+  proyecto (v0.2, grabación de voz de tarjetas AAC).

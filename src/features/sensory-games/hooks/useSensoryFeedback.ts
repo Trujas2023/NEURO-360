@@ -1,11 +1,10 @@
+import { createAudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import { useCallback } from 'react';
 
-import { speak } from '@services/audio/speech';
-
 export interface SensoryFeedback {
-  /** Reproduce un sonido corto (texto a voz local) solo si `enabled` es `true`. */
-  playCue: (text: string, enabled: boolean, volume?: number) => void;
+  /** Reproduce un efecto de sonido local empaquetado (ver `constants/soundAssets.ts`) solo si `enabled` es `true`. */
+  playSound: (asset: number, enabled: boolean, volume?: number) => void;
   /** Vibración corta solo si `enabled` es `true`. Nunca lanza si el dispositivo no vibra. */
   vibrate: (enabled: boolean) => void;
 }
@@ -16,11 +15,30 @@ export interface SensoryFeedback {
  * que cada juego pueda ofrecer un ajuste en el momento (ver "Configurable"
  * de cada juego) sin persistirlo — los valores iniciales de esos
  * controles salen de `useSensoryRuntime`.
+ *
+ * Los efectos de sonido son archivos de audio reales empaquetados
+ * localmente (sin texto a voz, sin servicios externos): cada llamada crea
+ * un reproductor de corta vida con `expo-audio` (la misma librería que ya
+ * usa el comunicador AAC para reproducir voces grabadas) y lo libera solo
+ * cuando termina de sonar.
  */
 export function useSensoryFeedback(): SensoryFeedback {
-  const playCue = useCallback((text: string, enabled: boolean, volume = 0.8) => {
-    if (enabled) {
-      speak(text, { volume });
+  const playSound = useCallback((asset: number, enabled: boolean, volume = 0.8) => {
+    if (!enabled) {
+      return;
+    }
+    try {
+      const player = createAudioPlayer(asset);
+      player.volume = volume;
+      const subscription = player.addListener('playbackStatusUpdate', (status) => {
+        if (status.didJustFinish) {
+          subscription.remove();
+          player.remove();
+        }
+      });
+      player.play();
+    } catch {
+      // Si el audio falla, el juego sigue funcionando en silencio en vez de romper la pantalla.
     }
   }, []);
 
@@ -33,5 +51,5 @@ export function useSensoryFeedback(): SensoryFeedback {
     });
   }, []);
 
-  return { playCue, vibrate };
+  return { playSound, vibrate };
 }

@@ -21,10 +21,10 @@ const VOLUME_OPTIONS: { value: number; label: string }[] = [
   { value: 1, label: 'Alto' },
 ];
 
-/** Juego 4: botones causa-efecto grandes que reproducen un sonido corto (texto a voz local). */
+/** Juego 4: botones causa-efecto grandes que reproducen un efecto de sonido real local. */
 export function TouchAndListenScreen({ navigation }: Props) {
   const runtime = useSensoryRuntime();
-  const { playCue } = useSensoryFeedback();
+  const { playSound } = useSensoryFeedback();
   const [showControls, setShowControls] = useState(false);
   const [muted, setMuted] = useState(!runtime.soundEnabled);
   const [volume, setVolume] = useState(0.65);
@@ -35,7 +35,7 @@ export function TouchAndListenScreen({ navigation }: Props) {
 
   function handlePlay(sound: TouchAndListenSound) {
     setLastSound(sound);
-    playCue(sound.cue, !muted, volume);
+    playSound(sound.asset, !muted, volume);
   }
 
   function toggleSoundAvailable(id: string) {
@@ -79,7 +79,7 @@ export function TouchAndListenScreen({ navigation }: Props) {
               variant="secondary"
               fullWidth={false}
               disabled={!lastSound}
-              onPress={() => lastSound && playCue(lastSound.cue, !muted, volume)}
+              onPress={() => lastSound && playSound(lastSound.asset, !muted, volume)}
             />
           </View>
 

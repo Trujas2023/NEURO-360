@@ -4,6 +4,7 @@ import { Animated, Easing, LayoutChangeEvent, Pressable, StyleSheet, View } from
 import { colors, radius } from '@shared/theme';
 import { createId } from '@shared/utils/id';
 
+import { SOUND_ASSETS } from '../constants/soundAssets';
 import { useSensoryFeedback } from '../hooks/useSensoryFeedback';
 
 const BUBBLE_COLORS = [colors.accent, colors.primary, colors.blush, colors.lavender, colors.secondary];
@@ -123,7 +124,7 @@ export interface BubblesGameProps {
 export function BubblesGame({ bubbleCount, baseDurationMs, soundEnabled, vibrationEnabled }: BubblesGameProps) {
   const [area, setArea] = useState({ width: 0, height: 0 });
   const [bubbles, setBubbles] = useState<BubbleDescriptor[]>([]);
-  const { playCue, vibrate } = useSensoryFeedback();
+  const { playSound, vibrate } = useSensoryFeedback();
 
   const areaRef = useRef(area);
   useEffect(() => {
@@ -160,7 +161,7 @@ export function BubblesGame({ bubbleCount, baseDurationMs, soundEnabled, vibrati
   }
 
   function handlePop(id: string) {
-    playCue('pop', soundEnabled, 0.6);
+    playSound(SOUND_ASSETS.bubblePop, soundEnabled, 0.5);
     vibrate(vibrationEnabled);
     setBubbles((current) => [
       ...current.filter((bubble) => bubble.id !== id),

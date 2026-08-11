@@ -3,6 +3,7 @@ import { Animated, LayoutChangeEvent, Pressable, StyleSheet, View } from 'react-
 
 import { colors, radius } from '@shared/theme';
 
+import { SOUND_ASSETS } from '../constants/soundAssets';
 import { useSensoryFeedback } from '../hooks/useSensoryFeedback';
 import type { FollowLightTrajectory } from '../types';
 
@@ -28,7 +29,7 @@ export function FollowTheLightGame({ trajectory, speedMultiplier, soundEnabled }
   const [area, setArea] = useState({ width: 0, height: 0 });
   const [position] = useState(() => new Animated.ValueXY({ x: 0, y: 0 }));
   const [scale] = useState(() => new Animated.Value(1));
-  const { playCue } = useSensoryFeedback();
+  const { playSound } = useSensoryFeedback();
   const wanderRef = useRef<WanderState | null>(null);
 
   const handleLayout = (event: LayoutChangeEvent) => {
@@ -87,7 +88,7 @@ export function FollowTheLightGame({ trajectory, speedMultiplier, soundEnabled }
   }, [area.width, area.height, trajectory, speedMultiplier, position]);
 
   function handlePress() {
-    playCue('¡muy bien!', soundEnabled, 0.7);
+    playSound(SOUND_ASSETS.sparkle, soundEnabled, 0.6);
     Animated.sequence([
       Animated.timing(scale, { toValue: 1.5, duration: 180, useNativeDriver: true }),
       Animated.timing(scale, { toValue: 1, duration: 220, useNativeDriver: true }),

@@ -64,10 +64,22 @@ alcanzable únicamente tocando "Ajustes sensoriales" en Mundo Sensorial y
 pasando el PIN (`PinGateScreen`, con un `redirect` configurable que no
 altera su comportamiento por defecto hacia `AdultHome`).
 
-## Sonido sin archivos de audio
+## Sonido: efectos de audio reales, sin texto a voz
 
-No hay archivos de audio empaquetados ni servicios externos: "Toca y
-escucha" y el "pop" de Burbujas reutilizan `@services/audio/speech`
-(texto a voz local) con onomatopeyas cortas ("pío pío", "splash", "pop",
-...). Es una limitación conocida frente a grabaciones reales; ver el
-informe de la Fase 2 para más detalle.
+Los efectos de sonido de Mundo Sensorial (Burbujas, Sigue la luz, Toca y
+escucha) son archivos WAV reales, generados una sola vez y empaquetados
+en `assets/sounds/sensory/` (mono, 22.05 kHz, 16 bits) — no hay texto a
+voz simulando sonidos ni servicios externos ni descargas en tiempo de
+ejecución. `constants/soundAssets.ts` los importa con `require()`/
+`import` (Metro los incluye en el binario) y `hooks/useSensoryFeedback.ts`
+los reproduce con `expo-audio` (`createAudioPlayer`), la misma librería
+que ya usa el comunicador AAC para las grabaciones de voz personalizadas.
+Cada reproductor es de corta vida: se libera solo al terminar de sonar.
+
+Los ocho sonidos de "Toca y escucha" (`bird.wav`, `water_drop.wav`,
+`waves.wav`, `bell.wav`, `drum.wav`, `clap.wav`, `cat.wav`,
+`car_horn.wav`), el "pop" de Burbujas (`bubble_pop.wav`) y el destello
+positivo de Sigue la luz (`sparkle.wav`) están todos suavizados (ataque y
+caída graduales, sin clics ni picos) y normalizados a un volumen
+moderado, pensados para no sobresaltar a niños con hipersensibilidad
+auditiva.

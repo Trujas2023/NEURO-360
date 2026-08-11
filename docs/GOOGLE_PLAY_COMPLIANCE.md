@@ -51,11 +51,14 @@ tiempo y deben reconfirmarse antes de enviar la app a revisión.
   `react-native-svg` (dibujo vectorial en pantalla) y `expo-haptics`
   (vibración corta opcional), no acceden a red, cámara, micrófono ni
   almacenamiento externo — no requieren entrada en `app.json.plugins` ni
-  cambian el permiso alguno. Los sonidos de "Toca y escucha" y el "pop"
-  de Burbujas reutilizan el motor de texto a voz local (`expo-speech`),
-  ya declarado en el punto anterior; no hay archivos de audio nuevos ni
-  llamadas a servicios externos. Los ajustes sensoriales por perfil se
-  guardan en `AsyncStorage`, igual que el resto de los datos offline-first,
+  cambian el permiso alguno. Los efectos de sonido (Burbujas, Sigue la
+  luz, "Toca y escucha") son 10 archivos WAV reales, generados una sola
+  vez y empaquetados en `assets/sounds/sensory/`, reproducidos con
+  `expo-audio` (ya declarado en el punto anterior para las grabaciones de
+  voz de tarjetas) — no usan texto a voz, no se descargan en tiempo de
+  ejecución y no llaman a ningún servicio externo. Los ajustes sensoriales
+  por perfil se guardan en `AsyncStorage`, igual que el resto de los datos
+  offline-first,
   y se aíslan y eliminan por perfil (`profileDataRegistry`).
 
 ## Pendiente para fases posteriores
