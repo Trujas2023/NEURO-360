@@ -24,8 +24,14 @@ a la siguiente.
   Corrección de mantenimiento incluida: al eliminar un perfil o una
   tarjeta también se borran sus fotos/audios asociados.
 - [ ] Fase 5 — Personalización para padres *(cubierta por v0.2: tarjetas, fotos y grabación de voz; falta lo que surja más adelante)*.
-- [ ] Fase 6 — Primer juego sensorial.
-- [ ] Fase 7 — Resto de juegos.
+- [x] **Fase 2 (Mundo Sensorial) — "Juega & Regula" completo.** Ver
+  `src/features/sensory-games/README.md` y `docs/ARCHITECTURE.md`. Los
+  seis juegos (Burbujas, Colores mágicos, Sigue la luz, Toca y escucha,
+  Ondas calmantes, Dibujo sensorial), sin puntuación obligatoria, más
+  ajustes sensoriales por perfil (Modo Adulto, vía PIN). Cubre lo
+  originalmente planeado para las Fases 6-7.
+- [x] ~~Fase 6 — Primer juego sensorial~~ *(cubierta arriba)*.
+- [x] ~~Fase 7 — Resto de juegos~~ *(cubierta arriba)*.
 - [ ] Fase 8 — Modo adulto y controles (PIN).
 - [ ] Fase 9 — Almacenamiento offline.
 - [ ] Fase 10 — Diseño definitivo.

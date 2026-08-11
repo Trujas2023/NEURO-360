@@ -46,6 +46,17 @@ tiempo y deben reconfirmarse antes de enviar la app a revisión.
 - **Sin enlaces externos ni compras dentro de la app** planificados; si en
   el futuro se agregara algo similar, debe evaluarse contra la política de
   Anuncios y Compras de Families antes de implementarse.
+- **Fase 2 (Mundo Sensorial)**: los seis juegos sensoriales son 100% locales
+  y no agregan permisos nuevos. Las dos dependencias incorporadas,
+  `react-native-svg` (dibujo vectorial en pantalla) y `expo-haptics`
+  (vibración corta opcional), no acceden a red, cámara, micrófono ni
+  almacenamiento externo — no requieren entrada en `app.json.plugins` ni
+  cambian el permiso alguno. Los sonidos de "Toca y escucha" y el "pop"
+  de Burbujas reutilizan el motor de texto a voz local (`expo-speech`),
+  ya declarado en el punto anterior; no hay archivos de audio nuevos ni
+  llamadas a servicios externos. Los ajustes sensoriales por perfil se
+  guardan en `AsyncStorage`, igual que el resto de los datos offline-first,
+  y se aíslan y eliminan por perfil (`profileDataRegistry`).
 
 ## Pendiente para fases posteriores
 

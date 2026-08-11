@@ -5,6 +5,10 @@ import { DEFAULT_SPEECH_LANGUAGE } from '@shared/constants/app';
 export interface SpeakOptions {
   /** Código de idioma BCP-47 (p. ej. "es-ES"). Por defecto, español. */
   language?: string;
+  /** Volumen entre 0.0 (silencio) y 1.0 (máximo). Por defecto, el del sistema. */
+  volume?: number;
+  /** Velocidad del habla; 1.0 es la velocidad normal. */
+  rate?: number;
 }
 
 /**
@@ -32,7 +36,7 @@ export function speak(text: string, options: SpeakOptions = {}): void {
     .then(async () => {
       try {
         await Speech.stop();
-        Speech.speak(trimmed, { language });
+        Speech.speak(trimmed, { language, volume: options.volume, rate: options.rate });
       } catch {
         // Si el motor de voz falla, la app sigue funcionando en silencio
         // en vez de romper la pantalla (Módulo 15).

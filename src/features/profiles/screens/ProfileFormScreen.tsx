@@ -6,7 +6,7 @@ import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'rea
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { deleteLocalFile, persistLocalFile } from '@services/media/localFiles';
-import { BigButton, ProfileAvatar, ScreenContainer } from '@shared/components';
+import { BigButton, OptionRow, ProfileAvatar, ScreenContainer } from '@shared/components';
 import { AVATAR_COLORS, DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
 import { colors, radius, spacing, typography } from '@shared/theme';
 import type { AacCardSize, AacColumns, AacDisplayMode } from '@shared/types';
@@ -29,35 +29,6 @@ const COLUMNS_OPTIONS: { value: AacColumns; label: string }[] = [
   { value: 3, label: '3' },
   { value: 4, label: '4' },
 ];
-
-function OptionRow<T extends string | number>({
-  options,
-  value,
-  onChange,
-}: {
-  options: { value: T; label: string }[];
-  value: T;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <View style={styles.optionRow}>
-      {options.map((option) => (
-        <Pressable
-          key={String(option.value)}
-          onPress={() => onChange(option.value)}
-          accessibilityRole="button"
-          accessibilityLabel={option.label}
-          accessibilityState={{ selected: option.value === value }}
-          style={[styles.optionChip, option.value === value && styles.optionChipSelected]}
-        >
-          <Text style={[styles.optionChipText, option.value === value && styles.optionChipTextSelected]}>
-            {option.label}
-          </Text>
-        </Pressable>
-      ))}
-    </View>
-  );
-}
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProfileForm'>;
 
@@ -284,32 +255,6 @@ const styles = StyleSheet.create({
   swatchRow: {
     flexDirection: 'row',
     gap: spacing.sm,
-  },
-  optionRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  optionChip: {
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: radius.pill,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.md,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  optionChipSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  optionChipText: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.medium,
-    color: colors.textPrimary,
-  },
-  optionChipTextSelected: {
-    color: colors.onPrimary,
   },
   swatch: {
     width: 40,

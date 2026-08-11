@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
@@ -13,7 +13,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'PinGate'>;
 
 type Stage = 'checking' | 'enter' | 'create-step1' | 'create-step2';
 
-export function PinGateScreen({ navigation }: Props) {
+export function PinGateScreen({ navigation, route }: Props) {
   const [stage, setStage] = useState<Stage>('checking');
   const [value, setValue] = useState('');
   const [firstPin, setFirstPin] = useState('');
@@ -31,6 +31,16 @@ export function PinGateScreen({ navigation }: Props) {
     };
   }, []);
 
+  const redirect = route.params?.redirect;
+
+  const redirectAfterSuccess = useCallback(() => {
+    if (redirect?.screen === 'SensorySettings') {
+      navigation.replace('SensorySettings', redirect.params);
+    } else {
+      navigation.replace('AdultHome');
+    }
+  }, [redirect, navigation]);
+
   useEffect(() => {
     if (value.length < ADULT_PIN_LENGTH) {
       return;
@@ -40,7 +50,7 @@ export function PinGateScreen({ navigation }: Props) {
       if (stage === 'enter') {
         const valid = await verifyAdultPin(value);
         if (valid) {
-          navigation.replace('AdultHome');
+          redirectAfterSuccess();
         } else {
           setError('PIN incorrecto. Inténtalo de nuevo.');
           setValue('');
@@ -53,7 +63,7 @@ export function PinGateScreen({ navigation }: Props) {
       } else if (stage === 'create-step2') {
         if (value === firstPin) {
           await setAdultPin(value);
-          navigation.replace('AdultHome');
+          redirectAfterSuccess();
         } else {
           setError('Los PIN no coinciden. Vuelve a crearlo.');
           setValue('');
@@ -62,7 +72,7 @@ export function PinGateScreen({ navigation }: Props) {
         }
       }
     })();
-  }, [value, stage, firstPin, navigation]);
+  }, [value, stage, firstPin, redirectAfterSuccess]);
 
   if (stage === 'checking') {
     return (

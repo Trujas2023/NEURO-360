@@ -57,7 +57,15 @@ src/
       components/                # CategoryTile, AacCardTile, PhraseBar, ...
       navigation/                 # AacNavigator (stack anidado de Modo Niño)
       screens/                     # AacHome/AacCategory (niño) + Manager/CardForm (adulto)
-    sensory-games/         # Fase 6-7 — "Juega & Regula"
+    sensory-games/         # Fase 2 (Mundo Sensorial) — "Juega & Regula" (ver README del feature)
+      types/                 # SensoryPreferences, ids/opciones de cada juego
+      constants/              # las 6 tarjetas de juego, defaults, sonidos de Toca y escucha
+      storage/                 # sensoryPreferencesRepository (por perfil)
+      hooks/                    # useSensoryPreferences/useSensoryRuntime/useSensoryFeedback
+      components/                # GameCard, SensoryLayout, ToggleIconButton
+      navigation/                 # SensoryNavigator (stack anidado de Modo Niño)
+      games/                       # el "canvas" jugable de cada minijuego
+      screens/                      # SensoryHome + una pantalla por juego + SensorySettings (adulto)
     profiles/              # Fase 2 — perfiles, selector y alta/edición
     parent-mode/            # Fase 2 (PIN + admin básica) — Fase 8 la amplía
   shared/
@@ -220,3 +228,48 @@ huérfanos (ver más abajo).
   reproducir y hablar están envueltos en try/catch para que un fallo de
   audio nunca rompa la pantalla; sin permiso de cámara o micrófono, el
   formulario de tarjeta sigue funcionando (foto o grabación opcionales).
+
+## Estado — Mundo Sensorial (Fase 2)
+
+Implementa "Juega & Regula" completo sobre la arquitectura existente, sin
+modificar el comunicador AAC, perfiles, fotografías, audios grabados, el
+PIN de Modo Adulto, favoritos, `app.json`, ni el package name/bundle id
+(`com.senseplayadventures.app`). No se generó ningún `eas.json` ni build.
+
+- **Mismo patrón de navegador anidado que "Mi Voz"**: `SensoryNavigator`
+  se monta como una sola pantalla del stack raíz (ruta `SensoryWorld`).
+- **PIN reutilizado y extendido de forma retrocompatible**: `PinGate`
+  ahora acepta un `redirect` opcional (`{ screen: 'SensorySettings',
+  params }`); sin ese parámetro se comporta exactamente igual que antes
+  (`AdultHome`), así que el flujo de Modo Adulto ya existente no cambia.
+  `SensoryHomeScreen` es la única pantalla nueva que lo usa, para llegar
+  a `SensorySettingsScreen` (Modo Adulto) desde Mundo Sensorial.
+- **Reutilización explícita en vez de duplicar**: el sonido general
+  (`soundEnabled`) y la reducción de movimiento (`reduceMotion`) de
+  `ChildProfilePreferences` (Fase 2) se leen tal cual — Mundo Sensorial
+  solo agrega lo que le falta (`SensoryPreferences`: vibración, velocidad
+  de animaciones, nivel visual, duración de sesión, modo reducido de
+  estímulos), en su propio almacenamiento por perfil, registrado en
+  `profileDataRegistry` igual que `aacCardsRepository`. También se
+  extrajo `OptionRow` (antes duplicado dentro de `ProfileFormScreen`) a
+  `shared/components`, y se reutiliza en `SensorySettingsScreen` y en
+  cada juego.
+- **Ajustes "en el momento" vs. ajustes de perfil**: los controles
+  "Configurable" de cada juego (velocidad, paleta, trayectoria, volumen,
+  sonidos disponibles, grosor, brillo, ...) son estado local del juego —
+  se inicializan con los valores por defecto del perfil y cualquiera
+  puede tocarlos sin PIN, mientras que los ajustes generales por perfil
+  viven exclusivamente en `SensorySettingsScreen`, detrás del PIN.
+- **Sin dependencias nuevas para efectos "flashy"**: se usa `Animated`
+  (ya incluido en React Native) para todas las animaciones, con
+  duraciones lentas y sin parpadeos; `react-native-svg` (nueva, estándar
+  y compatible con Expo Go) para dibujar círculos/trazos con precisión en
+  Colores mágicos, Ondas calmantes y Dibujo sensorial; `expo-haptics`
+  (nueva) para la vibración opcional. Ningún juego depende de una
+  conexión a internet ni de un servicio externo.
+- **Patrón de PanResponder documentado**: los manejadores de gestos
+  táctiles (Colores mágicos, Ondas calmantes, Dibujo sensorial) llevan un
+  comentario explicando por qué se desactivan puntualmente las reglas
+  `react-hooks/purity`/`react-hooks/refs` — son manejadores de eventos
+  reales (toques), no código que corre durante el render; el linter no
+  puede seguir esa indirección a través de `PanResponder.create`.

@@ -10,6 +10,8 @@ import { AdultHomeScreen } from '@features/parent-mode/screens/AdultHomeScreen';
 import { PinGateScreen } from '@features/parent-mode/screens/PinGateScreen';
 import { ProfileFormScreen } from '@features/profiles/screens/ProfileFormScreen';
 import { ProfileSelectorScreen } from '@features/profiles/screens/ProfileSelectorScreen';
+import { SensoryNavigator } from '@features/sensory-games/navigation/SensoryNavigator';
+import { SensorySettingsScreen } from '@features/sensory-games/screens/SensorySettingsScreen';
 import { colors } from '@shared/theme';
 
 import type { RootStackParamList } from './types';
@@ -37,6 +39,8 @@ export function RootNavigator() {
       <Stack.Screen name="AacCommunicator" component={AacNavigator} />
       <Stack.Screen name="AacManager" component={AacManagerScreen} />
       <Stack.Screen name="AacCardForm" component={AacCardFormScreen} />
+      <Stack.Screen name="SensoryWorld" component={SensoryNavigator} />
+      <Stack.Screen name="SensorySettings" component={SensorySettingsScreen} />
     </Stack.Navigator>
   );
 }
