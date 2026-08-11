@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { deleteLocalFile } from '@services/media/localFiles';
 import {
   getActiveProfileId,
   getProfiles,
@@ -88,6 +89,8 @@ export function ProfilesProvider({ children }: { children: ReactNode }) {
 
   const deleteProfile = useCallback(
     async (id: string) => {
+      const profileToDelete = profiles.find((profile) => profile.id === id);
+
       setProfiles((current) => {
         const next = current.filter((profile) => profile.id !== id);
         saveProfiles(next);
@@ -95,16 +98,17 @@ export function ProfilesProvider({ children }: { children: ReactNode }) {
       });
 
       // Borra también, de forma aislada, cualquier dato guardado exclusivamente
-      // para este perfil (tarjetas AAC hoy; otros datos por perfil en el futuro),
-      // sin tocar el almacenamiento de ningún otro perfil.
+      // para este perfil (tarjetas AAC y sus fotos/audios hoy; otros datos por
+      // perfil en el futuro), sin tocar el almacenamiento de ningún otro perfil.
       await cleanupProfileData(id);
+      deleteLocalFile(profileToDelete?.avatarUri);
 
       if (activeProfileId === id) {
         setActiveProfileId(null);
         await persistActiveProfileId(null);
       }
     },
-    [activeProfileId],
+    [activeProfileId, profiles],
   );
 
   const selectProfile = useCallback(async (id: string) => {

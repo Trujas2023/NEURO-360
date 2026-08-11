@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { deleteLocalFile } from '@services/media/localFiles';
 import { createId } from '@shared/utils/id';
 
 import { buildDefaultCards } from '../constants/seedCards';
@@ -15,6 +16,8 @@ export interface UseAacCardsResult {
   deleteCard: (id: string) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
   moveCard: (id: string, direction: 'up' | 'down') => Promise<void>;
+  /** Módulo 13: incrementa el contador de uso de una tarjeta (sin registrar la frase completa). */
+  recordUsage: (id: string) => Promise<void>;
 }
 
 /** Lee las tarjetas guardadas de un perfil, sembrando el vocabulario por defecto la primera vez. */
@@ -91,10 +94,12 @@ export function useAacCards(profileId: string | null): UseAacCardsResult {
         label: input.label.trim(),
         emoji: input.emoji.trim(),
         imageUri: input.imageUri,
+        audioUri: input.audioUri,
         color: input.color,
         isFavorite: input.isFavorite ?? false,
         order: nextOrder,
         createdAt: new Date().toISOString(),
+        useCount: 0,
       };
 
       await persist([...cards, card]);
@@ -105,6 +110,15 @@ export function useAacCards(profileId: string | null): UseAacCardsResult {
 
   const updateCard = useCallback(
     async (id: string, updates: UpdateAacCardInput) => {
+      const previous = cards.find((card) => card.id === id);
+      // Si la foto o el audio cambian, se borra el archivo reemplazado
+      // para no acumular medios huérfanos en el dispositivo.
+      if (previous && 'imageUri' in updates && updates.imageUri !== previous.imageUri) {
+        deleteLocalFile(previous.imageUri);
+      }
+      if (previous && 'audioUri' in updates && updates.audioUri !== previous.audioUri) {
+        deleteLocalFile(previous.audioUri);
+      }
       await persist(cards.map((card) => (card.id === id ? { ...card, ...updates } : card)));
     },
     [cards, persist],
@@ -112,6 +126,9 @@ export function useAacCards(profileId: string | null): UseAacCardsResult {
 
   const deleteCard = useCallback(
     async (id: string) => {
+      const target = cards.find((card) => card.id === id);
+      deleteLocalFile(target?.imageUri);
+      deleteLocalFile(target?.audioUri);
       await persist(cards.filter((card) => card.id !== id));
     },
     [cards, persist],
@@ -157,8 +174,31 @@ export function useAacCards(profileId: string | null): UseAacCardsResult {
     [cards, persist],
   );
 
+  const recordUsage = useCallback(
+    async (id: string) => {
+      await persist(
+        cards.map((card) =>
+          card.id === id
+            ? { ...card, useCount: card.useCount + 1, lastUsedAt: new Date().toISOString() }
+            : card,
+        ),
+      );
+    },
+    [cards, persist],
+  );
+
   return useMemo(
-    () => ({ cards, loading, reload, createCard, updateCard, deleteCard, toggleFavorite, moveCard }),
-    [cards, loading, reload, createCard, updateCard, deleteCard, toggleFavorite, moveCard],
+    () => ({
+      cards,
+      loading,
+      reload,
+      createCard,
+      updateCard,
+      deleteCard,
+      toggleFavorite,
+      moveCard,
+      recordUsage,
+    }),
+    [cards, loading, reload, createCard, updateCard, deleteCard, toggleFavorite, moveCard, recordUsage],
   );
 }

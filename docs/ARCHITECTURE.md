@@ -68,7 +68,8 @@ src/
     types/                  # tipos de dominio compartidos
   services/
     storage/                # Fase 2 — perfiles/PIN vía AsyncStorage; Fase 9 lo amplía
-    audio/                  # Fase 3 — texto a voz (speech.ts); Fase 5 agrega grabaciones
+    audio/                  # Fase 3 — texto a voz (speech.ts); v0.2 agrega playback.ts (grabaciones)
+    media/                  # v0.2 — fotos/audios persistentes (localFiles.ts)
 
 assets/
   images/, sounds/, fonts/  # medios estáticos del bundle
@@ -163,3 +164,59 @@ Sobre esa base, la Fase 4 extiende el constructor de frases ya existente:
   producen audio superpuesto.
 - El botón de reproducir la frase pasa a mostrar el emoji 🔊 pedido en esta
   fase (antes ▶️), sin cambiar su comportamiento.
+
+## Estado v0.2 — "Mi Voz" AAC completo
+
+Consolida el comunicador sobre la arquitectura ya construida en las Fases
+1-4, sin renombrar archivos existentes ni tocar navegación, perfiles,
+Modo Adulto, `app.json` (salvo agregar el plugin `expo-audio`) ni el
+package name. Antes de empezar se corrigió una segunda fuga de datos
+huérfanos (ver más abajo).
+
+- **Categorías consolidadas**: las 13 categorías de la Fase 3 se
+  reducen a las 10 pedidas (`favorites`, `needs`, `foodDrink`,
+  `emotions`, `people`, `places`, `activities`, `hurts`, `yesNo`,
+  `quickPhrases`) fusionando comida+bebidas y quiero+no quiero, y
+  agregando "Frases rápidas". Al momento del cambio ningún dispositivo
+  real tenía perfiles con datos guardados (la app todavía no se probó
+  fuera de este entorno), así que renombrar los ids no dejó tarjetas
+  huérfanas.
+- **Frases rápidas sin mecanismo nuevo**: una tarjeta ya podía tener una
+  etiqueta de varias palabras desde la Fase 3 (p. ej. "Quiero ir a casa");
+  la categoría `quickPhrases` solo agrupa tarjetas así, reutilizando el
+  mismo modelo `AacCard`.
+- **Fotos y audio persistentes de verdad**: `services/media/localFiles.ts`
+  copia lo elegido por el picker (o grabado) a `Paths.document`
+  (`expo-file-system`), en vez de guardar la URI de caché temporal que
+  entregan `expo-image-picker`/la grabación — esa caché puede ser
+  liberada por el sistema operativo en cualquier momento. Se aplica a la
+  foto de perfil (Fase 2) y a la foto/audio de cada tarjeta. Al borrar o
+  reemplazar un perfil, una tarjeta, o una foto/grabación durante la
+  edición (antes de guardar), se limpia el archivo que quedó sin
+  referencia — nunca el original hasta que el guardado se confirma, para
+  no dejar un registro apuntando a un archivo ya borrado si se cancela.
+- **Grabación de voz con prioridad sobre TTS**: `expo-audio`
+  (`AudioRecorderField` + `services/audio/playback.ts`). `PhraseContext`
+  reproduce `card.audioUri` si existe; si no, cae a `speak(card.label)`.
+  Gateado por la preferencia de perfil "Hablar al tocar pictograma"
+  (`speakOnTap`), que solo afecta el auto-habla al tocar — el botón
+  Hablar de la frase completa sigue funcionando igual.
+- **Configuración visual por perfil**: `ChildProfilePreferences` suma
+  `cardSize`, `displayMode` y `columns` (Módulo 9), editables en
+  `ProfileFormScreen` y aplicados por `useAacDisplaySettings.ts` en
+  `CategoryTile`/`AacCardTile` (columnas automáticas según
+  `useWindowDimensions`).
+- **Historial básico de uso**: `AacCard.useCount`/`lastUsedAt`,
+  incrementado solo al tocar una tarjeta en Modo Niño
+  (`AacCategoryScreen`); Modo Adulto muestra "Más utilizados" en
+  `AacManagerScreen`. Nunca se registra la frase completa construida,
+  solo conteos por tarjeta (Módulo 13, privacidad).
+- **Segunda corrección de datos huérfanos**: `removeAacCards` (al borrar
+  un perfil) y `deleteCard`/`updateCard` (al borrar o reemplazar una
+  tarjeta) ahora también borran la foto/audio que esa tarjeta tenía
+  guardados localmente.
+- **Manejo de errores (Módulo 15)**: `AacCardVisual`/`ProfileAvatar` caen
+  al pictograma/inicial si la imagen falla al cargar (`onError`); grabar,
+  reproducir y hablar están envueltos en try/catch para que un fallo de
+  audio nunca rompa la pantalla; sin permiso de cámara o micrófono, el
+  formulario de tarjeta sigue funcionando (foto o grabación opcionales).

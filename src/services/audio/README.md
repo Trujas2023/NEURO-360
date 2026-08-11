@@ -9,5 +9,12 @@ Reproducción de voz.
   idiomas más adelante. `speak()` encadena las llamadas en una cola de un
   solo elemento (detiene la reproducción anterior antes de iniciar la
   siguiente), así toques rápidos y sucesivos nunca superponen audio.
-- **Fase 5 (pendiente)**: grabaciones de voz personalizadas de los padres.
-  Candidato técnico: `expo-av`/`expo-audio`.
+  Errores del motor de voz se atrapan y se ignoran: la app sigue
+  funcionando en silencio en vez de romper la pantalla.
+- **v0.2 (implementado)**: `playback.ts` reproduce grabaciones de voz
+  personalizadas (`expo-audio`) guardadas localmente por un adulto. El
+  comunicador prioriza esta grabación sobre el texto a voz cuando existe
+  (ver `features/aac-communicator/context/PhraseContext.tsx`). La
+  grabación en sí (permiso de micrófono, UI de grabar/reproducir/
+  regrabar/eliminar) vive en
+  `features/aac-communicator/components/AudioRecorderField.tsx`.

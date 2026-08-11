@@ -10,69 +10,100 @@ interface SeedDefinition {
 }
 
 /**
- * Vocabulario inicial por defecto. Cubre los ejemplos de la Fase 3
- * (Agua, Comer, Baño, Ayuda, Sí, No, Más, Terminé, Quiero descansar, Me
- * duele, Estoy feliz/triste/enojado, Tengo miedo) y la sección de
- * emociones/necesidades de expresión rápida (uno o dos toques).
+ * Vocabulario inicial por defecto (v0.2): biblioteca completa pedida para
+ * "Mi Voz" — Necesidades, Comida y bebida, Emociones, Personas, Lugares,
+ * Actividades, Dolor/malestar, Sí/No y Frases rápidas (categoría nueva:
+ * cada frase se guarda como una tarjeta con una etiqueta de varias
+ * palabras, así hablarla no requiere construirla palabra por palabra).
+ * Es intencional que algunas palabras se repitan en más de una categoría
+ * (p. ej. "Agua" en Necesidades y en Comida y bebida): así lo pide la
+ * especificación, y cada repetición es una tarjeta independiente.
  */
 const SEED_DEFINITIONS: SeedDefinition[] = [
-  // Comida
-  { categoryId: 'food', label: 'Comer', emoji: '🍽️' },
-  { categoryId: 'food', label: 'Manzana', emoji: '🍎' },
-  { categoryId: 'food', label: 'Pan', emoji: '🍞' },
-  { categoryId: 'food', label: 'Más comida', emoji: '➕' },
-  // Bebidas
-  { categoryId: 'drinks', label: 'Agua', emoji: '💧' },
-  { categoryId: 'drinks', label: 'Leche', emoji: '🥛' },
-  { categoryId: 'drinks', label: 'Jugo', emoji: '🧃' },
-  // Quiero
-  { categoryId: 'want', label: 'Quiero', emoji: '❤️' },
-  { categoryId: 'want', label: 'Yo', emoji: '🙋' },
-  { categoryId: 'want', label: 'Sí', emoji: '✅' },
-  { categoryId: 'want', label: 'Más', emoji: '➕' },
-  // No quiero
-  { categoryId: 'dontWant', label: 'No quiero', emoji: '🚫' },
-  { categoryId: 'dontWant', label: 'No', emoji: '❌' },
-  { categoryId: 'dontWant', label: 'Terminé', emoji: '🏁' },
-  { categoryId: 'dontWant', label: 'Quiero parar', emoji: '🛑' },
+  // Necesidades
+  { categoryId: 'needs', label: 'Agua', emoji: '💧' },
+  { categoryId: 'needs', label: 'Baño', emoji: '🚽' },
+  { categoryId: 'needs', label: 'Comer', emoji: '🍽️' },
+  { categoryId: 'needs', label: 'Descansar', emoji: '🛌' },
+  { categoryId: 'needs', label: 'Ayuda', emoji: '🆘' },
+  { categoryId: 'needs', label: 'Dormir', emoji: '😴' },
+  { categoryId: 'needs', label: 'Más', emoji: '➕' },
+  { categoryId: 'needs', label: 'Terminé', emoji: '🏁' },
+  { categoryId: 'needs', label: 'Espera', emoji: '⏳' },
+  { categoryId: 'needs', label: 'Quiero estar solo', emoji: '🙅' },
+  // Comida y bebida
+  { categoryId: 'foodDrink', label: 'Agua', emoji: '💧' },
+  { categoryId: 'foodDrink', label: 'Leche', emoji: '🥛' },
+  { categoryId: 'foodDrink', label: 'Jugo', emoji: '🧃' },
+  { categoryId: 'foodDrink', label: 'Manzana', emoji: '🍎' },
+  { categoryId: 'foodDrink', label: 'Plátano', emoji: '🍌' },
+  { categoryId: 'foodDrink', label: 'Galleta', emoji: '🍪' },
+  { categoryId: 'foodDrink', label: 'Yogur', emoji: '🥣' },
+  { categoryId: 'foodDrink', label: 'Comida', emoji: '🍽️' },
+  { categoryId: 'foodDrink', label: 'Snack', emoji: '🍿' },
   // Emociones
-  { categoryId: 'emotions', label: 'Estoy feliz', emoji: '😊' },
-  { categoryId: 'emotions', label: 'Estoy triste', emoji: '😢' },
-  { categoryId: 'emotions', label: 'Estoy enojado', emoji: '😡' },
-  { categoryId: 'emotions', label: 'Tengo miedo', emoji: '😨' },
-  { categoryId: 'emotions', label: 'Estoy cansado', emoji: '😴' },
-  // Me duele
-  { categoryId: 'hurts', label: 'Me duele', emoji: '🤕' },
-  { categoryId: 'hurts', label: 'Me duele la cabeza', emoji: '🤕' },
-  { categoryId: 'hurts', label: 'Me duele la panza', emoji: '🤕' },
-  // Baño
-  { categoryId: 'bathroom', label: 'Baño', emoji: '🚽' },
-  { categoryId: 'bathroom', label: 'Necesito ir al baño', emoji: '🚽' },
-  { categoryId: 'bathroom', label: 'Lavarme las manos', emoji: '🧼' },
-  // Lugares
-  { categoryId: 'places', label: 'Casa', emoji: '🏠' },
-  { categoryId: 'places', label: 'Quiero ir a casa', emoji: '🏠' },
-  { categoryId: 'places', label: 'Quiero irme', emoji: '🚪' },
-  { categoryId: 'places', label: 'Escuela', emoji: '🏫' },
-  // Personas
+  { categoryId: 'emotions', label: 'Feliz', emoji: '😊' },
+  { categoryId: 'emotions', label: 'Triste', emoji: '😢' },
+  { categoryId: 'emotions', label: 'Enojado', emoji: '😡' },
+  { categoryId: 'emotions', label: 'Asustado', emoji: '😨' },
+  { categoryId: 'emotions', label: 'Cansado', emoji: '😴' },
+  { categoryId: 'emotions', label: 'Nervioso', emoji: '😬' },
+  { categoryId: 'emotions', label: 'Frustrado', emoji: '😤' },
+  { categoryId: 'emotions', label: 'Tranquilo', emoji: '😌' },
+  { categoryId: 'emotions', label: 'Me duele', emoji: '🤕' },
+  // Personas (se agrega "Yo" para poder armar el ejemplo "Yo quiero agua")
+  { categoryId: 'people', label: 'Yo', emoji: '🙋' },
   { categoryId: 'people', label: 'Mamá', emoji: '👩' },
   { categoryId: 'people', label: 'Papá', emoji: '👨' },
-  { categoryId: 'people', label: 'Familia', emoji: '👨‍👩‍👧' },
-  { categoryId: 'people', label: 'Amigo', emoji: '🧑‍🤝‍🧑' },
+  { categoryId: 'people', label: 'Maestro/a', emoji: '🧑‍🏫' },
+  { categoryId: 'people', label: 'Terapeuta', emoji: '🩺' },
+  { categoryId: 'people', label: 'Hermano/a', emoji: '🧒' },
+  { categoryId: 'people', label: 'Abuelo/a', emoji: '👴' },
+  // Lugares
+  { categoryId: 'places', label: 'Casa', emoji: '🏠' },
+  { categoryId: 'places', label: 'Escuela', emoji: '🏫' },
+  { categoryId: 'places', label: 'Baño', emoji: '🚽' },
+  { categoryId: 'places', label: 'Parque', emoji: '🌳' },
+  { categoryId: 'places', label: 'Carro', emoji: '🚗' },
+  { categoryId: 'places', label: 'Terapia', emoji: '🩺' },
   // Actividades
   { categoryId: 'activities', label: 'Jugar', emoji: '🎮' },
-  { categoryId: 'activities', label: 'Ver tele', emoji: '📺' },
-  { categoryId: 'activities', label: 'Leer', emoji: '📖' },
+  { categoryId: 'activities', label: 'Dormir', emoji: '😴' },
+  { categoryId: 'activities', label: 'Comer', emoji: '🍽️' },
+  { categoryId: 'activities', label: 'Ver televisión', emoji: '📺' },
+  { categoryId: 'activities', label: 'Tablet', emoji: '📱' },
+  { categoryId: 'activities', label: 'Salir', emoji: '🚶' },
+  { categoryId: 'activities', label: 'Colorear', emoji: '🎨' },
   { categoryId: 'activities', label: 'Música', emoji: '🎵' },
-  // Necesidades
-  { categoryId: 'needs', label: 'Quiero descansar', emoji: '🛏️' },
-  { categoryId: 'needs', label: 'Tengo sueño', emoji: '😴' },
-  { categoryId: 'needs', label: 'Hay mucho ruido', emoji: '🔊' },
-  { categoryId: 'needs', label: 'Necesito silencio', emoji: '🤫' },
-  // Ayuda
-  { categoryId: 'help', label: 'Ayuda', emoji: '🆘' },
-  { categoryId: 'help', label: 'Necesito ayuda', emoji: '🫂' },
-  { categoryId: 'help', label: 'Ven aquí', emoji: '👋' },
+  // Dolor / malestar
+  { categoryId: 'hurts', label: 'Me duele', emoji: '🤕' },
+  { categoryId: 'hurts', label: 'Cabeza', emoji: '🤕' },
+  { categoryId: 'hurts', label: 'Garganta', emoji: '😷' },
+  { categoryId: 'hurts', label: 'Estómago', emoji: '🤢' },
+  { categoryId: 'hurts', label: 'Dientes', emoji: '🦷' },
+  { categoryId: 'hurts', label: 'Oído', emoji: '👂' },
+  { categoryId: 'hurts', label: 'Mano', emoji: '✋' },
+  { categoryId: 'hurts', label: 'Pie', emoji: '🦶' },
+  { categoryId: 'hurts', label: 'Tengo frío', emoji: '🥶' },
+  { categoryId: 'hurts', label: 'Tengo calor', emoji: '🥵' },
+  // Sí / No
+  { categoryId: 'yesNo', label: 'Sí', emoji: '✅' },
+  { categoryId: 'yesNo', label: 'No', emoji: '❌' },
+  { categoryId: 'yesNo', label: 'No quiero', emoji: '🚫' },
+  { categoryId: 'yesNo', label: 'Quiero', emoji: '❤️' },
+  { categoryId: 'yesNo', label: 'Otra vez', emoji: '🔁' },
+  { categoryId: 'yesNo', label: 'Ya terminé', emoji: '🏁' },
+  // Frases rápidas: cada una habla la frase completa en un solo toque.
+  { categoryId: 'quickPhrases', label: 'Tengo hambre', emoji: '🍽️' },
+  { categoryId: 'quickPhrases', label: 'Tengo sed', emoji: '🥤' },
+  { categoryId: 'quickPhrases', label: 'Quiero ir al baño', emoji: '🚽' },
+  { categoryId: 'quickPhrases', label: 'Necesito ayuda', emoji: '🆘' },
+  { categoryId: 'quickPhrases', label: 'Quiero descansar', emoji: '🛌' },
+  { categoryId: 'quickPhrases', label: 'No quiero', emoji: '🚫' },
+  { categoryId: 'quickPhrases', label: 'Me duele', emoji: '🤕' },
+  { categoryId: 'quickPhrases', label: 'Quiero ir a casa', emoji: '🏠' },
+  { categoryId: 'quickPhrases', label: 'Quiero jugar', emoji: '🎮' },
+  { categoryId: 'quickPhrases', label: 'Necesito espacio', emoji: '🧘' },
 ];
 
 /** Genera el vocabulario inicial de un perfil nuevo (una sola vez, ver `useAacCards`). */
@@ -92,6 +123,7 @@ export function buildDefaultCards(): AacCard[] {
       isFavorite: false,
       order,
       createdAt: new Date().toISOString(),
+      useCount: 0,
     };
   });
 }

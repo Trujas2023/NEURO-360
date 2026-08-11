@@ -32,10 +32,31 @@ export function AacManagerScreen({ route, navigation }: Props) {
     ]);
   }
 
+  const mostUsed = cards
+    .filter((card) => card.useCount > 0)
+    .sort((a, b) => b.useCount - a.useCount)
+    .slice(0, 5);
+
   return (
     <ScreenContainer scrollable>
       <Text style={styles.title}>Comunicador AAC</Text>
       <Text style={styles.subtitle}>Tarjetas del perfil</Text>
+
+      {mostUsed.length > 0 ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📊 Más utilizados</Text>
+          {mostUsed.map((card) => (
+            <View key={card.id} style={styles.usageRow}>
+              <Text style={styles.usageLabel} numberOfLines={1}>
+                {card.emoji} {card.label}
+              </Text>
+              <Text style={styles.usageCount}>
+                {card.useCount} {card.useCount === 1 ? 'uso' : 'usos'}
+              </Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
 
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} />
@@ -188,6 +209,28 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.md,
     color: colors.textPrimary,
   },
+  usageRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  usageLabel: {
+    flex: 1,
+    fontSize: typography.sizes.md,
+    color: colors.textPrimary,
+  },
+  usageCount: {
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+    fontWeight: typography.weights.medium,
+  },
   rowActions: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -197,8 +240,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,3 +1,4 @@
+import { deleteLocalFile } from '@services/media/localFiles';
 import { getItem, removeItem, setItem } from '@services/storage/asyncStorage';
 import { registerProfileDataCleanup } from '@services/storage/profileDataRegistry';
 
@@ -22,6 +23,11 @@ export async function saveAacCards(profileId: string, cards: AacCard[]): Promise
 }
 
 export async function removeAacCards(profileId: string): Promise<void> {
+  const cards = await getAacCards(profileId);
+  cards?.forEach((card) => {
+    deleteLocalFile(card.imageUri);
+    deleteLocalFile(card.audioUri);
+  });
   await removeItem(cardsKey(profileId));
 }
 

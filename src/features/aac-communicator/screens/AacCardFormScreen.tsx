@@ -4,10 +4,12 @@ import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
+import { deleteLocalFile, persistLocalFile } from '@services/media/localFiles';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { AVATAR_COLORS as PALETTE_COLORS } from '@shared/constants/profiles';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
+import { AudioRecorderField } from '../components/AudioRecorderField';
 import { AacCardVisual } from '../components/AacCardVisual';
 import { ASSIGNABLE_CATEGORIES, getCategory } from '../constants/categories';
 import { useAacCards } from '../hooks/useAacCards';
@@ -23,6 +25,8 @@ export function AacCardFormScreen({ route, navigation }: Props) {
   const { profileId, cardId, categoryId: initialCategoryId } = route.params;
   const { cards, createCard, updateCard } = useAacCards(profileId);
   const editingCard = useMemo(() => cards.find((card) => card.id === cardId) ?? null, [cards, cardId]);
+  const originalImageUri = editingCard?.imageUri;
+  const originalAudioUri = editingCard?.audioUri;
 
   const defaultCategoryId = editingCard?.categoryId ?? initialCategoryId ?? ASSIGNABLE_CATEGORIES[0].id;
 
@@ -30,6 +34,7 @@ export function AacCardFormScreen({ route, navigation }: Props) {
   const [label, setLabel] = useState(editingCard?.label ?? '');
   const [emoji, setEmoji] = useState(editingCard?.emoji ?? getCategory(defaultCategoryId)?.emoji ?? '🙂');
   const [imageUri, setImageUri] = useState<string | undefined>(editingCard?.imageUri);
+  const [audioUri, setAudioUri] = useState<string | undefined>(editingCard?.audioUri);
   const [color, setColor] = useState(editingCard?.color ?? getCategory(defaultCategoryId)?.color ?? PALETTE_COLORS[0]);
   const [isFavorite, setIsFavorite] = useState(editingCard?.isFavorite ?? false);
   const [saving, setSaving] = useState(false);
@@ -41,6 +46,21 @@ export function AacCardFormScreen({ route, navigation }: Props) {
       setEmoji(getCategory(nextCategoryId)?.emoji ?? emoji);
       setColor(getCategory(nextCategoryId)?.color ?? color);
     }
+  }
+
+  /** Igual que en ProfileFormScreen: si había un pick sin guardar de esta misma sesión, se borra para no acumular huérfanos. */
+  function replaceStagedImage(nextUri: string) {
+    if (imageUri && imageUri !== originalImageUri) {
+      deleteLocalFile(imageUri);
+    }
+    setImageUri(nextUri);
+  }
+
+  function handleAudioChange(nextUri: string | undefined) {
+    if (audioUri && audioUri !== originalAudioUri) {
+      deleteLocalFile(audioUri);
+    }
+    setAudioUri(nextUri);
   }
 
   async function pickFromLibrary() {
@@ -56,7 +76,8 @@ export function AacCardFormScreen({ route, navigation }: Props) {
       quality: 0.6,
     });
     if (!result.canceled && result.assets[0]) {
-      setImageUri(result.assets[0].uri);
+      const persistedUri = await persistLocalFile(result.assets[0].uri, 'card-images', 'jpg');
+      replaceStagedImage(persistedUri);
     }
   }
 
@@ -68,7 +89,8 @@ export function AacCardFormScreen({ route, navigation }: Props) {
     }
     const result = await ImagePicker.launchCameraAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.6 });
     if (!result.canceled && result.assets[0]) {
-      setImageUri(result.assets[0].uri);
+      const persistedUri = await persistLocalFile(result.assets[0].uri, 'card-images', 'jpg');
+      replaceStagedImage(persistedUri);
     }
   }
 
@@ -87,6 +109,7 @@ export function AacCardFormScreen({ route, navigation }: Props) {
           label: trimmedLabel,
           emoji: emoji.trim() || '🙂',
           imageUri,
+          audioUri,
           color,
           isFavorite,
         });
@@ -96,6 +119,7 @@ export function AacCardFormScreen({ route, navigation }: Props) {
           label: trimmedLabel,
           emoji: emoji.trim() || '🙂',
           imageUri,
+          audioUri,
           color,
           isFavorite,
         });
@@ -123,8 +147,21 @@ export function AacCardFormScreen({ route, navigation }: Props) {
         </View>
       </View>
       {imageUri ? (
-        <BigButton label="Quitar foto" variant="ghost" fullWidth={false} onPress={() => setImageUri(undefined)} />
+        <BigButton
+          label="Quitar foto"
+          variant="ghost"
+          fullWidth={false}
+          onPress={() => {
+            if (imageUri !== originalImageUri) {
+              deleteLocalFile(imageUri);
+            }
+            setImageUri(undefined);
+          }}
+        />
       ) : null}
+
+      <Text style={styles.label}>Voz personalizada</Text>
+      <AudioRecorderField value={audioUri} onChange={handleAudioChange} />
 
       <Text style={styles.label}>Palabra o frase</Text>
       <TextInput

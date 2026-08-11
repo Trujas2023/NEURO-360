@@ -11,9 +11,18 @@ export const AVATAR_COLORS: readonly string[] = [
   colors.warning,
 ];
 
+/**
+ * Modo recomendado por defecto (Módulo 9): botones grandes, imagen + texto
+ * grande, alto contraste (colores del tema) y bordes redondeados
+ * (`shared/theme/spacing.radius`).
+ */
 export const DEFAULT_PROFILE_PREFERENCES: ChildProfilePreferences = {
   soundEnabled: true,
   reduceMotion: false,
+  speakOnTap: true,
+  cardSize: 'large',
+  displayMode: 'imageTextLarge',
+  columns: 'auto',
 };
 
 /** Cantidad de dígitos del PIN de Modo Adulto. */

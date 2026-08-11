@@ -30,11 +30,22 @@ export function speak(text: string, options: SpeakOptions = {}): void {
   pending = pending
     .catch(() => {})
     .then(async () => {
-      await Speech.stop();
-      Speech.speak(trimmed, { language });
+      try {
+        await Speech.stop();
+        Speech.speak(trimmed, { language });
+      } catch {
+        // Si el motor de voz falla, la app sigue funcionando en silencio
+        // en vez de romper la pantalla (Módulo 15).
+      }
     });
 }
 
 export function stopSpeaking(): void {
-  pending = pending.catch(() => {}).then(() => Speech.stop());
+  pending = pending.catch(() => {}).then(async () => {
+    try {
+      await Speech.stop();
+    } catch {
+      // Se ignora a propósito.
+    }
+  });
 }

@@ -15,7 +15,15 @@ a la siguiente.
   `expo-speech` para que toques rápidos no generen audio superpuesto.
   Antes de esta fase se corrigió un dato huérfano: al eliminar un perfil
   ahora también se borran sus tarjetas AAC (`services/storage/profileDataRegistry.ts`).
-- [ ] Fase 5 — Personalización para padres *(tarjetas ya cubiertas en Fase 3; falta grabación de voz y otras preferencias)*.
+- [x] **v0.2 — "Mi Voz" AAC completo.** Ver `docs/ARCHITECTURE.md` para el
+  detalle. Consolida el comunicador: 10 categorías, biblioteca de
+  pictogramas ampliada, frases rápidas, grabación de voz por tarjeta
+  (con prioridad sobre texto a voz), fotos/audios persistidos en
+  almacenamiento local propio de la app, favoritos, configuración visual
+  por perfil (tamaño/columnas/modo de vista) e historial básico de uso.
+  Corrección de mantenimiento incluida: al eliminar un perfil o una
+  tarjeta también se borran sus fotos/audios asociados.
+- [ ] Fase 5 — Personalización para padres *(cubierta por v0.2: tarjetas, fotos y grabación de voz; falta lo que surja más adelante)*.
 - [ ] Fase 6 — Primer juego sensorial.
 - [ ] Fase 7 — Resto de juegos.
 - [ ] Fase 8 — Modo adulto y controles (PIN).

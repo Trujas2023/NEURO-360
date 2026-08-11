@@ -2,9 +2,19 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
+import { playSound } from '@services/audio/playback';
 import { speak } from '@services/audio/speech';
 
 import type { AacCard } from '../types';
+
+/** Prioridad de audio (Módulo 4): grabación personalizada primero; si no existe, texto a voz. */
+function playCard(card: AacCard): void {
+  if (card.audioUri) {
+    playSound(card.audioUri);
+  } else {
+    speak(card.label);
+  }
+}
 
 interface PhraseContextValue {
   phrase: AacCard[];
@@ -27,16 +37,19 @@ const PhraseContext = createContext<PhraseContextValue | undefined>(undefined);
 export function PhraseProvider({ children }: { children: ReactNode }) {
   const { activeProfile } = useProfiles();
   const soundEnabled = activeProfile?.preferences.soundEnabled ?? true;
+  const speakOnTap = activeProfile?.preferences.speakOnTap ?? true;
   const [phrase, setPhrase] = useState<AacCard[]>([]);
 
   const addCard = useCallback(
     (card: AacCard) => {
-      if (soundEnabled) {
-        speak(card.label);
+      // "Hablar al tocar pictograma" (Módulo 4) solo controla este auto-habla
+      // por toque; el botón Hablar de la frase completa funciona igual.
+      if (soundEnabled && speakOnTap) {
+        playCard(card);
       }
       setPhrase((current) => [...current, card]);
     },
-    [soundEnabled],
+    [soundEnabled, speakOnTap],
   );
 
   const removeAt = useCallback((index: number) => {

@@ -17,8 +17,14 @@ type Props = NativeStackScreenProps<AacStackParamList, 'AacCategory'>;
 export function AacCategoryScreen({ route, navigation }: Props) {
   const { categoryId } = route.params;
   const { activeProfile } = useProfiles();
-  const { cards, loading } = useAacCards(activeProfile?.id ?? null);
+  const { cards, loading, recordUsage } = useAacCards(activeProfile?.id ?? null);
   const { addCard } = usePhrase();
+
+  function handleCardPress(card: (typeof cards)[number]) {
+    // Módulo 13: solo se guarda un contador por tarjeta, nunca la frase completa.
+    recordUsage(card.id);
+    addCard(card);
+  }
 
   const category = getCategory(categoryId);
   const visibleCards = cards
@@ -39,7 +45,7 @@ export function AacCategoryScreen({ route, navigation }: Props) {
         <View style={styles.grid}>
           {visibleCards.map((card) => (
             <View key={card.id} style={styles.gridItem}>
-              <AacCardTile card={card} onPress={() => addCard(card)} />
+              <AacCardTile card={card} onPress={() => handleCardPress(card)} />
             </View>
           ))}
         </View>

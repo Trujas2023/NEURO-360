@@ -13,22 +13,26 @@ tiempo y deben reconfirmarse antes de enviar la app a revisión.
 - **Sin publicidad ni SDKs de terceros con fines publicitarios**: no se
   instalará ningún SDK de ads, analítica de comportamiento o atribución.
 - **Sin recopilación de datos innecesaria**: no hay ubicación, contactos,
-  red social ni chat. El único acceso a cámara/galería es la foto de
-  avatar del perfil infantil (Fase 2) y, desde la Fase 3, la fotografía
-  opcional de las tarjetas del comunicador (`expo-image-picker`, misma
-  dependencia, sin instalar nada nuevo). En ambos casos es:
+  red social ni chat. El acceso a cámara/galería/micrófono es: la foto de
+  avatar del perfil infantil (Fase 2), la fotografía opcional de las
+  tarjetas del comunicador (Fase 3) y, desde v0.2, la grabación de voz
+  personalizada por tarjeta (`expo-audio`). En todos los casos es:
   - iniciado explícitamente por un adulto, solo alcanzable dentro de Modo
     Adulto (protegido por PIN desde la Fase 2),
-  - almacenado únicamente en el dispositivo (offline-first; las tarjetas
-    además quedan aisladas por perfil, nunca se mezclan entre niños),
+  - almacenado únicamente en el dispositivo, en un directorio propio de
+    la app (`services/media/localFiles.ts`, sobre `expo-file-system`,
+    v0.2) — no en la caché temporal del picker/grabación, que el sistema
+    operativo podría liberar; las tarjetas y sus fotos/audios además
+    quedan aisladas por perfil, nunca se mezclan entre niños,
   - sin subida a servidores propios ni de terceros.
-  El mismo criterio aplicará a las grabaciones de voz personalizadas del
-  comunicador (Fase 5). El texto a voz de la Fase 3 (`expo-speech`) se
-  ejecuta localmente en el dispositivo, sin servicio externo.
+  El texto a voz (`expo-speech`) se ejecuta localmente en el dispositivo,
+  sin servicio externo.
 - **`android.permissions` en `app.json` se mantiene vacío**; los permisos
-  de cámara/galería los agrega automáticamente el config plugin de
-  `expo-image-picker` (declarado en `app.json`) al generar el proyecto
-  nativo, sin permisos adicionales declarados a mano.
+  de cámara/galería/micrófono los agregan automáticamente los config
+  plugins de `expo-image-picker` y `expo-audio` (declarados en
+  `app.json`, este último con grabación/reproducción en segundo plano
+  deshabilitadas por no ser necesarias) al generar el proyecto nativo,
+  sin permisos adicionales declarados a mano.
 - **PIN de Modo Adulto (Fase 2)**: es una barrera parental (fricción para
   evitar que un niño entre por accidente a la configuración o cree/edite
   perfiles), no un mecanismo de seguridad criptográfica; se guarda en el
@@ -49,10 +53,11 @@ tiempo y deben reconfirmarse antes de enviar la app a revisión.
   desde la Fase 2) es también el lugar natural para exponer, cuando
   corresponda, enlaces a política de privacidad y ajustes de datos, como
   exige la Data Safety section de Play Console.
-- **Fase 9 (almacenamiento offline)**: documentar explícitamente qué datos
-  se guardan (perfiles, vocabulario, fotos, audios) y confirmar que nada
-  sale del dispositivo, como base para completar el formulario de
-  Seguridad de los Datos de Play Console.
+- **Fase 9 (almacenamiento offline)**: perfiles, vocabulario, fotos y
+  audios ya persisten localmente desde la Fase 2/v0.2
+  (`services/storage`, `services/media`); falta formalizar el resto de
+  esa fase (si corresponde) y usar esto como base para completar el
+  formulario de Seguridad de los Datos de Play Console.
 - **Fase 11 (accesibilidad y pruebas)**: validar tamaños de toque, contraste
   y navegación con lector de pantalla, requisitos de accesibilidad además
   de las políticas específicas de contenido infantil.

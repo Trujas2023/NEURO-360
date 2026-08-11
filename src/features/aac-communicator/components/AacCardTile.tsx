@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { AacCardVisual } from './AacCardVisual';
+import { useAacDisplaySettings } from '../hooks/useAacDisplaySettings';
 import type { AacCard } from '../types';
 
 export interface AacCardTileProps {
@@ -14,16 +15,22 @@ export interface AacCardTileProps {
  * Tarjeta grande de comunicación. Un solo toque; sin controles de edición
  * o borrado (eso vive únicamente en Modo Adulto). El color de categoría es
  * solo un refuerzo visual: la palabra y el pictograma/foto son lo que
- * identifica la tarjeta.
+ * identifica la tarjeta. El tamaño, las columnas y si se muestra texto
+ * dependen de la configuración visual del perfil activo (Módulo 9).
  */
 export function AacCardTile({ card, onPress }: AacCardTileProps) {
+  const display = useAacDisplaySettings();
+
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={card.label}
       accessibilityHint="Toca para escuchar y agregar a la frase"
-      style={({ pressed }) => [styles.card, { opacity: pressed ? 0.8 : 1 }]}
+      style={({ pressed }) => [
+        styles.card,
+        { width: display.tileWidth, minHeight: display.minHeight, opacity: pressed ? 0.8 : 1 },
+      ]}
     >
       <View style={[styles.accent, { backgroundColor: card.color }]} />
       {card.isFavorite ? (
@@ -31,18 +38,18 @@ export function AacCardTile({ card, onPress }: AacCardTileProps) {
           ⭐
         </Text>
       ) : null}
-      <AacCardVisual emoji={card.emoji} imageUri={card.imageUri} size={64} />
-      <Text style={styles.label} numberOfLines={2}>
-        {card.label}
-      </Text>
+      <AacCardVisual emoji={card.emoji} imageUri={card.imageUri} size={display.iconSize} />
+      {display.showLabel ? (
+        <Text style={[styles.label, { fontSize: display.fontSize }]} numberOfLines={2}>
+          {card.label}
+        </Text>
+      ) : null}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: 140,
-    minHeight: 140,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
@@ -67,7 +74,6 @@ const styles = StyleSheet.create({
   },
   label: {
     marginTop: spacing.sm,
-    fontSize: typography.sizes.md,
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
     textAlign: 'center',

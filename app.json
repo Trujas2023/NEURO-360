@@ -46,8 +46,16 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Sense & Play Adventures 360 usa la galería para que un adulto elija una foto de perfil del niño.",
-          "cameraPermission": "Sense & Play Adventures 360 usa la cámara para que un adulto tome una foto de perfil del niño."
+          "photosPermission": "Sense & Play Adventures 360 usa la galería para que un adulto elija una foto de perfil o de una tarjeta del comunicador.",
+          "cameraPermission": "Sense & Play Adventures 360 usa la cámara para que un adulto tome una foto de perfil o de una tarjeta del comunicador."
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Sense & Play Adventures 360 usa el micrófono para que un adulto grabe una voz personalizada para una tarjeta del comunicador.",
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
         }
       ]
     ],

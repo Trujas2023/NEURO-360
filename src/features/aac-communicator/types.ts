@@ -19,13 +19,25 @@ export interface AacCard {
   label: string;
   /** Pictograma simple (emoji) usado cuando la tarjeta no tiene foto. */
   emoji: string;
-  /** Foto elegida por un adulto (expo-image-picker). Si existe, reemplaza al emoji. */
+  /**
+   * Foto elegida por un adulto (expo-image-picker), copiada a un archivo
+   * local persistente (`@services/media/localFiles`). Si existe,
+   * reemplaza al emoji.
+   */
   imageUri?: string;
+  /**
+   * Grabación de voz del adulto (expo-audio), copiada a un archivo local
+   * persistente. Si existe, se reproduce en lugar del texto a voz.
+   */
+  audioUri?: string;
   color: string;
   isFavorite: boolean;
   /** Orden dentro de su categoría; menor va primero. */
   order: number;
   createdAt: string;
+  /** Historial básico (Módulo 13): solo conteos, nunca frases completas. */
+  useCount: number;
+  lastUsedAt?: string;
 }
 
 export type CreateAacCardInput = {
@@ -33,6 +45,7 @@ export type CreateAacCardInput = {
   label: string;
   emoji: string;
   imageUri?: string;
+  audioUri?: string;
   color: string;
   isFavorite?: boolean;
 };

@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing } from '@shared/theme';
 
+import { useAacDisplaySettings } from '../hooks/useAacDisplaySettings';
 import type { AacCategory } from '../types';
 
 export interface CategoryTileProps {
@@ -9,8 +10,10 @@ export interface CategoryTileProps {
   onPress: () => void;
 }
 
-/** Botón grande de categoría para la pantalla principal del comunicador. */
+/** Botón grande de categoría para la pantalla principal del comunicador, según la configuración visual del perfil (Módulo 9). */
 export function CategoryTile({ category, onPress }: CategoryTileProps) {
+  const display = useAacDisplaySettings();
+
   return (
     <Pressable
       onPress={onPress}
@@ -18,33 +21,34 @@ export function CategoryTile({ category, onPress }: CategoryTileProps) {
       accessibilityLabel={category.label}
       style={({ pressed }) => [
         styles.tile,
-        { backgroundColor: category.color, opacity: pressed ? 0.85 : 1 },
+        {
+          width: display.tileWidth,
+          minHeight: display.minHeight,
+          backgroundColor: category.color,
+          opacity: pressed ? 0.85 : 1,
+        },
       ]}
     >
-      <Text style={styles.emoji}>{category.emoji}</Text>
-      <Text style={styles.label} numberOfLines={2}>
-        {category.label}
-      </Text>
+      <Text style={{ fontSize: display.iconSize }}>{category.emoji}</Text>
+      {display.showLabel ? (
+        <Text style={[styles.label, { fontSize: display.fontSize }]} numberOfLines={2}>
+          {category.label}
+        </Text>
+      ) : null}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   tile: {
-    width: 120,
-    minHeight: 120,
     borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.sm,
   },
-  emoji: {
-    fontSize: 40,
-  },
   label: {
     marginTop: spacing.xs,
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.bold,
+    fontWeight: '700',
     color: colors.textPrimary,
     textAlign: 'center',
   },

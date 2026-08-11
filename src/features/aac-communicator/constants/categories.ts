@@ -17,20 +17,27 @@ const PALETTE = [
   colors.primaryDark,
 ];
 
+/**
+ * v0.2: se consolidan las categorías de la Fase 3 (13) en las 10 pedidas
+ * por el módulo "Mi Voz" completo. "Comida" + "Bebidas" se unen en
+ * `foodDrink`; "Quiero" + "No quiero" se unen en `yesNo`; "Baño" y
+ * "Ayuda" dejan de ser categorías propias (sus tarjetas pasan a
+ * `places`/`needs`/`quickPhrases`, ver `seedCards.ts`); se agrega
+ * `quickPhrases` ("Frases rápidas"). Ningún perfil real usaba todavía
+ * estas categorías en un dispositivo (la app aún no se probó fuera de
+ * este entorno), así que renombrar los ids no deja datos huérfanos.
+ */
 const DEFINITIONS: Omit<AacCategory, 'color'>[] = [
   { id: FAVORITES_CATEGORY_ID, label: 'Favoritos', emoji: '⭐' },
-  { id: 'food', label: 'Comida', emoji: '🍎' },
-  { id: 'drinks', label: 'Bebidas', emoji: '🥤' },
-  { id: 'want', label: 'Quiero', emoji: '❤️' },
-  { id: 'dontWant', label: 'No quiero', emoji: '🚫' },
-  { id: 'emotions', label: 'Emociones', emoji: '😊' },
-  { id: 'hurts', label: 'Me duele', emoji: '🤕' },
-  { id: 'bathroom', label: 'Baño', emoji: '🚽' },
-  { id: 'places', label: 'Lugares', emoji: '🏠' },
-  { id: 'people', label: 'Personas', emoji: '👨‍👩‍👧' },
-  { id: 'activities', label: 'Actividades', emoji: '🎮' },
   { id: 'needs', label: 'Necesidades', emoji: '🛏️' },
-  { id: 'help', label: 'Ayuda', emoji: '🆘' },
+  { id: 'foodDrink', label: 'Comida y bebida', emoji: '🍎' },
+  { id: 'emotions', label: 'Emociones', emoji: '😊' },
+  { id: 'people', label: 'Personas', emoji: '👨‍👩‍👧' },
+  { id: 'places', label: 'Lugares', emoji: '🏠' },
+  { id: 'activities', label: 'Actividades', emoji: '🎮' },
+  { id: 'hurts', label: 'Dolor / malestar', emoji: '🤕' },
+  { id: 'yesNo', label: 'Sí / No', emoji: '✅' },
+  { id: 'quickPhrases', label: 'Frases rápidas', emoji: '💬' },
 ];
 
 /**
