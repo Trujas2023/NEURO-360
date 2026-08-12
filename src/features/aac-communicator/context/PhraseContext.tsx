@@ -27,16 +27,22 @@ const PhraseContext = createContext<PhraseContextValue | undefined>(undefined);
 export function PhraseProvider({ children }: { children: ReactNode }) {
   const { activeProfile } = useProfiles();
   const soundEnabled = activeProfile?.preferences.soundEnabled ?? true;
+  /**
+   * "Hablar al tocar" (Mi Voz AAC Pro): ON habla cada tarjeta de inmediato
+   * (comportamiento original). OFF solo agrega la palabra a la frase; se
+   * habla junto con el resto al pulsar "Hablar" (`speakPhrase`).
+   */
+  const speakOnTap = activeProfile?.preferences.speakOnTap ?? true;
   const [phrase, setPhrase] = useState<AacCard[]>([]);
 
   const addCard = useCallback(
     (card: AacCard) => {
-      if (soundEnabled) {
+      if (soundEnabled && speakOnTap) {
         speak(card.label);
       }
       setPhrase((current) => [...current, card]);
     },
-    [soundEnabled],
+    [soundEnabled, speakOnTap],
   );
 
   const removeAt = useCallback((index: number) => {

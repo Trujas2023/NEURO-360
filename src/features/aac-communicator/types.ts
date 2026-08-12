@@ -21,10 +21,29 @@ export interface AacCard {
   emoji: string;
   /** Foto elegida por un adulto (expo-image-picker). Si existe, reemplaza al emoji. */
   imageUri?: string;
+  /**
+   * Grabación de voz de un adulto (reservado para cuando se agregue
+   * grabación de audio). Si existe, se reproduce en vez del TTS.
+   * No implementado todavía: ver docs/AAC_PRO_FASE2_PLAN.md.
+   */
+  audioUri?: string;
   color: string;
   isFavorite: boolean;
   /** Orden dentro de su categoría; menor va primero. */
   order: number;
+  /**
+   * Cuántas veces se tocó la tarjeta. Opcional para no romper tarjetas
+   * guardadas antes de esta fase; se lee como `card.usageCount ?? 0`.
+   */
+  usageCount?: number;
+  /** Fecha ISO del último toque; usada por la categoría virtual "Recientes". */
+  lastUsedAt?: string;
+  /**
+   * Si es `false`, la tarjeta no aparece en el comunicador de Modo Niño
+   * (pero se conserva para reactivarla). Opcional por compatibilidad con
+   * tarjetas guardadas antes de esta fase; se lee como `card.active ?? true`.
+   */
+  active?: boolean;
   createdAt: string;
 }
 
@@ -38,3 +57,18 @@ export type CreateAacCardInput = {
 };
 
 export type UpdateAacCardInput = Partial<Omit<AacCard, 'id' | 'createdAt'>>;
+
+/**
+ * Palabra de vocabulario núcleo: siempre visible, no vive en el
+ * repositorio de tarjetas por perfil (no se crea/edita/elimina desde la
+ * UI todavía). Definida como estructura de datos en `data/coreVocabulary.ts`
+ * para poder crecer sin tocar componentes.
+ */
+export interface CoreWord {
+  id: string;
+  label: string;
+  /** Texto que se lee en voz alta; por defecto igual a `label`. */
+  spokenText?: string;
+  emoji: string;
+  color: string;
+}

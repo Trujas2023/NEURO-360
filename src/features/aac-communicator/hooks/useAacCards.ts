@@ -15,6 +15,8 @@ export interface UseAacCardsResult {
   deleteCard: (id: string) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
   moveCard: (id: string, direction: 'up' | 'down') => Promise<void>;
+  /** Suma un uso y actualiza `lastUsedAt`; usado por "Más usados"/"Recientes". */
+  incrementUsage: (id: string) => Promise<void>;
 }
 
 /** Lee las tarjetas guardadas de un perfil, sembrando el vocabulario por defecto la primera vez. */
@@ -157,8 +159,30 @@ export function useAacCards(profileId: string | null): UseAacCardsResult {
     [cards, persist],
   );
 
+  const incrementUsage = useCallback(
+    async (id: string) => {
+      const now = new Date().toISOString();
+      await persist(
+        cards.map((card) =>
+          card.id === id ? { ...card, usageCount: (card.usageCount ?? 0) + 1, lastUsedAt: now } : card,
+        ),
+      );
+    },
+    [cards, persist],
+  );
+
   return useMemo(
-    () => ({ cards, loading, reload, createCard, updateCard, deleteCard, toggleFavorite, moveCard }),
-    [cards, loading, reload, createCard, updateCard, deleteCard, toggleFavorite, moveCard],
+    () => ({
+      cards,
+      loading,
+      reload,
+      createCard,
+      updateCard,
+      deleteCard,
+      toggleFavorite,
+      moveCard,
+      incrementUsage,
+    }),
+    [cards, loading, reload, createCard, updateCard, deleteCard, toggleFavorite, moveCard, incrementUsage],
   );
 }

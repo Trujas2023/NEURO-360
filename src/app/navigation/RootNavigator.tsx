@@ -6,6 +6,10 @@ import { WelcomeScreen } from '@app/screens/WelcomeScreen';
 import { AacNavigator } from '@features/aac-communicator/navigation/AacNavigator';
 import { AacCardFormScreen } from '@features/aac-communicator/screens/AacCardFormScreen';
 import { AacManagerScreen } from '@features/aac-communicator/screens/AacManagerScreen';
+import { AacSettingsScreen } from '@features/aac-communicator/screens/AacSettingsScreen';
+import { MyDayScreen } from '@features/daily-routine/screens/MyDayScreen';
+import { RoutineFormScreen } from '@features/daily-routine/screens/RoutineFormScreen';
+import { RoutineManagerScreen } from '@features/daily-routine/screens/RoutineManagerScreen';
 import { AdultHomeScreen } from '@features/parent-mode/screens/AdultHomeScreen';
 import { PinGateScreen } from '@features/parent-mode/screens/PinGateScreen';
 import { ProfileFormScreen } from '@features/profiles/screens/ProfileFormScreen';
@@ -37,6 +41,10 @@ export function RootNavigator() {
       <Stack.Screen name="AacCommunicator" component={AacNavigator} />
       <Stack.Screen name="AacManager" component={AacManagerScreen} />
       <Stack.Screen name="AacCardForm" component={AacCardFormScreen} />
+      <Stack.Screen name="AacSettings" component={AacSettingsScreen} />
+      <Stack.Screen name="MyDay" component={MyDayScreen} />
+      <Stack.Screen name="RoutineManager" component={RoutineManagerScreen} />
+      <Stack.Screen name="RoutineForm" component={RoutineFormScreen} />
     </Stack.Navigator>
   );
 }

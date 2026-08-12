@@ -4,7 +4,9 @@ import { useCallback } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
+import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { BigButton, ScreenContainer } from '@shared/components';
+import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { AacCardVisual } from '../components/AacCardVisual';
@@ -17,6 +19,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AacManager'>;
 /** Modo Adulto: alta, edición, eliminación, favoritos y orden de las tarjetas de un perfil. */
 export function AacManagerScreen({ route, navigation }: Props) {
   const { profileId } = route.params;
+  const { profiles } = useProfiles();
+  const profile = profiles.find((item) => item.id === profileId);
+  const confirmBeforeDelete = profile?.preferences.confirmBeforeDelete ?? DEFAULT_PROFILE_PREFERENCES.confirmBeforeDelete;
   const { cards, loading, reload, deleteCard, toggleFavorite, moveCard } = useAacCards(profileId);
 
   useFocusEffect(
@@ -26,6 +31,10 @@ export function AacManagerScreen({ route, navigation }: Props) {
   );
 
   function confirmDelete(card: AacCard) {
+    if (!confirmBeforeDelete) {
+      deleteCard(card.id);
+      return;
+    }
     Alert.alert('Eliminar tarjeta', `¿Eliminar "${card.label}"? Esta acción no se puede deshacer.`, [
       { text: 'Cancelar', style: 'cancel' },
       { text: 'Eliminar', style: 'destructive', onPress: () => deleteCard(card.id) },
