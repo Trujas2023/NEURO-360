@@ -50,6 +50,14 @@ export function HomeScreen({ navigation }: Props) {
           onPress={() => navigation.navigate('ComingSoon', { title: 'Juega & Regula', emoji: '🎮' })}
           accessibilityHint="Abre los juegos sensoriales"
         />
+        <View style={styles.spacer} />
+        <BigButton
+          label="Mi Día"
+          emoji="🗓️"
+          variant="secondary"
+          onPress={() => navigation.navigate('MyDay')}
+          accessibilityHint="Abre la agenda visual de rutinas"
+        />
       </View>
 
       <View style={styles.footer}>

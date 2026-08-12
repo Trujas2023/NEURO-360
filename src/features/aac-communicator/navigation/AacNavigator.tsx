@@ -5,6 +5,7 @@ import { colors } from '@shared/theme';
 import { PhraseProvider } from '../context/PhraseContext';
 import { AacCategoryScreen } from '../screens/AacCategoryScreen';
 import { AacHomeScreen } from '../screens/AacHomeScreen';
+import { CalmCommunicationScreen } from '../screens/CalmCommunicationScreen';
 import type { AacStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<AacStackParamList>();
@@ -24,6 +25,7 @@ export function AacNavigator() {
       >
         <Stack.Screen name="AacHome" component={AacHomeScreen} />
         <Stack.Screen name="AacCategory" component={AacCategoryScreen} />
+        <Stack.Screen name="AacCalm" component={CalmCommunicationScreen} />
       </Stack.Navigator>
     </PhraseProvider>
   );

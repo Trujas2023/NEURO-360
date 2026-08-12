@@ -50,6 +50,22 @@ export function AdultHomeScreen({ navigation }: Props) {
               />
               <View style={styles.rowActionSpacer} />
               <BigButton
+                label="Ajustes AAC"
+                emoji="⚙️"
+                variant="secondary"
+                fullWidth={false}
+                onPress={() => navigation.navigate('AacSettings', { profileId: profile.id })}
+              />
+              <View style={styles.rowActionSpacer} />
+              <BigButton
+                label="Mi Día"
+                emoji="🗓️"
+                variant="secondary"
+                fullWidth={false}
+                onPress={() => navigation.navigate('RoutineManager', { profileId: profile.id })}
+              />
+              <View style={styles.rowActionSpacer} />
+              <BigButton
                 label="Editar"
                 variant="secondary"
                 fullWidth={false}
