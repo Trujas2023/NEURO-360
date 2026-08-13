@@ -1,40 +1,40 @@
-import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StyleSheet, Text, View } from 'react-native';
 
-import type { RootStackParamList } from '@app/navigation/types';
+import type { MainTabParamList, RootStackParamList } from '@app/navigation/types';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { colors, spacing, typography } from '@shared/theme';
 
 import { QuickCommunication } from '../components/QuickCommunication';
-import type { AacStackParamList } from '../navigation/types';
+import { EMERGENCY_VOCABULARY } from '../data/emergencyVocabulary';
 
-type Props = NativeStackScreenProps<AacStackParamList, 'AacCalm'>;
+type Props = BottomTabScreenProps<MainTabParamList, 'Calma'>;
 
 /**
  * Calma 360: panel de comunicación rápida para momentos de crisis o
- * sobreestimulación, alcanzable en un toque desde cualquier pantalla de
- * "Mi Voz" (ver botón "Calma" en `AacLayout`). Enlaza a Mundo Sensorial
- * sin modificar su lógica interna (ese módulo todavía es un stub —
- * `ComingSoonScreen` — ver docs/AAC_PRO_FASE2_PLAN.md).
+ * sobreestimulación. Es uno de los cuatro tabs principales (siempre a un
+ * toque de distancia, ver `MainTabs`), así que no tiene botón "Volver":
+ * se sale cambiando de tab. Enlaza a Mundo Sensorial sin modificar su
+ * lógica interna (ese módulo todavía es un stub — `ComingSoonScreen` —
+ * ver docs/V2_ARCHITECTURE_AUDIT.md).
  */
 export function CalmCommunicationScreen({ navigation }: Props) {
-  const parentNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
+  const rootNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
-    <ScreenContainer scrollable>
-      <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={() => navigation.goBack()} />
-
+    <ScreenContainer scrollable topInset={false}>
       <Text style={styles.title}>😌 Calma</Text>
       <Text style={styles.subtitle}>Toca una frase para escucharla al instante</Text>
 
-      <QuickCommunication />
+      <QuickCommunication phrases={EMERGENCY_VOCABULARY} />
 
       <View style={styles.footer}>
         <BigButton
           label="Ir a Mundo Sensorial"
           emoji="🌈"
           variant="secondary"
-          onPress={() => parentNavigation?.navigate('ComingSoon', { title: 'Mundo Sensorial', emoji: '🌈' })}
+          onPress={() => rootNavigation?.navigate('ComingSoon', { title: 'Mundo Sensorial', emoji: '🌈' })}
         />
       </View>
     </ScreenContainer>

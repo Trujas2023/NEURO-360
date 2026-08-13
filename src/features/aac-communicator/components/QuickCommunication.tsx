@@ -4,19 +4,24 @@ import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { speak } from '@services/audio/speech';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
-import { EMERGENCY_VOCABULARY } from '../data/emergencyVocabulary';
+import type { QuickPhrase } from '../data/emergencyVocabulary';
+
+export interface QuickCommunicationProps {
+  phrases: QuickPhrase[];
+}
 
 /**
- * Grilla de frases de Calma 360. Cada frase se reproduce de inmediato al
- * tocarla, sin pasar por la barra de frase (uso de emergencia).
+ * Grilla de frases de comunicación rápida (Calma 360, Ayuda). Cada frase
+ * se reproduce de inmediato al tocarla, sin pasar por la barra de frase:
+ * son de uso inmediato, no una oración a construir.
  */
-export function QuickCommunication() {
+export function QuickCommunication({ phrases }: QuickCommunicationProps) {
   const { activeProfile } = useProfiles();
   const soundEnabled = activeProfile?.preferences.soundEnabled ?? true;
 
   return (
     <View style={styles.grid}>
-      {EMERGENCY_VOCABULARY.map((phrase) => (
+      {phrases.map((phrase) => (
         <Pressable
           key={phrase.id}
           onPress={() => {

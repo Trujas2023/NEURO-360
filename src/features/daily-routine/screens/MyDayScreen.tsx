@@ -1,8 +1,6 @@
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { speak } from '@services/audio/speech';
 import { BigButton, ScreenContainer } from '@shared/components';
@@ -11,10 +9,14 @@ import { colors, radius, spacing, typography } from '@shared/theme';
 import { useRoutines } from '../hooks/useRoutines';
 import type { RoutineStep } from '../types';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'MyDay'>;
-
-/** "Mi Día": agenda visual de rutinas del perfil activo (Modo Niño). */
-export function MyDayScreen({ navigation }: Props) {
+/**
+ * "Mi Día": agenda visual de rutinas del perfil activo (Modo Niño). Es la
+ * raíz del tab "Mi Día" de `MainTabs`, así que no tiene botón "Volver" al
+ * nivel de lista (se cambia de tab con la barra inferior); sí lo tiene la
+ * vista de pasos de una rutina, que vuelve a la lista (estado local, no
+ * navegación).
+ */
+export function MyDayScreen() {
   const { activeProfile } = useProfiles();
   const { routines, loading, toggleStepDone, resetRoutine } = useRoutines(activeProfile?.id ?? null);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string | null>(null);
@@ -33,7 +35,7 @@ export function MyDayScreen({ navigation }: Props) {
     const nextStep = sortedSteps.find((step) => !step.done);
 
     return (
-      <ScreenContainer scrollable>
+      <ScreenContainer scrollable topInset={false}>
         <View style={styles.header}>
           <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={() => setSelectedRoutineId(null)} />
           <Text style={styles.title}>
@@ -88,9 +90,8 @@ export function MyDayScreen({ navigation }: Props) {
   }
 
   return (
-    <ScreenContainer scrollable>
+    <ScreenContainer scrollable topInset={false}>
       <View style={styles.header}>
-        <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={() => navigation.goBack()} />
         <Text style={styles.title}>Mi Día</Text>
       </View>
 

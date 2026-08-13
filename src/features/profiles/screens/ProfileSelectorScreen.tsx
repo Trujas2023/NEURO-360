@@ -14,7 +14,7 @@ export function ProfileSelectorScreen({ navigation }: Props) {
 
   async function handleSelect(profileId: string) {
     await selectProfile(profileId);
-    navigation.navigate('Home');
+    navigation.navigate('MainTabs');
   }
 
   if (loading) {
@@ -27,7 +27,7 @@ export function ProfileSelectorScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer scrollable>
-      <Text style={styles.title}>¿Quién va a jugar?</Text>
+      <Text style={styles.title}>¿Quién va a usar la app?</Text>
 
       {profiles.length === 0 ? (
         <View style={styles.empty}>

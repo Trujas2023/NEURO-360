@@ -2,22 +2,34 @@ export type RootStackParamList = {
   Welcome: undefined;
   ProfileSelector: undefined;
   ProfileForm: { profileId?: string } | undefined;
-  Home: undefined;
+  /** Shell de Modo Niño: barra inferior con Inicio/Mi Voz/Calma/Mi Día (ver `MainTabParamList`). */
+  MainTabs: undefined;
   ComingSoon: { title: string; emoji: string };
   PinGate: undefined;
   AdultHome: undefined;
-  /** Comunicador "Mi Voz" (Modo Niño); usa el perfil activo del contexto de perfiles. */
-  AacCommunicator: undefined;
   /** Modo Adulto: administración de tarjetas de un perfil concreto. */
   AacManager: { profileId: string };
   AacCardForm: { profileId: string; cardId?: string; categoryId?: string };
   /** Modo Adulto: personalización AAC (tablero, texto, qué mostrar) de un perfil concreto. */
   AacSettings: { profileId: string };
-  /** Mi Día: agenda visual de rutinas del perfil activo (Modo Niño). */
-  MyDay: undefined;
   /** Modo Adulto: alta/edición de rutinas y pasos de Mi Día de un perfil concreto. */
   RoutineManager: { profileId: string };
   RoutineForm: { profileId: string; routineId?: string };
+  /** Ayuda: frases de auxilio inmediato, alcanzable en 1 toque desde cualquier tab principal. */
+  Help: undefined;
+};
+
+/**
+ * Barra inferior permanente de Modo Niño. Los cuatro módulos principales
+ * comparten perfil activo, tema y almacenamiento; ninguno queda a más de
+ * un toque de distancia de los demás.
+ */
+export type MainTabParamList = {
+  Inicio: undefined;
+  /** Hospeda `AacNavigator` (su propio stack anidado: AacHome/AacCategory). */
+  MiVoz: undefined;
+  Calma: undefined;
+  MiDia: undefined;
 };
 
 declare global {

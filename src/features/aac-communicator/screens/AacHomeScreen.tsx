@@ -1,7 +1,6 @@
-import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { StyleSheet, Text, View } from 'react-native';
 
-import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
 import { spacing, typography, colors } from '@shared/theme';
@@ -18,9 +17,13 @@ import type { AacStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<AacStackParamList, 'AacHome'>;
 
-/** Pantalla principal de "Mi Voz": vocabulario núcleo, buscador y grilla de categorías, siempre con la barra de frase visible. */
+/**
+ * Pantalla principal de "Mi Voz": vocabulario núcleo, buscador y grilla de
+ * categorías, siempre con la barra de frase visible. Es la raíz del tab
+ * "Mi Voz" de `MainTabs`, así que no tiene botón "Volver" (se cambia de
+ * tab con la barra inferior, ver `AacLayout`).
+ */
 export function AacHomeScreen({ navigation }: Props) {
-  const parentNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
   const { activeProfile } = useProfiles();
   const { cards, incrementUsage } = useAacCards(activeProfile?.id ?? null);
   const { addCard } = usePhrase();
@@ -36,7 +39,7 @@ export function AacHomeScreen({ navigation }: Props) {
     : [];
 
   return (
-    <AacLayout title="Mi Voz" onBack={() => parentNavigation?.goBack()}>
+    <AacLayout title="Mi Voz">
       <CoreVocabularyRow />
 
       <AacSearch
