@@ -20,6 +20,9 @@ export interface UseRoutinesResult {
   createRoutine: (input: CreateRoutineInput) => Promise<DailyRoutine>;
   updateRoutine: (id: string, updates: UpdateRoutineInput) => Promise<void>;
   deleteRoutine: (id: string) => Promise<void>;
+  /** Copia una rutina con todos sus pasos (sin marcar como hechos), al final de la lista. */
+  duplicateRoutine: (id: string) => Promise<void>;
+  moveRoutine: (id: string, direction: 'up' | 'down') => Promise<void>;
   addStep: (routineId: string, input: CreateStepInput) => Promise<void>;
   updateStep: (routineId: string, stepId: string, updates: UpdateStepInput) => Promise<void>;
   deleteStep: (routineId: string, stepId: string) => Promise<void>;
@@ -31,7 +34,7 @@ export interface UseRoutinesResult {
 async function loadRoutinesForProfile(profileId: string): Promise<DailyRoutine[]> {
   const stored = await getRoutines(profileId);
   if (stored === null) {
-    const seeded = buildDefaultRoutines();
+    const seeded = buildDefaultRoutines(profileId);
     await saveRoutines(profileId, seeded);
     return seeded;
   }
@@ -90,40 +93,99 @@ export function useRoutines(profileId: string | null): UseRoutinesResult {
     [profileId],
   );
 
+  /** Aplica un cambio a una rutina y le refresca `updatedAt` de una sola vez. */
   const withRoutine = useCallback(
-    (routineId: string, updater: (routine: DailyRoutine) => DailyRoutine) =>
-      routines.map((routine) => (routine.id === routineId ? updater(routine) : routine)),
+    (routineId: string, updater: (routine: DailyRoutine) => DailyRoutine) => {
+      const now = new Date().toISOString();
+      return routines.map((routine) =>
+        routine.id === routineId ? { ...updater(routine), updatedAt: now } : routine,
+      );
+    },
     [routines],
   );
 
   const createRoutine = useCallback(
     async (input: CreateRoutineInput) => {
+      const now = new Date().toISOString();
       const nextOrder = routines.reduce((max, routine) => Math.max(max, routine.order), -1) + 1;
       const routine: DailyRoutine = {
         id: createId(),
+        profileId: profileId ?? undefined,
         title: input.title.trim(),
         emoji: input.emoji.trim() || '🗓️',
         color: input.color,
         order: nextOrder,
+        displayMode: input.displayMode ?? 'list',
         steps: [],
-        createdAt: new Date().toISOString(),
+        createdAt: now,
+        updatedAt: now,
       };
       await persist([...routines, routine]);
       return routine;
     },
-    [routines, persist],
+    [routines, persist, profileId],
   );
 
   const updateRoutine = useCallback(
     async (id: string, updates: UpdateRoutineInput) => {
-      await persist(routines.map((routine) => (routine.id === id ? { ...routine, ...updates } : routine)));
+      await persist(withRoutine(id, (routine) => ({ ...routine, ...updates })));
     },
-    [routines, persist],
+    [withRoutine, persist],
   );
 
   const deleteRoutine = useCallback(
     async (id: string) => {
       await persist(routines.filter((routine) => routine.id !== id));
+    },
+    [routines, persist],
+  );
+
+  const duplicateRoutine = useCallback(
+    async (id: string) => {
+      const original = routines.find((routine) => routine.id === id);
+      if (!original) {
+        return;
+      }
+      const now = new Date().toISOString();
+      const nextOrder = routines.reduce((max, routine) => Math.max(max, routine.order), -1) + 1;
+      const copy: DailyRoutine = {
+        ...original,
+        id: createId(),
+        title: `${original.title} (copia)`,
+        order: nextOrder,
+        createdAt: now,
+        updatedAt: now,
+        // Los pasos se copian sin el progreso del original: una rutina
+        // recién duplicada empieza siempre desde cero.
+        steps: original.steps.map((step) => ({ ...step, id: createId(), done: false })),
+      };
+      await persist([...routines, copy]);
+    },
+    [routines, persist],
+  );
+
+  const moveRoutine = useCallback(
+    async (id: string, direction: 'up' | 'down') => {
+      const sorted = [...routines].sort((a, b) => a.order - b.order);
+      const index = sorted.findIndex((routine) => routine.id === id);
+      const swapIndex = direction === 'up' ? index - 1 : index + 1;
+      if (index < 0 || swapIndex < 0 || swapIndex >= sorted.length) {
+        return;
+      }
+      const target = sorted[index];
+      const sibling = sorted[swapIndex];
+
+      await persist(
+        routines.map((routine) => {
+          if (routine.id === target.id) {
+            return { ...routine, order: sibling.order };
+          }
+          if (routine.id === sibling.id) {
+            return { ...routine, order: target.order };
+          }
+          return routine;
+        }),
+      );
     },
     [routines, persist],
   );
@@ -137,6 +199,8 @@ export function useRoutines(profileId: string | null): UseRoutinesResult {
             id: createId(),
             label: input.label.trim(),
             emoji: input.emoji.trim() || '⭐',
+            imageUri: input.imageUri,
+            durationSeconds: input.durationSeconds,
             done: false,
             order: nextOrder,
           };
@@ -236,6 +300,8 @@ export function useRoutines(profileId: string | null): UseRoutinesResult {
       createRoutine,
       updateRoutine,
       deleteRoutine,
+      duplicateRoutine,
+      moveRoutine,
       addStep,
       updateStep,
       deleteStep,
@@ -250,6 +316,8 @@ export function useRoutines(profileId: string | null): UseRoutinesResult {
       createRoutine,
       updateRoutine,
       deleteRoutine,
+      duplicateRoutine,
+      moveRoutine,
       addStep,
       updateStep,
       deleteStep,

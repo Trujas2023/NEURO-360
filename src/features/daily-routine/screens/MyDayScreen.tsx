@@ -6,15 +6,19 @@ import { speak, speakOptionsForPreferences } from '@services/audio/speech';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
+import { RoutineComplete } from '../components/RoutineComplete';
+import { StepPanel, StepRow } from '../components/StepViews';
 import { useRoutines } from '../hooks/useRoutines';
-import type { RoutineStep } from '../types';
+import type { DailyRoutine, RoutineStep } from '../types';
 
 /**
  * "Mi Día": agenda visual de rutinas del perfil activo (Modo Niño). Es la
  * raíz del tab "Mi Día" de `MainTabs`, así que no tiene botón "Volver" al
  * nivel de lista (se cambia de tab con la barra inferior); sí lo tiene la
- * vista de pasos de una rutina, que vuelve a la lista (estado local, no
- * navegación).
+ * vista de una rutina, que vuelve a la lista (estado local, no navegación).
+ *
+ * Cada rutina se presenta según su `displayMode`, que configura un adulto:
+ * lista completa, tablero PRIMERO/DESPUÉS, o AHORA/DESPUÉS/TERMINADO.
  */
 export function MyDayScreen() {
   const { activeProfile } = useProfiles();
@@ -23,17 +27,40 @@ export function MyDayScreen() {
 
   const selectedRoutine = routines.find((routine) => routine.id === selectedRoutineId) ?? null;
   const soundEnabled = activeProfile?.preferences.soundEnabled ?? true;
+  const reduceMotion = activeProfile?.preferences.reduceMotion ?? false;
   const ttsOptions = speakOptionsForPreferences(activeProfile?.preferences);
 
-  function handleStepPress(step: RoutineStep) {
+  function speakStep(step: RoutineStep) {
     if (soundEnabled) {
       speak(step.label, ttsOptions);
     }
   }
 
+  /**
+   * Marca/desmarca un paso y, si con esto se completa la rutina entera,
+   * dispara el refuerzo sonoro. Va acá y no en un efecto de
+   * `RoutineComplete` para que suene exactamente una vez, en la
+   * transición, y no en cada render con la rutina ya terminada.
+   */
+  function toggleStep(routine: DailyRoutine, step: RoutineStep) {
+    const pendingCount = routine.steps.filter((item) => !item.done).length;
+    const willCompleteRoutine = !step.done && pendingCount === 1;
+
+    toggleStepDone(routine.id, step.id);
+
+    if (willCompleteRoutine && soundEnabled) {
+      speak('¡Muy bien! Terminaste toda la rutina.', ttsOptions);
+    }
+  }
+
   if (selectedRoutine) {
     const sortedSteps = [...selectedRoutine.steps].sort((a, b) => a.order - b.order);
-    const nextStep = sortedSteps.find((step) => !step.done);
+    const pendingSteps = sortedSteps.filter((step) => !step.done);
+    const doneSteps = sortedSteps.filter((step) => step.done);
+    const currentStep = pendingSteps[0] ?? null;
+    const nextStep = pendingSteps[1] ?? null;
+    const allDone = sortedSteps.length > 0 && pendingSteps.length === 0;
+    const mode = selectedRoutine.displayMode ?? 'list';
 
     return (
       <ScreenContainer scrollable topInset={false}>
@@ -44,39 +71,78 @@ export function MyDayScreen() {
           </Text>
         </View>
 
-        {sortedSteps.length === 0 ? (
-          <Text style={styles.empty}>Esta rutina todavía no tiene pasos.</Text>
-        ) : (
-          sortedSteps.map((step) => {
-            const isNext = nextStep?.id === step.id;
-            return (
-              <Pressable
+        {allDone ? <RoutineComplete reduceMotion={reduceMotion} /> : null}
+
+        {sortedSteps.length === 0 ? <Text style={styles.empty}>Esta rutina todavía no tiene pasos.</Text> : null}
+
+        {mode === 'list'
+          ? sortedSteps.map((step) => (
+              <StepRow
                 key={step.id}
-                onPress={() => handleStepPress(step)}
-                accessibilityRole="button"
-                accessibilityLabel={step.label}
-                style={({ pressed }) => [
-                  styles.stepRow,
-                  step.done && styles.stepRowDone,
-                  { opacity: pressed ? 0.85 : 1 },
-                ]}
-              >
-                {isNext ? <Text style={styles.stepBadge}>PRIMERO</Text> : null}
-                {!isNext && !step.done && nextStep ? <Text style={styles.stepBadgeMuted}>DESPUÉS</Text> : null}
-                <Text style={styles.stepEmoji}>{step.emoji}</Text>
-                <Text style={[styles.stepLabel, step.done && styles.stepLabelDone]}>{step.label}</Text>
-                <Pressable
-                  onPress={() => toggleStepDone(selectedRoutine.id, step.id)}
-                  accessibilityRole="button"
-                  accessibilityLabel={step.done ? `Marcar "${step.label}" como no hecho` : `Marcar "${step.label}" como hecho`}
-                  style={[styles.doneButton, step.done && styles.doneButtonActive]}
-                >
-                  <Text style={styles.doneButtonText}>{step.done ? '✅' : 'Hecho'}</Text>
-                </Pressable>
-              </Pressable>
-            );
-          })
-        )}
+                step={step}
+                badge={currentStep?.id === step.id ? 'PRIMERO' : !step.done && currentStep ? 'DESPUÉS' : undefined}
+                badgeMuted={currentStep?.id !== step.id}
+                onSpeak={() => speakStep(step)}
+                onToggle={() => toggleStep(selectedRoutine, step)}
+              />
+            ))
+          : null}
+
+        {mode === 'firstThen' ? (
+          <View>
+            {currentStep ? (
+              <StepPanel
+                step={currentStep}
+                badge="PRIMERO"
+                onSpeak={() => speakStep(currentStep)}
+                onToggle={() => toggleStep(selectedRoutine, currentStep)}
+                reduceMotion={reduceMotion}
+              />
+            ) : null}
+            {nextStep ? (
+              <StepPanel step={nextStep} badge="DESPUÉS" badgeMuted onSpeak={() => speakStep(nextStep)} />
+            ) : null}
+          </View>
+        ) : null}
+
+        {mode === 'nowNextDone' ? (
+          <View>
+            {currentStep ? (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>AHORA</Text>
+                <StepPanel
+                  step={currentStep}
+                  onSpeak={() => speakStep(currentStep)}
+                  onToggle={() => toggleStep(selectedRoutine, currentStep)}
+                  reduceMotion={reduceMotion}
+                />
+              </View>
+            ) : null}
+
+            {pendingSteps.length > 1 ? (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>DESPUÉS</Text>
+                {pendingSteps.slice(1).map((step) => (
+                  <StepRow key={step.id} step={step} onSpeak={() => speakStep(step)} />
+                ))}
+              </View>
+            ) : null}
+
+            {doneSteps.length > 0 ? (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>TERMINADO</Text>
+                {doneSteps.map((step) => (
+                  <StepRow
+                    key={step.id}
+                    step={step}
+                    onSpeak={() => speakStep(step)}
+                    onToggle={() => toggleStep(selectedRoutine, step)}
+                  />
+                ))}
+              </View>
+            ) : null}
+          </View>
+        ) : null}
 
         <View style={styles.actions}>
           <BigButton
@@ -150,6 +216,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.xl,
   },
+  section: {
+    marginBottom: spacing.lg,
+  },
+  sectionTitle: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.bold,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+    letterSpacing: 1,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -180,76 +256,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
-  },
-  stepRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.sm,
-    marginBottom: spacing.sm,
-    gap: spacing.sm,
-  },
-  stepRowDone: {
-    backgroundColor: colors.background,
-    borderColor: colors.success,
-  },
-  stepBadge: {
-    position: 'absolute',
-    top: -10,
-    left: spacing.sm,
-    backgroundColor: colors.primary,
-    color: colors.onPrimary,
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.bold,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.pill,
-  },
-  stepBadgeMuted: {
-    position: 'absolute',
-    top: -10,
-    left: spacing.sm,
-    backgroundColor: colors.border,
-    color: colors.textSecondary,
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.bold,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.pill,
-  },
-  stepEmoji: {
-    fontSize: typography.sizes.xl,
-  },
-  stepLabel: {
-    flex: 1,
-    fontSize: typography.sizes.md,
-    color: colors.textPrimary,
-  },
-  stepLabelDone: {
-    color: colors.textSecondary,
-    textDecorationLine: 'line-through',
-  },
-  doneButton: {
-    minHeight: 44,
-    minWidth: 44,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.sm,
-  },
-  doneButtonActive: {
-    backgroundColor: colors.success,
-    borderColor: colors.success,
-  },
-  doneButtonText: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.bold,
-    color: colors.textPrimary,
   },
   actions: {
     marginTop: spacing.md,

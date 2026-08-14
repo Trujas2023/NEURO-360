@@ -1,28 +1,50 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import * as ImagePicker from 'expo-image-picker';
 import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
+import { AacCardVisual } from '@features/aac-communicator/components/AacCardVisual';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { AVATAR_COLORS as PALETTE_COLORS } from '@shared/constants/profiles';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { useRoutines } from '../hooks/useRoutines';
+import type { RoutineDisplayMode, RoutineStep } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RoutineForm'>;
 
+const DISPLAY_MODES: { value: RoutineDisplayMode; label: string; description: string }[] = [
+  { value: 'list', label: 'Lista', description: 'Todos los pasos a la vez.' },
+  { value: 'firstThen', label: 'Primero / Después', description: 'Solo dos pasos a la vez.' },
+  { value: 'nowNextDone', label: 'Ahora / Después / Terminado', description: 'Separa lo hecho de lo que falta.' },
+];
+
 /**
- * Modo Adulto: crear o editar una rutina de Mi Día y sus pasos. Los pasos
- * usan texto + emoji (sin foto/audio todavía, ver docs/AAC_PRO_FASE2_PLAN.md).
+ * Duraciones disponibles para el temporizador visual de un paso. `0`
+ * significa "sin tiempo": el botón las recorre en orden, para no meter un
+ * selector numérico en una pantalla que ya tiene bastante.
  */
+const DURATION_PRESETS = [0, 30, 60, 120, 300, 600];
+
+function formatDuration(seconds?: number): string {
+  if (!seconds) {
+    return 'Sin tiempo';
+  }
+  return seconds < 60 ? `${seconds} s` : `${seconds / 60} min`;
+}
+
+/** Modo Adulto: crear o editar una rutina de Mi Día, sus pasos y cómo se le presenta al niño. */
 export function RoutineFormScreen({ route, navigation }: Props) {
   const { profileId, routineId } = route.params;
-  const { routines, createRoutine, updateRoutine, addStep, deleteStep, moveStep } = useRoutines(profileId);
+  const { routines, createRoutine, updateRoutine, addStep, updateStep, deleteStep, moveStep } =
+    useRoutines(profileId);
   const editingRoutine = useMemo(() => routines.find((routine) => routine.id === routineId) ?? null, [routines, routineId]);
 
   const [title, setTitle] = useState(editingRoutine?.title ?? '');
   const [emoji, setEmoji] = useState(editingRoutine?.emoji ?? '🗓️');
   const [color, setColor] = useState(editingRoutine?.color ?? PALETTE_COLORS[0]);
+  const [displayMode, setDisplayMode] = useState<RoutineDisplayMode>(editingRoutine?.displayMode ?? 'list');
   const [stepLabel, setStepLabel] = useState('');
   const [stepEmoji, setStepEmoji] = useState('⭐');
   const [saving, setSaving] = useState(false);
@@ -38,12 +60,14 @@ export function RoutineFormScreen({ route, navigation }: Props) {
       return;
     }
 
+    const details = { title: trimmedTitle, emoji: emoji.trim() || '🗓️', color, displayMode };
+
     setSaving(true);
     try {
       if (savedRoutineId) {
-        await updateRoutine(savedRoutineId, { title: trimmedTitle, emoji: emoji.trim() || '🗓️', color });
+        await updateRoutine(savedRoutineId, details);
       } else {
-        const routine = await createRoutine({ title: trimmedTitle, emoji: emoji.trim() || '🗓️', color });
+        const routine = await createRoutine(details);
         setSavedRoutineId(routine.id);
       }
     } finally {
@@ -63,6 +87,35 @@ export function RoutineFormScreen({ route, navigation }: Props) {
     await addStep(savedRoutineId, { label: trimmedLabel, emoji: stepEmoji.trim() || '⭐' });
     setStepLabel('');
     setStepEmoji('⭐');
+  }
+
+  async function pickStepPhoto(step: RoutineStep) {
+    if (!savedRoutineId) {
+      return;
+    }
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permiso necesario', 'Activa el acceso a la galería para elegir una foto.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.6,
+    });
+    if (!result.canceled && result.assets[0]) {
+      await updateStep(savedRoutineId, step.id, { imageUri: result.assets[0].uri });
+    }
+  }
+
+  function cycleStepDuration(step: RoutineStep) {
+    if (!savedRoutineId) {
+      return;
+    }
+    const currentIndex = DURATION_PRESETS.indexOf(step.durationSeconds ?? 0);
+    const next = DURATION_PRESETS[(currentIndex + 1) % DURATION_PRESETS.length];
+    updateStep(savedRoutineId, step.id, { durationSeconds: next === 0 ? undefined : next });
   }
 
   return (
@@ -102,6 +155,25 @@ export function RoutineFormScreen({ route, navigation }: Props) {
         ))}
       </View>
 
+      <Text style={styles.label}>Cómo se ve la rutina</Text>
+      <View style={styles.modeRow}>
+        {DISPLAY_MODES.map((mode) => (
+          <Pressable
+            key={mode.value}
+            onPress={() => setDisplayMode(mode.value)}
+            accessibilityRole="button"
+            accessibilityLabel={mode.label}
+            accessibilityState={{ selected: displayMode === mode.value }}
+            style={[styles.modeChip, displayMode === mode.value && styles.modeChipSelected]}
+          >
+            <Text style={[styles.modeChipText, displayMode === mode.value && styles.modeChipTextSelected]}>
+              {mode.label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+      <Text style={styles.modeHint}>{DISPLAY_MODES.find((mode) => mode.value === displayMode)?.description}</Text>
+
       <BigButton
         label={savedRoutineId ? 'Guardar cambios' : 'Guardar rutina'}
         emoji="✅"
@@ -118,11 +190,31 @@ export function RoutineFormScreen({ route, navigation }: Props) {
           ) : (
             steps.map((step, index) => (
               <View key={step.id} style={styles.stepRow}>
-                <Text style={styles.stepEmoji}>{step.emoji}</Text>
-                <Text style={styles.stepLabel} numberOfLines={1}>
-                  {step.label}
-                </Text>
+                <View style={styles.stepHeader}>
+                  <AacCardVisual emoji={step.emoji} imageUri={step.imageUri} size={36} />
+                  <Text style={styles.stepLabel} numberOfLines={2}>
+                    {step.label}
+                  </Text>
+                </View>
+
                 <View style={styles.stepActions}>
+                  <Pressable
+                    onPress={() => cycleStepDuration(step)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Tiempo del paso "${step.label}": ${formatDuration(step.durationSeconds)}. Toca para cambiar.`}
+                    style={({ pressed }) => [styles.durationChip, { opacity: pressed ? 0.7 : 1 }]}
+                  >
+                    <Text style={styles.durationChipText}>⏱ {formatDuration(step.durationSeconds)}</Text>
+                  </Pressable>
+
+                  <IconButton label="Elegir foto del paso" icon="📷" onPress={() => pickStepPhoto(step)} />
+                  {step.imageUri ? (
+                    <IconButton
+                      label="Quitar foto del paso"
+                      icon="🚫"
+                      onPress={() => updateStep(savedRoutineId, step.id, { imageUri: undefined })}
+                    />
+                  ) : null}
                   <IconButton label="Mover arriba" icon="↑" onPress={() => moveStep(savedRoutineId, step.id, 'up')} disabled={index === 0} />
                   <IconButton
                     label="Mover abajo"
@@ -238,6 +330,37 @@ const styles = StyleSheet.create({
   swatchSelected: {
     borderColor: colors.textPrimary,
   },
+  modeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  modeChip: {
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.surface,
+  },
+  modeChipSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  modeChipText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.medium,
+    color: colors.textPrimary,
+  },
+  modeChipTextSelected: {
+    color: colors.onPrimary,
+  },
+  modeHint: {
+    marginTop: spacing.xs,
+    marginBottom: spacing.md,
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+  },
   stepsSection: {
     marginTop: spacing.xl,
   },
@@ -253,18 +376,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   stepRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.sm,
-    marginBottom: spacing.xs,
-    gap: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  stepEmoji: {
-    fontSize: typography.sizes.lg,
+  stepHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   stepLabel: {
     flex: 1,
@@ -273,7 +395,24 @@ const styles = StyleSheet.create({
   },
   stepActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
     gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  durationChip: {
+    minHeight: 40,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.pill,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  durationChipText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.medium,
+    color: colors.textPrimary,
   },
   iconButton: {
     width: 40,
