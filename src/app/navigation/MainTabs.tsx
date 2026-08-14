@@ -4,7 +4,7 @@ import { Text } from 'react-native';
 import { MainTabHeader } from '@app/components/MainTabHeader';
 import { HomeScreen } from '@app/screens/HomeScreen';
 import { AacNavigator } from '@features/aac-communicator/navigation/AacNavigator';
-import { CalmCommunicationScreen } from '@features/aac-communicator/screens/CalmCommunicationScreen';
+import { CalmCommunicationScreen } from '@features/calm/screens/CalmCommunicationScreen';
 import { MyDayScreen } from '@features/daily-routine/screens/MyDayScreen';
 import { colors, touchTargets, typography } from '@shared/theme';
 

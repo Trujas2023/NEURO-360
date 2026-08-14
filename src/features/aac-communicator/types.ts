@@ -93,6 +93,27 @@ export interface CoreWord {
 }
 
 /**
+ * Frase de comunicación rápida: se reproduce de inmediato al tocarla, sin
+ * pasar por la barra de frase (Calma, Ayuda, y el Nivel 1 del
+ * comunicador). Vive acá y no en el feature que la consume porque es una
+ * primitiva AAC compartida: `calm` y `help` la importan desde este
+ * módulo, nunca al revés.
+ */
+export interface QuickPhrase {
+  id: string;
+  label: string;
+  emoji: string;
+  color: string;
+  /**
+   * Si existe, la tarjeta ofrece además un botón "Más" que abre un flujo
+   * guiado (p. ej. "Me duele" → dónde/cuánto/cómo). El valor es un
+   * identificador que interpreta la pantalla que la muestra; tocar la
+   * tarjeta sigue hablando de inmediato, el flujo es opcional.
+   */
+  detail?: string;
+}
+
+/**
  * Frase guardada desde la barra de frase ("Guardar frase") para reusarla
  * después sin tener que reconstruirla tarjeta por tarjeta. Guarda el
  * texto hablado de cada palabra (no las tarjetas completas: el color o el

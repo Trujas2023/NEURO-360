@@ -17,6 +17,10 @@ export type RootStackParamList = {
   RoutineForm: { profileId: string; routineId?: string };
   /** Ayuda: frases de auxilio inmediato, alcanzable en 1 toque desde cualquier tab principal. */
   Help: undefined;
+  /** Calma: flujo guiado "Me duele" (dónde / cuánto / cómo se siente). */
+  CalmPain: undefined;
+  /** Calma: flujo guiado "Tengo miedo / Estoy saturado" (qué te molesta / qué necesitas). */
+  CalmOverwhelm: undefined;
 };
 
 /**

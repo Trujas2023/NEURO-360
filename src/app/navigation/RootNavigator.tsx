@@ -5,6 +5,8 @@ import { WelcomeScreen } from '@app/screens/WelcomeScreen';
 import { AacCardFormScreen } from '@features/aac-communicator/screens/AacCardFormScreen';
 import { AacManagerScreen } from '@features/aac-communicator/screens/AacManagerScreen';
 import { AacSettingsScreen } from '@features/aac-communicator/screens/AacSettingsScreen';
+import { OverwhelmFlowScreen } from '@features/calm/screens/OverwhelmFlowScreen';
+import { PainFlowScreen } from '@features/calm/screens/PainFlowScreen';
 import { RoutineFormScreen } from '@features/daily-routine/screens/RoutineFormScreen';
 import { RoutineManagerScreen } from '@features/daily-routine/screens/RoutineManagerScreen';
 import { HelpScreen } from '@features/help/screens/HelpScreen';
@@ -45,6 +47,8 @@ export function RootNavigator() {
       <Stack.Screen name="RoutineManager" component={RoutineManagerScreen} />
       <Stack.Screen name="RoutineForm" component={RoutineFormScreen} />
       <Stack.Screen name="Help" component={HelpScreen} />
+      <Stack.Screen name="CalmPain" component={PainFlowScreen} />
+      <Stack.Screen name="CalmOverwhelm" component={OverwhelmFlowScreen} />
     </Stack.Navigator>
   );
 }

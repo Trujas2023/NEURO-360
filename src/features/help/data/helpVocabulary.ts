@@ -1,5 +1,5 @@
 import { colors } from '@shared/theme';
-import type { QuickPhrase } from '@features/aac-communicator/data/emergencyVocabulary';
+import type { QuickPhrase } from '@features/aac-communicator/types';
 
 /**
  * Frases del botón de Ayuda global (distinto de Calma 360: este es un

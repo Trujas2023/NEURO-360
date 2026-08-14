@@ -1,6 +1,6 @@
 import { colors } from '@shared/theme';
 
-import type { QuickPhrase } from './emergencyVocabulary';
+import type { QuickPhrase } from '../types';
 
 /**
  * Vocabulario esencial para Nivel 1 de comunicación (2-4 opciones
