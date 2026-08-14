@@ -9,6 +9,14 @@ import { OverwhelmFlowScreen } from '@features/calm/screens/OverwhelmFlowScreen'
 import { PainFlowScreen } from '@features/calm/screens/PainFlowScreen';
 import { RoutineFormScreen } from '@features/daily-routine/screens/RoutineFormScreen';
 import { RoutineManagerScreen } from '@features/daily-routine/screens/RoutineManagerScreen';
+import { CategorySortScreen } from '@features/games/screens/CategorySortScreen';
+import { ColorMatchScreen } from '@features/games/screens/ColorMatchScreen';
+import { EmotionsScreen } from '@features/games/screens/EmotionsScreen';
+import { GamesHomeScreen } from '@features/games/screens/GamesHomeScreen';
+import { GamesSettingsScreen } from '@features/games/screens/GamesSettingsScreen';
+import { MemoryScreen } from '@features/games/screens/MemoryScreen';
+import { SequenceScreen } from '@features/games/screens/SequenceScreen';
+import { ShapeMatchScreen } from '@features/games/screens/ShapeMatchScreen';
 import { HelpScreen } from '@features/help/screens/HelpScreen';
 import { AdultHomeScreen } from '@features/parent-mode/screens/AdultHomeScreen';
 import { PinGateScreen } from '@features/parent-mode/screens/PinGateScreen';
@@ -63,6 +71,14 @@ export function RootNavigator() {
       <Stack.Screen name="SensoryPaint" component={SensoryPaintScreen} />
       <Stack.Screen name="SensoryCauseEffect" component={CauseEffectScreen} />
       <Stack.Screen name="SensorySettings" component={SensorySettingsScreen} />
+      <Stack.Screen name="GamesHome" component={GamesHomeScreen} />
+      <Stack.Screen name="GameColors" component={ColorMatchScreen} />
+      <Stack.Screen name="GameShapes" component={ShapeMatchScreen} />
+      <Stack.Screen name="GameEmotions" component={EmotionsScreen} />
+      <Stack.Screen name="GameCategories" component={CategorySortScreen} />
+      <Stack.Screen name="GameMemory" component={MemoryScreen} />
+      <Stack.Screen name="GameSequence" component={SequenceScreen} />
+      <Stack.Screen name="GamesSettings" component={GamesSettingsScreen} />
     </Stack.Navigator>
   );
 }

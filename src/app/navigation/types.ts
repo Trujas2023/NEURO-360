@@ -30,6 +30,16 @@ export type RootStackParamList = {
   SensoryCauseEffect: undefined;
   /** Modo Adulto: ajustes de Mundo Sensorial de un perfil concreto. */
   SensorySettings: { profileId: string };
+  /** Juega & Regula: selector de juegos. */
+  GamesHome: undefined;
+  GameColors: undefined;
+  GameShapes: undefined;
+  GameEmotions: undefined;
+  GameCategories: undefined;
+  GameMemory: undefined;
+  GameSequence: undefined;
+  /** Modo Adulto: ajustes de Juega & Regula de un perfil concreto. */
+  GamesSettings: { profileId: string };
 };
 
 /**

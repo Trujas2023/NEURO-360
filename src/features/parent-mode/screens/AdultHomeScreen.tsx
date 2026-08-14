@@ -74,6 +74,14 @@ export function AdultHomeScreen({ navigation }: Props) {
               />
               <View style={styles.rowActionSpacer} />
               <BigButton
+                label="Juegos"
+                emoji="🎮"
+                variant="secondary"
+                fullWidth={false}
+                onPress={() => navigation.navigate('GamesSettings', { profileId: profile.id })}
+              />
+              <View style={styles.rowActionSpacer} />
+              <BigButton
                 label="Editar"
                 variant="secondary"
                 fullWidth={false}

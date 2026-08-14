@@ -77,6 +77,15 @@ export function HomeScreen({ navigation }: Props) {
       <View style={styles.grid}>
         <View style={styles.gridItem}>
           <BigButton
+            label="Jugar"
+            emoji="🎮"
+            variant="secondary"
+            onPress={() => rootNavigation?.navigate('GamesHome')}
+            accessibilityHint="Abre los juegos"
+          />
+        </View>
+        <View style={styles.gridItem}>
+          <BigButton
             label="Mi Día"
             emoji="📅"
             variant="secondary"
@@ -84,7 +93,6 @@ export function HomeScreen({ navigation }: Props) {
             accessibilityHint="Abre la agenda visual de rutinas"
           />
         </View>
-        <View style={styles.gridItem} />
       </View>
 
       <View style={styles.helpAction}>
@@ -97,8 +105,6 @@ export function HomeScreen({ navigation }: Props) {
           accessibilityHint="Abre frases de auxilio inmediato"
         />
       </View>
-
-      <Text style={styles.comingSoonNote}>Juega & Regula llega en la próxima fase.</Text>
 
       <View style={styles.footer}>
         <BigButton
