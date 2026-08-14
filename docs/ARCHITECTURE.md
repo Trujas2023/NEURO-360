@@ -163,3 +163,25 @@ Sobre esa base, la Fase 4 extiende el constructor de frases ya existente:
   producen audio superpuesto.
 - El botón de reproducir la frase pasa a mostrar el emoji 🔊 pedido en esta
   fase (antes ▶️), sin cambiar su comportamiento.
+
+## Estado de la Fase 6
+
+Sustituye la pantalla `ComingSoon` de "Juega & Regula" por un catálogo de
+juegos real, mismo patrón que la Fase 3 con "Mi Voz":
+
+- **Navegador anidado**: `SensoryGamesNavigator` se monta como una sola
+  pantalla del `RootNavigator` (ruta `SensoryGames`) y trae su propio
+  stack (catálogo → juego), igual que `AacNavigator`.
+- **Catálogo declarativo con fallback a `ComingSoon`**: `sensory-games/constants/games.ts`
+  lista los seis juegos planeados; solo *Revienta burbujas* tiene `route`
+  hacia una pantalla propia. Los otros cinco se ven en el catálogo pero
+  navegan a `ComingSoon` (stack raíz) con su propio título/emoji hasta la
+  Fase 7, sin necesitar una pantalla dedicada todavía.
+- **Sin dependencias nuevas**: la animación de "reventar" burbujas usa
+  únicamente la API `Animated` incluida en React Native.
+- **Sin persistencia**: el estado del juego (burbujas, contador) vive solo
+  en memoria de la pantalla, igual razonamiento que Calma 360 — es juego
+  momentáneo, no datos que conservar por perfil.
+- **Dos puntos de entrada actualizados**: el botón "Juega & Regula" de
+  `HomeScreen` y el botón "Ir a Mundo Sensorial" de `CalmCommunicationScreen`
+  (Calma 360) ahora navegan a `SensoryGames` en vez de `ComingSoon`.

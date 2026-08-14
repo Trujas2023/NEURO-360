@@ -16,7 +16,11 @@ a la siguiente.
   Antes de esta fase se corrigió un dato huérfano: al eliminar un perfil
   ahora también se borran sus tarjetas AAC (`services/storage/profileDataRegistry.ts`).
 - [ ] Fase 5 — Personalización para padres *(tarjetas ya cubiertas en Fase 3; falta grabación de voz y otras preferencias)*.
-- [ ] Fase 6 — Primer juego sensorial.
+- [x] **Fase 6 — Primer juego sensorial.** "Juega & Regula" deja de ser un
+  stub: catálogo con los seis juegos planeados (`sensory-games/README.md`)
+  y el primero implementado, *Revienta burbujas* (sin puntaje que
+  penalice, sin límite de tiempo, sin sonido). Los otros cinco siguen
+  apuntando a `ComingSoon` hasta la Fase 7.
 - [ ] Fase 7 — Resto de juegos.
 - [ ] Fase 8 — Modo adulto y controles (PIN).
 - [ ] Fase 9 — Almacenamiento offline.

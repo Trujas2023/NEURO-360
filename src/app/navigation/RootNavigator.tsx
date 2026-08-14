@@ -14,6 +14,7 @@ import { AdultHomeScreen } from '@features/parent-mode/screens/AdultHomeScreen';
 import { PinGateScreen } from '@features/parent-mode/screens/PinGateScreen';
 import { ProfileFormScreen } from '@features/profiles/screens/ProfileFormScreen';
 import { ProfileSelectorScreen } from '@features/profiles/screens/ProfileSelectorScreen';
+import { SensoryGamesNavigator } from '@features/sensory-games/navigation/SensoryGamesNavigator';
 import { colors } from '@shared/theme';
 
 import type { RootStackParamList } from './types';
@@ -45,6 +46,7 @@ export function RootNavigator() {
       <Stack.Screen name="MyDay" component={MyDayScreen} />
       <Stack.Screen name="RoutineManager" component={RoutineManagerScreen} />
       <Stack.Screen name="RoutineForm" component={RoutineFormScreen} />
+      <Stack.Screen name="SensoryGames" component={SensoryGamesNavigator} />
     </Stack.Navigator>
   );
 }

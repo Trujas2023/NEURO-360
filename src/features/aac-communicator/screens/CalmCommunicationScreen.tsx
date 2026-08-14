@@ -1,4 +1,7 @@
-import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
+import type {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
@@ -13,16 +16,20 @@ type Props = NativeStackScreenProps<AacStackParamList, 'AacCalm'>;
 /**
  * Calma 360: panel de comunicación rápida para momentos de crisis o
  * sobreestimulación, alcanzable en un toque desde cualquier pantalla de
- * "Mi Voz" (ver botón "Calma" en `AacLayout`). Enlaza a Mundo Sensorial
- * sin modificar su lógica interna (ese módulo todavía es un stub —
- * `ComingSoonScreen` — ver docs/AAC_PRO_FASE2_PLAN.md).
+ * "Mi Voz" (ver botón "Calma" en `AacLayout`). Enlaza a "Juega & Regula"
+ * (Mundo Sensorial) sin modificar su lógica interna.
  */
 export function CalmCommunicationScreen({ navigation }: Props) {
   const parentNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <ScreenContainer scrollable>
-      <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={() => navigation.goBack()} />
+      <BigButton
+        label="Volver"
+        variant="ghost"
+        fullWidth={false}
+        onPress={() => navigation.goBack()}
+      />
 
       <Text style={styles.title}>😌 Calma</Text>
       <Text style={styles.subtitle}>Toca una frase para escucharla al instante</Text>
@@ -34,7 +41,7 @@ export function CalmCommunicationScreen({ navigation }: Props) {
           label="Ir a Mundo Sensorial"
           emoji="🌈"
           variant="secondary"
-          onPress={() => parentNavigation?.navigate('ComingSoon', { title: 'Mundo Sensorial', emoji: '🌈' })}
+          onPress={() => parentNavigation?.navigate('SensoryGames')}
         />
       </View>
     </ScreenContainer>

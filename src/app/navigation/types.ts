@@ -18,6 +18,8 @@ export type RootStackParamList = {
   /** Modo Adulto: alta/edición de rutinas y pasos de Mi Día de un perfil concreto. */
   RoutineManager: { profileId: string };
   RoutineForm: { profileId: string; routineId?: string };
+  /** "Juega & Regula": catálogo de juegos sensoriales (Modo Niño). */
+  SensoryGames: undefined;
 };
 
 declare global {

@@ -47,7 +47,7 @@ export function HomeScreen({ navigation }: Props) {
           label="Juega & Regula"
           emoji="🎮"
           variant="secondary"
-          onPress={() => navigation.navigate('ComingSoon', { title: 'Juega & Regula', emoji: '🎮' })}
+          onPress={() => navigation.navigate('SensoryGames')}
           accessibilityHint="Abre los juegos sensoriales"
         />
         <View style={styles.spacer} />
