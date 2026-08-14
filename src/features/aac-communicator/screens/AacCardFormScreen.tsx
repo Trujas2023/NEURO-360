@@ -5,12 +5,13 @@ import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'rea
 
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { speak, speakOptionsForPreferences } from '@services/audio/speech';
+import { speak, speakOptionsForPreferences } from '@services/audio';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { AVATAR_COLORS as PALETTE_COLORS, DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { AacCardVisual } from '../components/AacCardVisual';
+import { VoiceRecorderField } from '../components/VoiceRecorderField';
 import { ASSIGNABLE_CATEGORIES, getCategory } from '../constants/categories';
 import { useAacCards } from '../hooks/useAacCards';
 
@@ -36,6 +37,7 @@ export function AacCardFormScreen({ route, navigation }: Props) {
   const [spokenText, setSpokenText] = useState(editingCard?.spokenText ?? '');
   const [emoji, setEmoji] = useState(editingCard?.emoji ?? getCategory(defaultCategoryId)?.emoji ?? '🙂');
   const [imageUri, setImageUri] = useState<string | undefined>(editingCard?.imageUri);
+  const [audioUri, setAudioUri] = useState<string | undefined>(editingCard?.audioUri);
   const [color, setColor] = useState(editingCard?.color ?? getCategory(defaultCategoryId)?.color ?? PALETTE_COLORS[0]);
   const [isFavorite, setIsFavorite] = useState(editingCard?.isFavorite ?? false);
   const [saving, setSaving] = useState(false);
@@ -104,6 +106,7 @@ export function AacCardFormScreen({ route, navigation }: Props) {
           emoji: emoji.trim() || '🙂',
           imageUri,
           imageType: imageUri ? 'photo' : 'icon',
+          audioUri,
           color,
           isFavorite,
         });
@@ -114,6 +117,7 @@ export function AacCardFormScreen({ route, navigation }: Props) {
           spokenText: trimmedSpokenText || undefined,
           emoji: emoji.trim() || '🙂',
           imageUri,
+          audioUri,
           color,
           isFavorite,
         });
@@ -166,6 +170,8 @@ export function AacCardFormScreen({ route, navigation }: Props) {
       <View style={styles.tryVoiceButton}>
         <BigButton label="Probar voz" emoji="🔊" variant="secondary" fullWidth={false} onPress={tryVoice} />
       </View>
+
+      <VoiceRecorderField audioUri={audioUri} onChange={setAudioUri} />
 
       <Text style={styles.label}>Pictograma (emoji, si no hay foto)</Text>
       <TextInput

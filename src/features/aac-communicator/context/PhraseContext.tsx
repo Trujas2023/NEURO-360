@@ -2,15 +2,12 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { speak, speakOptionsForPreferences } from '@services/audio/speech';
+import { speak, speakOptionsForPreferences } from '@services/audio';
 
 import { useSavedPhrases } from '../hooks/useSavedPhrases';
 import { addSavedPhrase } from '../storage/savedPhrasesRepository';
 import type { AacCard, SavedPhrase } from '../types';
-
-function spokenTextOf(card: AacCard): string {
-  return card.spokenText ?? card.label;
-}
+import { speakCard, spokenTextOf } from '../utils/cardSpeech';
 
 interface PhraseContextValue {
   phrase: AacCard[];
@@ -56,7 +53,9 @@ export function PhraseProvider({ children }: { children: ReactNode }) {
   const addCard = useCallback(
     (card: AacCard) => {
       if (soundEnabled && speakOnTap) {
-        speak(spokenTextOf(card), ttsOptions);
+        // Habla la grabación personalizada de la tarjeta si tiene una;
+        // si no, TTS. Nunca las dos a la vez (ver `utils/cardSpeech.ts`).
+        speakCard(card, ttsOptions);
       }
       setPhrase((current) => [...current, card]);
     },
@@ -79,6 +78,10 @@ export function PhraseProvider({ children }: { children: ReactNode }) {
     if (!soundEnabled || phrase.length === 0) {
       return;
     }
+    // Siempre TTS, aunque alguna palabra tenga grabación propia: no hay
+    // forma de unir grabaciones de voces distintas en una sola oración
+    // fluida, así que una frase de varias palabras se lee con una sola
+    // voz consistente.
     speak(phrase.map(spokenTextOf).join(' '), ttsOptions);
   }, [phrase, soundEnabled, ttsOptions]);
 

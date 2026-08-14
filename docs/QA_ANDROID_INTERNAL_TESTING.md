@@ -115,15 +115,109 @@ se reporte como falla.
 
 ## 10. Grabación de voz
 
-⚠️ **NO EXISTE — no se puede probar.**
+La grabación de voz personalizada por un adulto **está implementada**
+(dependencia `expo-audio` + `expo-file-system`). Solo se accede desde el
+editor de tarjetas en Modo Adulto (protegido por PIN), igual que el resto
+del formulario.
 
-La grabación de voz personalizada por un adulto **no está implementada**.
-El campo `audioUri` existe reservado en el modelo de datos pero no hay
-interfaz ni dependencia de audio instalada. Todo el habla de la app usa
-el texto a voz del sistema (`expo-speech`).
+**Permisos**
 
-No lo reportes como falla; queda pendiente para una fase futura y requiere
-agregar `expo-audio` y permiso de micrófono.
+- [ ] Al abrir la app y navegar por "Mi Voz" **no** aparece ningún aviso de
+      permiso de micrófono (el permiso nunca se pide al inicio).
+- [ ] Al tocar **"Grabar voz"** por primera vez aparece primero una
+      explicación en pantalla ("Usar el micrófono...") con **Cancelar** /
+      **Continuar**, antes de que el sistema pida el permiso.
+- [ ] Tocar **Cancelar** en esa explicación no pide permiso al sistema y no
+      inicia ninguna grabación.
+- [ ] Tocar **Continuar** dispara el diálogo de permiso nativo de Android.
+- [ ] **Conceder** el permiso inicia la grabación de inmediato.
+- [ ] **Denegar** el permiso muestra un aviso claro en la tarjeta ("No
+      diste permiso... puede seguir usando voz sintética") y la app sigue
+      funcionando con TTS; no se cierra ni queda bloqueada.
+- [ ] Denegar el permiso **dos veces** (Android deja de volver a preguntar):
+      al tocar "Grabar voz" de nuevo aparece un aviso para activarlo desde
+      los ajustes del sistema, sin volver a mostrar el diálogo nativo.
+
+**Grabación**
+
+- [ ] Al grabar se ve un indicador visual claro (punto rojo + "Grabando…"
+      con el tiempo transcurrido).
+- [ ] **Detener** guarda la grabación y muestra un indicador de "Guardando…"
+      breve mientras se persiste el archivo.
+- [ ] Después de guardar aparecen los botones **Escuchar**, **Volver a
+      grabar** y **Eliminar grabación**.
+- [ ] **Escuchar** reproduce la grabación recién hecha.
+- [ ] **Volver a grabar** permite grabar de nuevo y reemplaza la anterior
+      al guardar la tarjeta.
+- [ ] **Eliminar grabación** quita la grabación del formulario (la tarjeta
+      queda sin audio propio, usará TTS) sin necesidad de guardar todavía.
+- [ ] **Cancelar** el formulario después de grabar, volver a grabar, o
+      eliminar una grabación **no debe** dejar la tarjeta original rota:
+      vuelve a abrir la tarjeta y comprueba que conserva su grabación (o su
+      ausencia) previa a esos cambios sin guardar.
+- [ ] **Guardar** la tarjeta con una grabación nueva la deja disponible al
+      tocarla desde "Mi Voz".
+
+**Reproducción (grabación vs. TTS)**
+
+- [ ] Una tarjeta **con** grabación reproduce la voz grabada al tocarla,
+      no el TTS del sistema.
+- [ ] Una tarjeta **sin** grabación sigue usando TTS exactamente igual que
+      antes.
+- [ ] Nunca se escuchan la grabación y el TTS **al mismo tiempo** para la
+      misma tarjeta.
+- [ ] Al construir una **frase de varias tarjetas** (algunas con
+      grabación, otras sin) y tocar "Hablar", la frase completa se lee con
+      TTS (voz consistente); no intenta encadenar grabaciones distintas.
+- [ ] Las **frases guardadas** ("Guardar frase") también se reproducen con
+      TTS al tocarlas.
+
+**Persistencia**
+
+- [ ] Grabar una tarjeta, **cerrar la app por completo** y volver a
+      abrirla: la grabación sigue disponible y se reproduce igual.
+- [ ] Grabar una tarjeta, **reiniciar el dispositivo** y volver a abrir la
+      app: la grabación sigue disponible.
+- [ ] La grabación **no** debe perderse con una actualización normal de la
+      app desde Google Play (verificar si hay oportunidad de instalar una
+      build más nueva sobre una anterior con tarjetas grabadas).
+- [ ] **Eliminar una tarjeta** con grabación la borra correctamente (no
+      queda un archivo de audio huérfano ni un error al eliminar).
+- [ ] **Eliminar un perfil completo** que tenía tarjetas con grabaciones no
+      produce errores ni deja la app en un estado inconsistente.
+
+**Privacidad**
+
+- [ ] En ningún punto del flujo de grabación se menciona ni ocurre una
+      subida a internet, nube o servidor: la explicación en pantalla dice
+      explícitamente que la grabación se guarda solo en el dispositivo.
+- [ ] La app funciona igual con el **WiFi/datos apagados** (grabar,
+      escuchar y reproducir tarjetas grabadas no requieren red).
+
+**Modo Adulto / Modo Niño**
+
+- [ ] Grabar, volver a grabar o eliminar una grabación **solo** es posible
+      dentro del editor de tarjetas de Modo Adulto (tras el PIN); no hay
+      forma de llegar a esas acciones desde Modo Niño.
+- [ ] Desde **Modo Niño**, el niño puede tocar una tarjeta con grabación y
+      escucharla con normalidad, pero no tiene acceso a grabar, reemplazar
+      ni eliminar esa grabación.
+
+**Manejo de errores**
+
+- [ ] Denegar el permiso de micrófono: aviso claro, la app sigue
+      funcionando (cubierto arriba).
+- [ ] Micrófono no disponible (p. ej. en uso por otra app, si se puede
+      simular): la app muestra un aviso ("No se pudo iniciar la
+      grabación...") y no se cierra.
+- [ ] Interrumpir la grabación a la fuerza (p. ej. mandar la app a segundo
+      plano o recibir una llamada mientras graba, si es posible probarlo):
+      la app no se cierra ni queda en un estado bloqueado al volver.
+- [ ] Si el archivo de audio de una tarjeta ya no existe en el dispositivo
+      (por ejemplo, borrado manualmente fuera de la app), tocar la tarjeta
+      cae de vuelta a TTS en lugar de fallar en silencio.
+- [ ] Un error de reproducción (archivo dañado, etc.) muestra un aviso en
+      el editor y no cierra la app.
 
 ## 11. Mi Día
 

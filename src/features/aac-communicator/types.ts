@@ -34,9 +34,12 @@ export interface AacCard {
    */
   imageType?: 'icon' | 'localAsset' | 'photo';
   /**
-   * Grabación de voz de un adulto (reservado para cuando se agregue
-   * grabación de audio). Si existe, se reproduce en vez del TTS.
-   * No implementado todavía: ver docs/AAC_PRO_FASE2_PLAN.md.
+   * URI local (persistente, `expo-file-system`) de una grabación de voz
+   * hecha por un adulto para esta tarjeta. Si existe y el archivo sigue
+   * en el dispositivo, se reproduce en vez del TTS — ver
+   * `utils/cardSpeech.ts`. Se graba y se borra únicamente desde el
+   * editor de tarjetas (Modo Adulto, protegido por PIN); el niño puede
+   * escucharla pero no crearla ni eliminarla.
    */
   audioUri?: string;
   /**
@@ -71,6 +74,7 @@ export type CreateAacCardInput = {
   spokenText?: string;
   emoji: string;
   imageUri?: string;
+  audioUri?: string;
   color: string;
   isFavorite?: boolean;
 };

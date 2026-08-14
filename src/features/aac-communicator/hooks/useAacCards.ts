@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { deleteRecording } from '@services/audio';
 import { createId } from '@shared/utils/id';
 
 import { buildDefaultCards } from '../constants/seedCards';
@@ -96,6 +97,7 @@ export function useAacCards(profileId: string | null): UseAacCardsResult {
         emoji: input.emoji.trim(),
         imageUri: input.imageUri,
         imageType: input.imageUri ? 'photo' : 'icon',
+        audioUri: input.audioUri,
         createdByUser: true,
         color: input.color,
         isFavorite: input.isFavorite ?? false,
@@ -111,14 +113,28 @@ export function useAacCards(profileId: string | null): UseAacCardsResult {
 
   const updateCard = useCallback(
     async (id: string, updates: UpdateAacCardInput) => {
+      const previous = cards.find((card) => card.id === id);
       await persist(cards.map((card) => (card.id === id ? { ...card, ...updates } : card)));
+
+      // Solo se borra el archivo viejo una vez que el cambio ya se
+      // guardó (nunca durante la edición): si el adulto graba de nuevo o
+      // quita la grabación y guarda, la anterior queda huérfana en el
+      // formulario hasta este momento, así cancelar el formulario nunca
+      // deja a una tarjeta con una referencia rota a un audio borrado.
+      if (previous?.audioUri && 'audioUri' in updates && updates.audioUri !== previous.audioUri) {
+        await deleteRecording(previous.audioUri);
+      }
     },
     [cards, persist],
   );
 
   const deleteCard = useCallback(
     async (id: string) => {
+      const target = cards.find((card) => card.id === id);
       await persist(cards.filter((card) => card.id !== id));
+      if (target?.audioUri) {
+        await deleteRecording(target.audioUri);
+      }
     },
     [cards, persist],
   );
