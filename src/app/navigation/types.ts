@@ -21,6 +21,15 @@ export type RootStackParamList = {
   CalmPain: undefined;
   /** Calma: flujo guiado "Tengo miedo / Estoy saturado" (qué te molesta / qué necesitas). */
   CalmOverwhelm: undefined;
+  /** Mundo Sensorial: entrada por necesidad ("¿qué necesitas ahora?"). */
+  SensoryHome: undefined;
+  SensoryBubbles: undefined;
+  SensoryBreathing: undefined;
+  SensoryTracking: undefined;
+  SensoryPaint: undefined;
+  SensoryCauseEffect: undefined;
+  /** Modo Adulto: ajustes de Mundo Sensorial de un perfil concreto. */
+  SensorySettings: { profileId: string };
 };
 
 /**

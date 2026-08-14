@@ -14,6 +14,13 @@ import { AdultHomeScreen } from '@features/parent-mode/screens/AdultHomeScreen';
 import { PinGateScreen } from '@features/parent-mode/screens/PinGateScreen';
 import { ProfileFormScreen } from '@features/profiles/screens/ProfileFormScreen';
 import { ProfileSelectorScreen } from '@features/profiles/screens/ProfileSelectorScreen';
+import { BreathingScreen } from '@features/sensory-world/screens/BreathingScreen';
+import { BubblesScreen } from '@features/sensory-world/screens/BubblesScreen';
+import { CauseEffectScreen } from '@features/sensory-world/screens/CauseEffectScreen';
+import { SensoryHomeScreen } from '@features/sensory-world/screens/SensoryHomeScreen';
+import { SensoryPaintScreen } from '@features/sensory-world/screens/SensoryPaintScreen';
+import { SensorySettingsScreen } from '@features/sensory-world/screens/SensorySettingsScreen';
+import { VisualTrackingScreen } from '@features/sensory-world/screens/VisualTrackingScreen';
 import { colors } from '@shared/theme';
 
 import { MainTabs } from './MainTabs';
@@ -49,6 +56,13 @@ export function RootNavigator() {
       <Stack.Screen name="Help" component={HelpScreen} />
       <Stack.Screen name="CalmPain" component={PainFlowScreen} />
       <Stack.Screen name="CalmOverwhelm" component={OverwhelmFlowScreen} />
+      <Stack.Screen name="SensoryHome" component={SensoryHomeScreen} />
+      <Stack.Screen name="SensoryBubbles" component={BubblesScreen} />
+      <Stack.Screen name="SensoryBreathing" component={BreathingScreen} />
+      <Stack.Screen name="SensoryTracking" component={VisualTrackingScreen} />
+      <Stack.Screen name="SensoryPaint" component={SensoryPaintScreen} />
+      <Stack.Screen name="SensoryCauseEffect" component={CauseEffectScreen} />
+      <Stack.Screen name="SensorySettings" component={SensorySettingsScreen} />
     </Stack.Navigator>
   );
 }

@@ -46,7 +46,7 @@ export function CalmCommunicationScreen({ navigation }: Props) {
           label="Ir a Mundo Sensorial"
           emoji="🌈"
           variant="secondary"
-          onPress={() => rootNavigation?.navigate('ComingSoon', { title: 'Mundo Sensorial', emoji: '🌈' })}
+          onPress={() => rootNavigation?.navigate('SensoryHome')}
         />
       </View>
     </ScreenContainer>

@@ -1,9 +1,14 @@
 # sensory-games
 
-Módulo "Juega & Regula": seis minijuegos sensoriales (Revienta burbujas,
-Pintura sensorial, Toca y escucha, Sigue el color, ¿Cómo me siento?,
-Respira conmigo). Se implementa en las Fases 6 y 7.
+Reservado para "Juega & Regula" (Fase 6 de V2): seis juegos completos —
+emparejar colores, emparejar formas, memoria visual, secuencias,
+reconocer emociones y clasificar por categorías.
 
-Cada juego vive en su propia subcarpeta (`bubble-pop/`, `sensory-paint/`,
-`touch-and-listen/`, `follow-the-color/`, `how-i-feel/`, `breathe-with-me/`)
-para mantener el módulo escalable y desacoplado.
+Todavía no tiene código y **no aparece en la navegación** hasta que los
+juegos existan de verdad.
+
+Ojo con el nombre: las *actividades sensoriales* (burbujas, respiración,
+seguimiento visual, pintura, causa y efecto) no viven acá sino en
+`features/sensory-world`, que es "Mundo Sensorial". V2 separa los dos
+módulos: Mundo Sensorial regula, Juega & Regula propone juegos con
+objetivo.

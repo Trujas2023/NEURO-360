@@ -65,6 +65,18 @@ export function HomeScreen({ navigation }: Props) {
         </View>
         <View style={styles.gridItem}>
           <BigButton
+            label="Sensorial"
+            emoji="🌈"
+            variant="secondary"
+            onPress={() => rootNavigation?.navigate('SensoryHome')}
+            accessibilityHint="Abre las actividades de regulación sensorial"
+          />
+        </View>
+      </View>
+
+      <View style={styles.grid}>
+        <View style={styles.gridItem}>
+          <BigButton
             label="Mi Día"
             emoji="📅"
             variant="secondary"
@@ -72,6 +84,7 @@ export function HomeScreen({ navigation }: Props) {
             accessibilityHint="Abre la agenda visual de rutinas"
           />
         </View>
+        <View style={styles.gridItem} />
       </View>
 
       <View style={styles.helpAction}>
@@ -85,7 +98,7 @@ export function HomeScreen({ navigation }: Props) {
         />
       </View>
 
-      <Text style={styles.comingSoonNote}>Sensorial y Juega & Regula llegan en próximas fases.</Text>
+      <Text style={styles.comingSoonNote}>Juega & Regula llega en la próxima fase.</Text>
 
       <View style={styles.footer}>
         <BigButton
