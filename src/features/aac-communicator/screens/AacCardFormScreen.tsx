@@ -4,8 +4,10 @@ import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
+import { useProfiles } from '@features/profiles/context/ProfilesContext';
+import { speak, speakOptionsForPreferences } from '@services/audio/speech';
 import { BigButton, ScreenContainer } from '@shared/components';
-import { AVATAR_COLORS as PALETTE_COLORS } from '@shared/constants/profiles';
+import { AVATAR_COLORS as PALETTE_COLORS, DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { AacCardVisual } from '../components/AacCardVisual';
@@ -21,6 +23,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AacCardForm'>;
  */
 export function AacCardFormScreen({ route, navigation }: Props) {
   const { profileId, cardId, categoryId: initialCategoryId } = route.params;
+  const { profiles } = useProfiles();
+  const profile = profiles.find((item) => item.id === profileId);
+  const ttsOptions = speakOptionsForPreferences(profile?.preferences ?? DEFAULT_PROFILE_PREFERENCES);
   const { cards, createCard, updateCard } = useAacCards(profileId);
   const editingCard = useMemo(() => cards.find((card) => card.id === cardId) ?? null, [cards, cardId]);
 
@@ -28,11 +33,19 @@ export function AacCardFormScreen({ route, navigation }: Props) {
 
   const [categoryId, setCategoryId] = useState(defaultCategoryId);
   const [label, setLabel] = useState(editingCard?.label ?? '');
+  const [spokenText, setSpokenText] = useState(editingCard?.spokenText ?? '');
   const [emoji, setEmoji] = useState(editingCard?.emoji ?? getCategory(defaultCategoryId)?.emoji ?? '🙂');
   const [imageUri, setImageUri] = useState<string | undefined>(editingCard?.imageUri);
   const [color, setColor] = useState(editingCard?.color ?? getCategory(defaultCategoryId)?.color ?? PALETTE_COLORS[0]);
   const [isFavorite, setIsFavorite] = useState(editingCard?.isFavorite ?? false);
   const [saving, setSaving] = useState(false);
+
+  function tryVoice() {
+    const textToSpeak = spokenText.trim() || label.trim();
+    if (textToSpeak) {
+      speak(textToSpeak, ttsOptions);
+    }
+  }
 
   function handleSelectCategory(nextCategoryId: string) {
     setCategoryId(nextCategoryId);
@@ -79,14 +92,18 @@ export function AacCardFormScreen({ route, navigation }: Props) {
       return;
     }
 
+    const trimmedSpokenText = spokenText.trim();
+
     setSaving(true);
     try {
       if (editingCard) {
         await updateCard(editingCard.id, {
           categoryId,
           label: trimmedLabel,
+          spokenText: trimmedSpokenText || undefined,
           emoji: emoji.trim() || '🙂',
           imageUri,
+          imageType: imageUri ? 'photo' : 'icon',
           color,
           isFavorite,
         });
@@ -94,6 +111,7 @@ export function AacCardFormScreen({ route, navigation }: Props) {
         await createCard({
           categoryId,
           label: trimmedLabel,
+          spokenText: trimmedSpokenText || undefined,
           emoji: emoji.trim() || '🙂',
           imageUri,
           color,
@@ -135,6 +153,19 @@ export function AacCardFormScreen({ route, navigation }: Props) {
         style={styles.input}
         accessibilityLabel="Palabra o frase de la tarjeta"
       />
+
+      <Text style={styles.label}>Qué dirá en voz alta (opcional, si es distinto del texto)</Text>
+      <TextInput
+        value={spokenText}
+        onChangeText={setSpokenText}
+        placeholder="Ej: Quiero a mi mamá"
+        placeholderTextColor={colors.textSecondary}
+        style={styles.input}
+        accessibilityLabel="Texto que se lee en voz alta"
+      />
+      <View style={styles.tryVoiceButton}>
+        <BigButton label="Probar voz" emoji="🔊" variant="secondary" fullWidth={false} onPress={tryVoice} />
+      </View>
 
       <Text style={styles.label}>Pictograma (emoji, si no hay foto)</Text>
       <TextInput
@@ -213,6 +244,10 @@ const styles = StyleSheet.create({
   },
   photoButton: {
     flex: 1,
+  },
+  tryVoiceButton: {
+    marginTop: spacing.sm,
+    alignItems: 'flex-start',
   },
   label: {
     marginTop: spacing.lg,

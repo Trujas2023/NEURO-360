@@ -13,6 +13,17 @@ export type AacBoardSize = '2x2' | '2x3' | '3x3' | '3x4' | '4x4';
 /** Tamaño de texto de las tarjetas del comunicador AAC. */
 export type AacTextSize = 'small' | 'medium' | 'large';
 
+/**
+ * Nivel de comunicación AAC del perfil (Mi Voz AAC V2). El adulto lo
+ * cambia desde Ajustes; la interfaz de "Mi Voz" se adapta automáticamente
+ * (ver `AacHomeScreen`):
+ * - LEVEL_1: 2-4 opciones grandes, habla inmediata, sin barra de frase.
+ * - LEVEL_2: 6-12 tarjetas núcleo en una sola grilla, sin categorías.
+ * - LEVEL_3: vocabulario núcleo + categorías, sin buscador ni accesos rápidos.
+ * - LEVEL_4: comunicador AAC completo (comportamiento histórico).
+ */
+export type CommunicationLevel = 'LEVEL_1' | 'LEVEL_2' | 'LEVEL_3' | 'LEVEL_4';
+
 export interface ChildProfilePreferences {
   /** Si está apagado, el comunicador y los juegos deben evitar sonido (Fase 3+). */
   soundEnabled: boolean;
@@ -46,6 +57,10 @@ export interface ChildProfilePreferences {
   showCategories?: boolean;
   /** Pedir confirmación antes de eliminar una tarjeta o rutina en Modo Adulto. */
   confirmBeforeDelete?: boolean;
+  /** Velocidad del texto a voz (1.0 = normal). Ver `services/audio/speech.ts`. */
+  ttsRate?: number;
+  /** Tono del texto a voz (1.0 = normal), si el dispositivo lo admite. */
+  ttsPitch?: number;
 }
 
 export interface ChildProfile {
@@ -55,6 +70,8 @@ export interface ChildProfile {
   avatarUri?: string;
   avatarColor: string;
   preferences: ChildProfilePreferences;
+  /** Opcional por compatibilidad con perfiles guardados antes de esta fase; se lee como `?? 'LEVEL_4'` (AAC completo, el comportamiento histórico). */
+  communicationLevel?: CommunicationLevel;
   createdAt: string;
 }
 

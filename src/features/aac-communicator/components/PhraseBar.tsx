@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { BigButton } from '@shared/components';
 import { colors, radius, spacing, typography } from '@shared/theme';
@@ -8,11 +8,17 @@ import { usePhrase } from '../context/PhraseContext';
 /**
  * Barra superior donde el niño arma la frase tocando tarjetas. Cada
  * palabra de la frase es a su vez tocable para quitarla individualmente
- * (además de "Borrar" la última y "Limpiar" todas).
+ * (además de "Borrar" la última y "Limpiar" todas). "Guardar" persiste la
+ * frase completa para reusarla después (ver `SavedPhrasesRow`).
  */
 export function PhraseBar() {
-  const { phrase, removeAt, removeLast, clear, speakPhrase } = usePhrase();
+  const { phrase, removeAt, removeLast, clear, speakPhrase, savePhrase } = usePhrase();
   const isEmpty = phrase.length === 0;
+
+  async function handleSave() {
+    await savePhrase();
+    Alert.alert('Frase guardada', 'La vas a encontrar en "Frases guardadas".');
+  }
 
   return (
     <View style={styles.container}>
@@ -49,6 +55,9 @@ export function PhraseBar() {
         </View>
         <View style={styles.actionButton}>
           <BigButton label="Borrar" emoji="⌫" variant="secondary" onPress={removeLast} disabled={isEmpty} />
+        </View>
+        <View style={styles.actionButton}>
+          <BigButton label="Guardar" emoji="📥" variant="secondary" onPress={handleSave} disabled={isEmpty} />
         </View>
         <View style={styles.actionButton}>
           <BigButton label="Limpiar" emoji="🗑️" variant="ghost" onPress={clear} disabled={isEmpty} />
@@ -99,10 +108,12 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
     marginTop: spacing.sm,
   },
   actionButton: {
-    flex: 1,
+    flexBasis: '47%',
+    flexGrow: 1,
   },
 });

@@ -4,10 +4,11 @@ import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
+import { speak, speakOptionsForPreferences } from '@services/audio/speech';
 import { BigButton, ScreenContainer } from '@shared/components';
-import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
+import { COMMUNICATION_LEVELS, DEFAULT_COMMUNICATION_LEVEL, DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
 import { colors, radius, spacing, typography } from '@shared/theme';
-import type { AacBoardSize, AacTextSize, ChildProfilePreferences } from '@shared/types';
+import type { AacBoardSize, AacTextSize, ChildProfilePreferences, CommunicationLevel } from '@shared/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AacSettings'>;
 
@@ -16,6 +17,16 @@ const TEXT_SIZES: { value: AacTextSize; label: string }[] = [
   { value: 'small', label: 'Pequeño' },
   { value: 'medium', label: 'Mediano' },
   { value: 'large', label: 'Grande' },
+];
+const VOICE_RATES: { value: number; label: string }[] = [
+  { value: 0.75, label: 'Lenta' },
+  { value: 1, label: 'Normal' },
+  { value: 1.25, label: 'Rápida' },
+];
+const VOICE_PITCHES: { value: number; label: string }[] = [
+  { value: 0.8, label: 'Grave' },
+  { value: 1, label: 'Normal' },
+  { value: 1.2, label: 'Agudo' },
 ];
 
 /**
@@ -38,15 +49,68 @@ export function AacSettingsScreen({ route, navigation }: Props) {
   }
 
   const prefs: ChildProfilePreferences = { ...DEFAULT_PROFILE_PREFERENCES, ...profile.preferences };
+  const level = profile.communicationLevel ?? DEFAULT_COMMUNICATION_LEVEL;
 
   function setPref<K extends keyof ChildProfilePreferences>(key: K, value: ChildProfilePreferences[K]) {
     updateProfile(profileId, { preferences: { ...prefs, [key]: value } });
+  }
+
+  function setLevel(value: CommunicationLevel) {
+    updateProfile(profileId, { communicationLevel: value });
+  }
+
+  function tryVoice() {
+    speak('Hola, así suena mi voz.', speakOptionsForPreferences(prefs));
   }
 
   return (
     <ScreenContainer scrollable>
       <Text style={styles.title}>Ajustes de Mi Voz</Text>
       <Text style={styles.subtitle}>Personalización AAC de {profile.name}</Text>
+
+      <Section title="Nivel de comunicación">
+        <View style={styles.chipRow}>
+          {COMMUNICATION_LEVELS.map((option) => (
+            <Chip
+              key={option.value}
+              label={option.label}
+              selected={level === option.value}
+              onPress={() => setLevel(option.value)}
+            />
+          ))}
+        </View>
+        <Text style={styles.toggleHint}>
+          {COMMUNICATION_LEVELS.find((option) => option.value === level)?.description}
+        </Text>
+      </Section>
+
+      <Section title="Voz">
+        <Text style={styles.subsectionLabel}>Velocidad</Text>
+        <View style={styles.chipRow}>
+          {VOICE_RATES.map((option) => (
+            <Chip
+              key={option.value}
+              label={option.label}
+              selected={(prefs.ttsRate ?? 1) === option.value}
+              onPress={() => setPref('ttsRate', option.value)}
+            />
+          ))}
+        </View>
+        <Text style={styles.subsectionLabel}>Tono</Text>
+        <View style={styles.chipRow}>
+          {VOICE_PITCHES.map((option) => (
+            <Chip
+              key={option.value}
+              label={option.label}
+              selected={(prefs.ttsPitch ?? 1) === option.value}
+              onPress={() => setPref('ttsPitch', option.value)}
+            />
+          ))}
+        </View>
+        <View style={styles.tryVoiceButton}>
+          <BigButton label="Probar voz" emoji="🔊" variant="secondary" fullWidth={false} onPress={tryVoice} />
+        </View>
+      </Section>
 
       <Section title="Tamaño del tablero">
         <View style={styles.chipRow}>
@@ -173,10 +237,21 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
+  subsectionLabel: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.medium,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  tryVoiceButton: {
+    marginTop: spacing.sm,
+    alignItems: 'flex-start',
+  },
   chipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
+    marginBottom: spacing.sm,
   },
   chip: {
     borderWidth: 2,

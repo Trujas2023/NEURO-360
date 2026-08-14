@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { speak } from '@services/audio/speech';
+import { speak, speakOptionsForPreferences } from '@services/audio/speech';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import type { QuickPhrase } from '../data/emergencyVocabulary';
@@ -18,6 +18,7 @@ export interface QuickCommunicationProps {
 export function QuickCommunication({ phrases }: QuickCommunicationProps) {
   const { activeProfile } = useProfiles();
   const soundEnabled = activeProfile?.preferences.soundEnabled ?? true;
+  const ttsOptions = speakOptionsForPreferences(activeProfile?.preferences);
 
   return (
     <View style={styles.grid}>
@@ -26,7 +27,7 @@ export function QuickCommunication({ phrases }: QuickCommunicationProps) {
           key={phrase.id}
           onPress={() => {
             if (soundEnabled) {
-              speak(phrase.label);
+              speak(phrase.label, ttsOptions);
             }
           }}
           accessibilityRole="button"

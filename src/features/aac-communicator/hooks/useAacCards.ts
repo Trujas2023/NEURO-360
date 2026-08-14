@@ -87,12 +87,16 @@ export function useAacCards(profileId: string | null): UseAacCardsResult {
       const cardsInCategory = cards.filter((card) => card.categoryId === input.categoryId);
       const nextOrder = cardsInCategory.reduce((max, card) => Math.max(max, card.order), -1) + 1;
 
+      const trimmedSpokenText = input.spokenText?.trim();
       const card: AacCard = {
         id: createId(),
         categoryId: input.categoryId,
         label: input.label.trim(),
+        spokenText: trimmedSpokenText ? trimmedSpokenText : undefined,
         emoji: input.emoji.trim(),
         imageUri: input.imageUri,
+        imageType: input.imageUri ? 'photo' : 'icon',
+        createdByUser: true,
         color: input.color,
         isFavorite: input.isFavorite ?? false,
         order: nextOrder,

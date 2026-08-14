@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { speak } from '@services/audio/speech';
+import { speak, speakOptionsForPreferences } from '@services/audio/speech';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
@@ -23,10 +23,11 @@ export function MyDayScreen() {
 
   const selectedRoutine = routines.find((routine) => routine.id === selectedRoutineId) ?? null;
   const soundEnabled = activeProfile?.preferences.soundEnabled ?? true;
+  const ttsOptions = speakOptionsForPreferences(activeProfile?.preferences);
 
   function handleStepPress(step: RoutineStep) {
     if (soundEnabled) {
-      speak(step.label);
+      speak(step.label, ttsOptions);
     }
   }
 

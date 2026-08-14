@@ -13,6 +13,13 @@ export interface AacLayoutProps {
   /** Omitir en la pantalla raíz del tab "Mi Voz" (no hay a dónde volver; se cambia de tab). */
   onBack?: () => void;
   children: ReactNode;
+  /**
+   * Sobrescribe el ajuste "Mostrar barra de frase" del perfil. Lo usa
+   * Nivel 1 de comunicación (`AacHomeScreen`), que habla de inmediato en
+   * vez de construir una frase, así que no tiene sentido mostrarla ahí
+   * aunque el perfil la tenga activada.
+   */
+  showPhraseBar?: boolean;
 }
 
 /**
@@ -21,9 +28,10 @@ export interface AacLayoutProps {
  * cuatro tabs principales de `MainTabs`, siempre a un toque de distancia
  * desde la barra inferior, sin duplicar el control en cada pantalla.
  */
-export function AacLayout({ title, onBack, children }: AacLayoutProps) {
+export function AacLayout({ title, onBack, children, showPhraseBar: showPhraseBarOverride }: AacLayoutProps) {
   const { activeProfile } = useProfiles();
-  const showPhraseBar = activeProfile?.preferences.showPhraseBar ?? DEFAULT_PROFILE_PREFERENCES.showPhraseBar;
+  const showPhraseBar =
+    showPhraseBarOverride ?? (activeProfile?.preferences.showPhraseBar ?? DEFAULT_PROFILE_PREFERENCES.showPhraseBar);
 
   return (
     <ScreenContainer scrollable topInset={false}>
