@@ -1,6 +1,6 @@
-# Pruebas manuales en Android — Prueba interna (V2 Fases 0–6)
+# Pruebas manuales en Android — Prueba interna (V2 Fases 0–6, ampliado en V7)
 
-Build a probar: `version 0.1.0`, `versionCode 5`, paquete
+Build a probar: `version 0.1.0`, `versionCode 6`, paquete
 `com.senseplayadventures.app`.
 
 Marca cada punto como ✅ / ❌ y anota el modelo de teléfono y la versión
