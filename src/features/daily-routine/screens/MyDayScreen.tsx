@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { speak } from '@services/audio/speech';
-import { BigButton, ScreenContainer } from '@shared/components';
+import { BigButton, ChildModeShell, EmptyState } from '@shared/components';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { useRoutines } from '../hooks/useRoutines';
@@ -16,7 +16,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'MyDay'>;
 /** "Mi Día": agenda visual de rutinas del perfil activo (Modo Niño). */
 export function MyDayScreen({ navigation }: Props) {
   const { activeProfile } = useProfiles();
-  const { routines, loading, toggleStepDone, resetRoutine } = useRoutines(activeProfile?.id ?? null);
+  const { routines, loading, toggleStepDone, resetRoutine } = useRoutines(
+    activeProfile?.id ?? null,
+  );
   const [selectedRoutineId, setSelectedRoutineId] = useState<string | null>(null);
 
   const selectedRoutine = routines.find((routine) => routine.id === selectedRoutineId) ?? null;
@@ -33,16 +35,21 @@ export function MyDayScreen({ navigation }: Props) {
     const nextStep = sortedSteps.find((step) => !step.done);
 
     return (
-      <ScreenContainer scrollable>
+      <ChildModeShell scrollable>
         <View style={styles.header}>
-          <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={() => setSelectedRoutineId(null)} />
+          <BigButton
+            label="Volver"
+            variant="ghost"
+            fullWidth={false}
+            onPress={() => setSelectedRoutineId(null)}
+          />
           <Text style={styles.title}>
             {selectedRoutine.emoji} {selectedRoutine.title}
           </Text>
         </View>
 
         {sortedSteps.length === 0 ? (
-          <Text style={styles.empty}>Esta rutina todavía no tiene pasos.</Text>
+          <EmptyState emoji="🗓️" title="Esta rutina todavía no tiene pasos." />
         ) : (
           sortedSteps.map((step) => {
             const isNext = nextStep?.id === step.id;
@@ -59,13 +66,21 @@ export function MyDayScreen({ navigation }: Props) {
                 ]}
               >
                 {isNext ? <Text style={styles.stepBadge}>PRIMERO</Text> : null}
-                {!isNext && !step.done && nextStep ? <Text style={styles.stepBadgeMuted}>DESPUÉS</Text> : null}
+                {!isNext && !step.done && nextStep ? (
+                  <Text style={styles.stepBadgeMuted}>DESPUÉS</Text>
+                ) : null}
                 <Text style={styles.stepEmoji}>{step.emoji}</Text>
-                <Text style={[styles.stepLabel, step.done && styles.stepLabelDone]}>{step.label}</Text>
+                <Text style={[styles.stepLabel, step.done && styles.stepLabelDone]}>
+                  {step.label}
+                </Text>
                 <Pressable
                   onPress={() => toggleStepDone(selectedRoutine.id, step.id)}
                   accessibilityRole="button"
-                  accessibilityLabel={step.done ? `Marcar "${step.label}" como no hecho` : `Marcar "${step.label}" como hecho`}
+                  accessibilityLabel={
+                    step.done
+                      ? `Marcar "${step.label}" como no hecho`
+                      : `Marcar "${step.label}" como hecho`
+                  }
                   style={[styles.doneButton, step.done && styles.doneButtonActive]}
                 >
                   <Text style={styles.doneButtonText}>{step.done ? '✅' : 'Hecho'}</Text>
@@ -83,21 +98,30 @@ export function MyDayScreen({ navigation }: Props) {
             onPress={() => resetRoutine(selectedRoutine.id)}
           />
         </View>
-      </ScreenContainer>
+      </ChildModeShell>
     );
   }
 
   return (
-    <ScreenContainer scrollable>
+    <ChildModeShell scrollable>
       <View style={styles.header}>
-        <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={() => navigation.goBack()} />
+        <BigButton
+          label="Volver"
+          variant="ghost"
+          fullWidth={false}
+          onPress={() => navigation.goBack()}
+        />
         <Text style={styles.title}>Mi Día</Text>
       </View>
 
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} />
       ) : routines.length === 0 ? (
-        <Text style={styles.empty}>Todavía no hay rutinas. Un adulto puede crearlas en Modo Adulto.</Text>
+        <EmptyState
+          emoji="🗓️"
+          title="Todavía no hay rutinas."
+          message="Un adulto puede crearlas en Centro de Adultos."
+        />
       ) : (
         <View style={styles.grid}>
           {routines
@@ -127,7 +151,7 @@ export function MyDayScreen({ navigation }: Props) {
             })}
         </View>
       )}
-    </ScreenContainer>
+    </ChildModeShell>
   );
 }
 
@@ -141,12 +165,6 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
     textAlign: 'center',
-  },
-  empty: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: spacing.xl,
   },
   grid: {
     flexDirection: 'row',

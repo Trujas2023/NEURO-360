@@ -3,8 +3,9 @@ import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
-import { BigButton, ScreenContainer } from '@shared/components';
+import { BigButton, IconButton, ScreenContainer, useConfirmDialog } from '@shared/components';
 import { AVATAR_COLORS as PALETTE_COLORS } from '@shared/constants/profiles';
+import { useReduceMotion } from '@shared/hooks';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { useRoutines } from '../hooks/useRoutines';
@@ -17,8 +18,14 @@ type Props = NativeStackScreenProps<RootStackParamList, 'RoutineForm'>;
  */
 export function RoutineFormScreen({ route, navigation }: Props) {
   const { profileId, routineId } = route.params;
-  const { routines, createRoutine, updateRoutine, addStep, deleteStep, moveStep } = useRoutines(profileId);
-  const editingRoutine = useMemo(() => routines.find((routine) => routine.id === routineId) ?? null, [routines, routineId]);
+  const { routines, createRoutine, updateRoutine, addStep, deleteStep, moveStep } =
+    useRoutines(profileId);
+  const editingRoutine = useMemo(
+    () => routines.find((routine) => routine.id === routineId) ?? null,
+    [routines, routineId],
+  );
+  const reduceMotion = useReduceMotion();
+  const { confirm, dialog } = useConfirmDialog(reduceMotion);
 
   const [title, setTitle] = useState(editingRoutine?.title ?? '');
   const [emoji, setEmoji] = useState(editingRoutine?.emoji ?? '🗓️');
@@ -41,9 +48,17 @@ export function RoutineFormScreen({ route, navigation }: Props) {
     setSaving(true);
     try {
       if (savedRoutineId) {
-        await updateRoutine(savedRoutineId, { title: trimmedTitle, emoji: emoji.trim() || '🗓️', color });
+        await updateRoutine(savedRoutineId, {
+          title: trimmedTitle,
+          emoji: emoji.trim() || '🗓️',
+          color,
+        });
       } else {
-        const routine = await createRoutine({ title: trimmedTitle, emoji: emoji.trim() || '🗓️', color });
+        const routine = await createRoutine({
+          title: trimmedTitle,
+          emoji: emoji.trim() || '🗓️',
+          color,
+        });
         setSavedRoutineId(routine.id);
       }
     } finally {
@@ -53,7 +68,10 @@ export function RoutineFormScreen({ route, navigation }: Props) {
 
   async function handleAddStep() {
     if (!savedRoutineId) {
-      Alert.alert('Guarda la rutina primero', 'Guarda el nombre de la rutina antes de agregar pasos.');
+      Alert.alert(
+        'Guarda la rutina primero',
+        'Guarda el nombre de la rutina antes de agregar pasos.',
+      );
       return;
     }
     const trimmedLabel = stepLabel.trim();
@@ -97,7 +115,11 @@ export function RoutineFormScreen({ route, navigation }: Props) {
             onPress={() => setColor(swatch)}
             accessibilityRole="button"
             accessibilityLabel={`Elegir color ${swatch}`}
-            style={[styles.swatch, { backgroundColor: swatch }, swatch === color && styles.swatchSelected]}
+            style={[
+              styles.swatch,
+              { backgroundColor: swatch },
+              swatch === color && styles.swatchSelected,
+            ]}
           />
         ))}
       </View>
@@ -123,22 +145,33 @@ export function RoutineFormScreen({ route, navigation }: Props) {
                   {step.label}
                 </Text>
                 <View style={styles.stepActions}>
-                  <IconButton label="Mover arriba" icon="↑" onPress={() => moveStep(savedRoutineId, step.id, 'up')} disabled={index === 0} />
+                  <IconButton
+                    label="Mover arriba"
+                    icon="chevron-up"
+                    onPress={() => moveStep(savedRoutineId, step.id, 'up')}
+                    disabled={index === 0}
+                  />
                   <IconButton
                     label="Mover abajo"
-                    icon="↓"
+                    icon="chevron-down"
                     onPress={() => moveStep(savedRoutineId, step.id, 'down')}
                     disabled={index === steps.length - 1}
                   />
                   <IconButton
                     label="Eliminar paso"
-                    icon="🗑️"
-                    onPress={() =>
-                      Alert.alert('Eliminar paso', `¿Eliminar "${step.label}"?`, [
-                        { text: 'Cancelar', style: 'cancel' },
-                        { text: 'Eliminar', style: 'destructive', onPress: () => deleteStep(savedRoutineId, step.id) },
-                      ])
-                    }
+                    icon="trash-outline"
+                    variant="danger"
+                    onPress={async () => {
+                      const ok = await confirm({
+                        title: 'Eliminar paso',
+                        message: `¿Eliminar "${step.label}"?`,
+                        confirmLabel: 'Eliminar',
+                        destructive: true,
+                      });
+                      if (ok) {
+                        deleteStep(savedRoutineId, step.id);
+                      }
+                    }}
                   />
                 </View>
               </View>
@@ -171,31 +204,9 @@ export function RoutineFormScreen({ route, navigation }: Props) {
       <View style={styles.actions}>
         <BigButton label="Volver" variant="ghost" onPress={() => navigation.goBack()} />
       </View>
-    </ScreenContainer>
-  );
-}
 
-function IconButton({
-  label,
-  icon,
-  onPress,
-  disabled = false,
-}: {
-  label: string;
-  icon: string;
-  onPress: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      style={({ pressed }) => [styles.iconButton, { opacity: disabled ? 0.3 : pressed ? 0.7 : 1 }]}
-    >
-      <Text style={styles.iconButtonText}>{icon}</Text>
-    </Pressable>
+      {dialog}
+    </ScreenContainer>
   );
 }
 
@@ -274,19 +285,6 @@ const styles = StyleSheet.create({
   stepActions: {
     flexDirection: 'row',
     gap: spacing.xs,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  iconButtonText: {
-    fontSize: typography.sizes.md,
   },
   addStepRow: {
     flexDirection: 'row',

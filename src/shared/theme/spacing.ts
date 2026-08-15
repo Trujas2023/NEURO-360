@@ -21,3 +21,9 @@ export const radius = {
 
 /** Área táctil mínima recomendada (dp) para botones usados por niños. */
 export const minTouchTarget = 64;
+
+/** Separadores finos (R1, ver docs/UX_UI_SYSTEM_SPEC.md §1.3). */
+export const hairline = 1;
+
+/** Elementos hero: burbuja de respiración, iconos de resultado (R1). */
+export const heroSize = 96;

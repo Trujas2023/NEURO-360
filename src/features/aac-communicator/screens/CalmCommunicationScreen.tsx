@@ -1,4 +1,7 @@
-import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
+import type {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
@@ -22,7 +25,21 @@ export function CalmCommunicationScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer scrollable>
-      <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={() => navigation.goBack()} />
+      <View style={styles.headerButtons}>
+        <BigButton
+          label="Volver"
+          variant="ghost"
+          fullWidth={false}
+          onPress={() => navigation.goBack()}
+        />
+        <BigButton
+          label="Inicio"
+          icon="home"
+          variant="ghost"
+          fullWidth={false}
+          onPress={() => parentNavigation?.navigate('Home')}
+        />
+      </View>
 
       <Text style={styles.title}>😌 Calma</Text>
       <Text style={styles.subtitle}>Toca una frase para escucharla al instante</Text>
@@ -34,7 +51,9 @@ export function CalmCommunicationScreen({ navigation }: Props) {
           label="Ir a Mundo Sensorial"
           emoji="🌈"
           variant="secondary"
-          onPress={() => parentNavigation?.navigate('ComingSoon', { title: 'Mundo Sensorial', emoji: '🌈' })}
+          onPress={() =>
+            parentNavigation?.navigate('ComingSoon', { title: 'Mundo Sensorial', emoji: '🌈' })
+          }
         />
       </View>
     </ScreenContainer>
@@ -42,6 +61,11 @@ export function CalmCommunicationScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  headerButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'stretch',
+  },
   title: {
     marginTop: spacing.md,
     fontSize: typography.sizes.xl,

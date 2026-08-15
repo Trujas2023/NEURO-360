@@ -3,6 +3,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
@@ -19,15 +20,25 @@ export interface AacLayoutProps {
 
 /**
  * Encabezado + barra de frase + contenido, compartido por las pantallas
- * del comunicador. El botón "Calma" está siempre presente para que las
- * funciones esenciales (Calma, y desde ahí Ayuda/Baño/Dolor/No/Quiero)
- * sean alcanzables en como máximo un toque desde cualquier pantalla de
- * "Mi Voz" (ver sección de accesibilidad del prompt maestro).
+ * del comunicador. Los botones "Inicio" y "Calma" (R1, ver
+ * docs/DEFINITION_OF_DONE.md §7.1) están siempre presentes para que las
+ * funciones esenciales sean alcanzables en como máximo un toque desde
+ * cualquier pantalla de "Mi Voz". No se usa `ChildModeShell` aquí a
+ * propósito: esta pantalla vive dentro de `AacNavigator` (anidado), y
+ * `ChildModeShell` en R1 solo está probado para pantallas de nivel raíz
+ * (ver su propio comentario) — se integran en R9. Mientras tanto, "Inicio"
+ * usa el mismo patrón de `navigation.getParent()` que ya usa
+ * `CalmCommunicationScreen` para llegar al navegador raíz.
  */
 export function AacLayout({ title, onBack, children }: AacLayoutProps) {
   const navigation = useNavigation<NativeStackNavigationProp<AacStackParamList>>();
   const { activeProfile } = useProfiles();
-  const showPhraseBar = activeProfile?.preferences.showPhraseBar ?? DEFAULT_PROFILE_PREFERENCES.showPhraseBar;
+  const showPhraseBar =
+    activeProfile?.preferences.showPhraseBar ?? DEFAULT_PROFILE_PREFERENCES.showPhraseBar;
+
+  function goHome() {
+    navigation.getParent<NativeStackNavigationProp<RootStackParamList>>()?.navigate('Home');
+  }
 
   return (
     <ScreenContainer scrollable>
@@ -36,7 +47,20 @@ export function AacLayout({ title, onBack, children }: AacLayoutProps) {
       <View style={styles.header}>
         <View style={styles.headerButtons}>
           <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={onBack} />
-          <BigButton label="Calma" emoji="😌" variant="secondary" fullWidth={false} onPress={() => navigation.navigate('AacCalm')} />
+          <BigButton
+            label="Inicio"
+            icon="home"
+            variant="ghost"
+            fullWidth={false}
+            onPress={goHome}
+          />
+          <BigButton
+            label="Calma"
+            emoji="😌"
+            variant="secondary"
+            fullWidth={false}
+            onPress={() => navigation.navigate('AacCalm')}
+          />
         </View>
         <Text style={styles.title}>{title}</Text>
       </View>

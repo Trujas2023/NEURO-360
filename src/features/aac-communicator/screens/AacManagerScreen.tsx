@@ -1,12 +1,19 @@
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { BigButton, ScreenContainer } from '@shared/components';
+import {
+  BigButton,
+  EmptyState,
+  IconButton,
+  ScreenContainer,
+  useConfirmDialog,
+} from '@shared/components';
 import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
+import { useReduceMotion } from '@shared/hooks';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { AacCardVisual } from '../components/AacCardVisual';
@@ -21,8 +28,11 @@ export function AacManagerScreen({ route, navigation }: Props) {
   const { profileId } = route.params;
   const { profiles } = useProfiles();
   const profile = profiles.find((item) => item.id === profileId);
-  const confirmBeforeDelete = profile?.preferences.confirmBeforeDelete ?? DEFAULT_PROFILE_PREFERENCES.confirmBeforeDelete;
+  const confirmBeforeDelete =
+    profile?.preferences.confirmBeforeDelete ?? DEFAULT_PROFILE_PREFERENCES.confirmBeforeDelete;
   const { cards, loading, reload, deleteCard, toggleFavorite, moveCard } = useAacCards(profileId);
+  const reduceMotion = useReduceMotion();
+  const { confirm, dialog } = useConfirmDialog(reduceMotion);
 
   useFocusEffect(
     useCallback(() => {
@@ -30,26 +40,29 @@ export function AacManagerScreen({ route, navigation }: Props) {
     }, [reload]),
   );
 
-  function confirmDelete(card: AacCard) {
+  async function confirmDelete(card: AacCard) {
     if (!confirmBeforeDelete) {
       deleteCard(card.id);
       return;
     }
-    Alert.alert('Eliminar tarjeta', `¿Eliminar "${card.label}"? Esta acción no se puede deshacer.`, [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Eliminar', style: 'destructive', onPress: () => deleteCard(card.id) },
-    ]);
+    const ok = await confirm({
+      title: 'Eliminar tarjeta',
+      message: `¿Eliminar "${card.label}"? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar',
+      destructive: true,
+    });
+    if (ok) {
+      deleteCard(card.id);
+    }
   }
 
   return (
-    <ScreenContainer scrollable>
+    <ScreenContainer scrollable loading={loading} loadingLabel="Cargando tarjetas…">
       <Text style={styles.title}>Comunicador AAC</Text>
       <Text style={styles.subtitle}>Tarjetas del perfil</Text>
 
-      {loading ? (
-        <ActivityIndicator size="large" color={colors.primary} />
-      ) : cards.length === 0 ? (
-        <Text style={styles.empty}>Todavía no hay tarjetas para este perfil.</Text>
+      {cards.length === 0 ? (
+        <EmptyState emoji="🗂️" title="Todavía no hay tarjetas para este perfil." />
       ) : (
         ASSIGNABLE_CATEGORIES.map((category) => {
           const categoryCards = cards
@@ -70,20 +83,28 @@ export function AacManagerScreen({ route, navigation }: Props) {
                     {card.label}
                   </Text>
                   <View style={styles.rowActions}>
-                    <IconButton
-                      label={card.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
-                      icon={card.isFavorite ? '⭐' : '☆'}
+                    <Pressable
                       onPress={() => toggleFavorite(card.id)}
-                    />
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        card.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'
+                      }
+                      style={({ pressed }) => [
+                        styles.favoriteButton,
+                        { opacity: pressed ? 0.7 : 1 },
+                      ]}
+                    >
+                      <Text style={styles.favoriteButtonText}>{card.isFavorite ? '⭐' : '☆'}</Text>
+                    </Pressable>
                     <IconButton
                       label="Mover arriba"
-                      icon="↑"
+                      icon="chevron-up"
                       onPress={() => moveCard(card.id, 'up')}
                       disabled={index === 0}
                     />
                     <IconButton
                       label="Mover abajo"
-                      icon="↓"
+                      icon="chevron-down"
                       onPress={() => moveCard(card.id, 'down')}
                       disabled={index === categoryCards.length - 1}
                     />
@@ -92,7 +113,9 @@ export function AacManagerScreen({ route, navigation }: Props) {
                         label="Editar"
                         variant="secondary"
                         fullWidth={false}
-                        onPress={() => navigation.navigate('AacCardForm', { profileId, cardId: card.id })}
+                        onPress={() =>
+                          navigation.navigate('AacCardForm', { profileId, cardId: card.id })
+                        }
                       />
                     </View>
                     <View style={styles.smallButton}>
@@ -120,34 +143,9 @@ export function AacManagerScreen({ route, navigation }: Props) {
         <View style={styles.spacer} />
         <BigButton label="Volver" variant="ghost" onPress={() => navigation.goBack()} />
       </View>
-    </ScreenContainer>
-  );
-}
 
-function IconButton({
-  label,
-  icon,
-  onPress,
-  disabled = false,
-}: {
-  label: string;
-  icon: string;
-  onPress: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      style={({ pressed }) => [
-        styles.iconButton,
-        { opacity: disabled ? 0.3 : pressed ? 0.7 : 1 },
-      ]}
-    >
-      <Text style={styles.iconButtonText}>{icon}</Text>
-    </Pressable>
+      {dialog}
+    </ScreenContainer>
   );
 }
 
@@ -164,12 +162,6 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.md,
     color: colors.textSecondary,
     textAlign: 'center',
-  },
-  empty: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginVertical: spacing.lg,
   },
   section: {
     marginBottom: spacing.md,
@@ -205,7 +197,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'flex-end',
   },
-  iconButton: {
+  favoriteButton: {
     width: 40,
     height: 40,
     borderRadius: radius.pill,
@@ -215,7 +207,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  iconButtonText: {
+  favoriteButtonText: {
     fontSize: typography.sizes.md,
   },
   smallButton: {

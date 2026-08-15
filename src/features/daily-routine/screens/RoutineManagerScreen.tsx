@@ -1,12 +1,13 @@
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { BigButton, ScreenContainer } from '@shared/components';
+import { BigButton, EmptyState, ScreenContainer, useConfirmDialog } from '@shared/components';
 import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
+import { useReduceMotion } from '@shared/hooks';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { useRoutines } from '../hooks/useRoutines';
@@ -19,8 +20,11 @@ export function RoutineManagerScreen({ route, navigation }: Props) {
   const { profileId } = route.params;
   const { profiles } = useProfiles();
   const profile = profiles.find((item) => item.id === profileId);
-  const confirmBeforeDelete = profile?.preferences.confirmBeforeDelete ?? DEFAULT_PROFILE_PREFERENCES.confirmBeforeDelete;
+  const confirmBeforeDelete =
+    profile?.preferences.confirmBeforeDelete ?? DEFAULT_PROFILE_PREFERENCES.confirmBeforeDelete;
   const { routines, loading, reload, deleteRoutine } = useRoutines(profileId);
+  const reduceMotion = useReduceMotion();
+  const { confirm, dialog } = useConfirmDialog(reduceMotion);
 
   useFocusEffect(
     useCallback(() => {
@@ -28,26 +32,29 @@ export function RoutineManagerScreen({ route, navigation }: Props) {
     }, [reload]),
   );
 
-  function handleDelete(routine: DailyRoutine) {
+  async function handleDelete(routine: DailyRoutine) {
     if (!confirmBeforeDelete) {
       deleteRoutine(routine.id);
       return;
     }
-    Alert.alert('Eliminar rutina', `¿Eliminar "${routine.title}"? Esta acción no se puede deshacer.`, [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Eliminar', style: 'destructive', onPress: () => deleteRoutine(routine.id) },
-    ]);
+    const ok = await confirm({
+      title: 'Eliminar rutina',
+      message: `¿Eliminar "${routine.title}"? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar',
+      destructive: true,
+    });
+    if (ok) {
+      deleteRoutine(routine.id);
+    }
   }
 
   return (
-    <ScreenContainer scrollable>
+    <ScreenContainer scrollable loading={loading} loadingLabel="Cargando rutinas…">
       <Text style={styles.title}>Mi Día</Text>
       <Text style={styles.subtitle}>Rutinas del perfil</Text>
 
-      {loading ? (
-        <ActivityIndicator size="large" color={colors.primary} />
-      ) : routines.length === 0 ? (
-        <Text style={styles.empty}>Todavía no hay rutinas para este perfil.</Text>
+      {routines.length === 0 ? (
+        <EmptyState emoji="🗓️" title="Todavía no hay rutinas para este perfil." />
       ) : (
         routines
           .slice()
@@ -67,11 +74,18 @@ export function RoutineManagerScreen({ route, navigation }: Props) {
                     label="Editar"
                     variant="secondary"
                     fullWidth={false}
-                    onPress={() => navigation.navigate('RoutineForm', { profileId, routineId: routine.id })}
+                    onPress={() =>
+                      navigation.navigate('RoutineForm', { profileId, routineId: routine.id })
+                    }
                   />
                 </View>
                 <View style={styles.smallButton}>
-                  <BigButton label="Eliminar" variant="danger" fullWidth={false} onPress={() => handleDelete(routine)} />
+                  <BigButton
+                    label="Eliminar"
+                    variant="danger"
+                    fullWidth={false}
+                    onPress={() => handleDelete(routine)}
+                  />
                 </View>
               </View>
             </View>
@@ -79,10 +93,16 @@ export function RoutineManagerScreen({ route, navigation }: Props) {
       )}
 
       <View style={styles.actions}>
-        <BigButton label="Crear rutina" emoji="➕" onPress={() => navigation.navigate('RoutineForm', { profileId })} />
+        <BigButton
+          label="Crear rutina"
+          emoji="➕"
+          onPress={() => navigation.navigate('RoutineForm', { profileId })}
+        />
         <View style={styles.spacer} />
         <BigButton label="Volver" variant="ghost" onPress={() => navigation.goBack()} />
       </View>
+
+      {dialog}
     </ScreenContainer>
   );
 }
@@ -100,12 +120,6 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.md,
     color: colors.textSecondary,
     textAlign: 'center',
-  },
-  empty: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginVertical: spacing.lg,
   },
   row: {
     flexDirection: 'row',

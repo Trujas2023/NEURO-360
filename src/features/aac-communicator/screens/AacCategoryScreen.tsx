@@ -1,14 +1,20 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
+import { EmptyState } from '@shared/components';
 import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
-import { colors, spacing, typography } from '@shared/theme';
+import { useResponsiveColumns } from '@shared/hooks';
+import { colors, spacing } from '@shared/theme';
 
 import { AacLayout } from '../components/AacLayout';
 import { AacCardTile } from '../components/AacCardTile';
-import { cardWidthForBoardSize } from '../constants/boardSize';
-import { FAVORITES_CATEGORY_ID, MOST_USED_CATEGORY_ID, RECENT_CATEGORY_ID, getCategory } from '../constants/categories';
+import {
+  FAVORITES_CATEGORY_ID,
+  MOST_USED_CATEGORY_ID,
+  RECENT_CATEGORY_ID,
+  getCategory,
+} from '../constants/categories';
 import { usePhrase } from '../context/PhraseContext';
 import { useAacCards } from '../hooks/useAacCards';
 import type { AacCard } from '../types';
@@ -29,7 +35,17 @@ export function AacCategoryScreen({ route, navigation }: Props) {
   const { cards, loading, incrementUsage } = useAacCards(activeProfile?.id ?? null);
   const { addCard } = usePhrase();
   const prefs = { ...DEFAULT_PROFILE_PREFERENCES, ...activeProfile?.preferences };
-  const cardWidth = cardWidthForBoardSize(prefs.boardSize);
+
+  // Columnas responsivas (R1, ver docs/PRODUCT_MASTER_SPEC.md §1.5): el
+  // tamaño de tablero configurado es el mínimo deseado, nunca un valor
+  // absoluto — en pantallas grandes (tablet) se calculan más columnas y
+  // tarjetas más grandes en vez de repetir el mismo ancho fijo de teléfono.
+  const { width } = useWindowDimensions();
+  const preferredColumns = Number(prefs.boardSize?.split('x')[0] ?? 3);
+  const columns = useResponsiveColumns(preferredColumns);
+  const gridHorizontalPadding = spacing.lg * 2;
+  const gridGaps = spacing.md * (columns - 1);
+  const cardWidth = Math.floor((width - gridHorizontalPadding - gridGaps) / columns);
 
   const category = getCategory(categoryId);
   const activeCards = cards.filter((card) => card.active !== false);
@@ -48,7 +64,9 @@ export function AacCategoryScreen({ route, navigation }: Props) {
       .sort((a, b) => (b.lastUsedAt ?? '').localeCompare(a.lastUsedAt ?? ''))
       .slice(0, 24);
   } else {
-    visibleCards = activeCards.filter((card) => card.categoryId === categoryId).sort((a, b) => a.order - b.order);
+    visibleCards = activeCards
+      .filter((card) => card.categoryId === categoryId)
+      .sort((a, b) => a.order - b.order);
   }
 
   function handlePress(card: AacCard) {
@@ -57,13 +75,17 @@ export function AacCategoryScreen({ route, navigation }: Props) {
   }
 
   return (
-    <AacLayout title={category ? `${category.emoji} ${category.label}` : 'Tarjetas'} onBack={() => navigation.goBack()}>
+    <AacLayout
+      title={category ? `${category.emoji} ${category.label}` : 'Tarjetas'}
+      onBack={() => navigation.goBack()}
+    >
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} />
       ) : visibleCards.length === 0 ? (
-        <Text style={styles.empty}>
-          {EMPTY_MESSAGES[categoryId] ?? 'Todavía no hay tarjetas en esta categoría.'}
-        </Text>
+        <EmptyState
+          emoji="🗂️"
+          title={EMPTY_MESSAGES[categoryId] ?? 'Todavía no hay tarjetas en esta categoría.'}
+        />
       ) : (
         <View style={styles.grid}>
           {visibleCards.map((card) => (
@@ -94,11 +116,5 @@ const styles = StyleSheet.create({
   },
   gridItem: {
     marginBottom: spacing.sm,
-  },
-  empty: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: spacing.xl,
   },
 });

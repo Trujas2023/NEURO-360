@@ -1,3 +1,7 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
+
+import type { AacStackParamList } from '@features/aac-communicator/navigation/types';
+
 export type RootStackParamList = {
   Welcome: undefined;
   ProfileSelector: undefined;
@@ -6,8 +10,13 @@ export type RootStackParamList = {
   ComingSoon: { title: string; emoji: string };
   PinGate: undefined;
   AdultHome: undefined;
-  /** Comunicador "Mi Voz" (Modo Niño); usa el perfil activo del contexto de perfiles. */
-  AacCommunicator: undefined;
+  /**
+   * Comunicador "Mi Voz" (Modo Niño); usa el perfil activo del contexto de
+   * perfiles. Admite navegar directo a una subpantalla (p. ej. `{ screen:
+   * 'AacCalm' }`) para que `ChildModeShell` pueda abrir Calma desde fuera
+   * de este navegador anidado sin duplicar su lógica (R1).
+   */
+  AacCommunicator: NavigatorScreenParams<AacStackParamList> | undefined;
   /** Modo Adulto: administración de tarjetas de un perfil concreto. */
   AacManager: { profileId: string };
   AacCardForm: { profileId: string; cardId?: string; categoryId?: string };

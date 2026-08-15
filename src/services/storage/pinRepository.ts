@@ -1,24 +1,43 @@
-import { getItem, setItem } from './asyncStorage';
+import { getSetting, setSetting } from './db';
+import { hashPin } from './pinHash';
 
-const ADULT_PIN_KEY = 'sense-play/adult-pin';
+const PIN_HASH_KEY = 'adultPinHash';
+const PIN_SALT_KEY = 'adultPinSalt';
 
-/**
- * El PIN de Modo Adulto es una barrera parental (evitar que un niño entre
- * por accidente a la configuración), no un mecanismo de seguridad
- * criptográfica. Por eso se guarda tal cual en el almacenamiento local del
- * dispositivo, igual que el resto de los datos offline-first de la app.
- */
+async function getOrCreateSalt(): Promise<string> {
+  const existing = await getSetting(PIN_SALT_KEY);
+  if (existing) {
+    return existing;
+  }
+  const { randomUUID } = await import('expo-crypto');
+  const salt = randomUUID();
+  await setSetting(PIN_SALT_KEY, salt);
+  return salt;
+}
 
 export async function hasAdultPin(): Promise<boolean> {
-  const pin = await getItem<string>(ADULT_PIN_KEY);
-  return pin !== null;
+  const hash = await getSetting(PIN_HASH_KEY);
+  return hash !== null;
 }
 
 export async function setAdultPin(pin: string): Promise<void> {
-  await setItem(ADULT_PIN_KEY, pin);
+  const salt = await getOrCreateSalt();
+  const hash = await hashPin(pin, salt);
+  await setSetting(PIN_HASH_KEY, hash);
 }
 
 export async function verifyAdultPin(pin: string): Promise<boolean> {
-  const storedPin = await getItem<string>(ADULT_PIN_KEY);
-  return storedPin !== null && storedPin === pin;
+  const stored = await getSetting(PIN_HASH_KEY);
+  if (stored === null) {
+    return false;
+  }
+  const salt = await getOrCreateSalt();
+  const hash = await hashPin(pin, salt);
+  return hash === stored;
+}
+
+/** Usado solo por la migración de datos heredados (ver migrateFromAsyncStorage.ts). */
+export async function setAdultPinHashDirect(hash: string, salt: string): Promise<void> {
+  await setSetting(PIN_SALT_KEY, salt);
+  await setSetting(PIN_HASH_KEY, hash);
 }

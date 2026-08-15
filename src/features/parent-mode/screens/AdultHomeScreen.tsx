@@ -1,9 +1,10 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { BigButton, ProfileAvatar, ScreenContainer } from '@shared/components';
+import { BigButton, ProfileAvatar, ScreenContainer, useConfirmDialog } from '@shared/components';
+import { useReduceMotion } from '@shared/hooks';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdultHome'>;
@@ -15,12 +16,19 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AdultHome'>;
  */
 export function AdultHomeScreen({ navigation }: Props) {
   const { profiles, deleteProfile } = useProfiles();
+  const reduceMotion = useReduceMotion();
+  const { confirm, dialog } = useConfirmDialog(reduceMotion);
 
-  function confirmDelete(id: string, name: string) {
-    Alert.alert('Eliminar perfil', `¿Eliminar el perfil de ${name}? Esta acción no se puede deshacer.`, [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Eliminar', style: 'destructive', onPress: () => deleteProfile(id) },
-    ]);
+  async function confirmDelete(id: string, name: string) {
+    const ok = await confirm({
+      title: 'Eliminar perfil',
+      message: `¿Eliminar el perfil de ${name}? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar',
+      destructive: true,
+    });
+    if (ok) {
+      deleteProfile(id);
+    }
   }
 
   return (
@@ -84,7 +92,11 @@ export function AdultHomeScreen({ navigation }: Props) {
       )}
 
       <View style={styles.actions}>
-        <BigButton label="Agregar perfil" emoji="➕" onPress={() => navigation.navigate('ProfileForm')} />
+        <BigButton
+          label="Agregar perfil"
+          emoji="➕"
+          onPress={() => navigation.navigate('ProfileForm')}
+        />
         <View style={styles.spacer} />
         <BigButton
           label="Salir de Modo Adulto"
@@ -92,6 +104,8 @@ export function AdultHomeScreen({ navigation }: Props) {
           onPress={() => navigation.navigate('ProfileSelector')}
         />
       </View>
+
+      {dialog}
     </ScreenContainer>
   );
 }
