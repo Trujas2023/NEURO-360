@@ -1,9 +1,9 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
-import { BigButton, ScreenContainer } from '@shared/components';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { BigButton, EntityGridCard, ScreenContainer } from '@shared/components';
+import { colors, spacing, typography } from '@shared/theme';
 
 import { SENSORY_NEEDS } from '../data/activities';
 import type { SensoryActivityId } from '../types';
@@ -16,7 +16,9 @@ type SensoryActivityRoute =
   | 'SensoryBreathing'
   | 'SensoryTracking'
   | 'SensoryPaint'
-  | 'SensoryCauseEffect';
+  | 'SensoryCauseEffect'
+  | 'SensorySoundRhythm'
+  | 'SensoryAquarium';
 
 const ROUTE_BY_ACTIVITY: Record<SensoryActivityId, SensoryActivityRoute> = {
   bubbles: 'SensoryBubbles',
@@ -24,6 +26,8 @@ const ROUTE_BY_ACTIVITY: Record<SensoryActivityId, SensoryActivityRoute> = {
   tracking: 'SensoryTracking',
   paint: 'SensoryPaint',
   causeEffect: 'SensoryCauseEffect',
+  soundRhythm: 'SensorySoundRhythm',
+  aquarium: 'SensoryAquarium',
 };
 
 /**
@@ -32,6 +36,9 @@ const ROUTE_BY_ACTIVITY: Record<SensoryActivityId, SensoryActivityRoute> = {
  * niño rara vez sabe cómo se llama la actividad, pero sí puede
  * reconocer qué le está pasando. Cada opción abre su actividad directo,
  * así nada queda a más de dos toques.
+ *
+ * Grilla con `EntityGridCard` (Fase 7F) — este era uno de los 4 patrones
+ * de tarjeta casi idénticos señalados en `docs/V7_PRODUCT_AUDIT.md` §7.7.
  */
 export function SensoryHomeScreen({ navigation }: Props) {
   return (
@@ -43,16 +50,14 @@ export function SensoryHomeScreen({ navigation }: Props) {
 
       <View style={styles.grid}>
         {SENSORY_NEEDS.map((need) => (
-          <Pressable
+          <EntityGridCard
             key={need.id}
-            onPress={() => navigation.navigate(ROUTE_BY_ACTIVITY[need.activity])}
-            accessibilityRole="button"
+            emoji={need.emoji}
+            label={need.label}
+            accentColor={need.color}
             accessibilityLabel={need.label}
-            style={({ pressed }) => [styles.card, { borderColor: need.color, opacity: pressed ? 0.85 : 1 }]}
-          >
-            <Text style={styles.emoji}>{need.emoji}</Text>
-            <Text style={styles.label}>{need.label}</Text>
-          </Pressable>
+            onPress={() => navigation.navigate(ROUTE_BY_ACTIVITY[need.activity])}
+          />
         ))}
       </View>
     </ScreenContainer>
@@ -79,25 +84,5 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: spacing.md,
-  },
-  card: {
-    width: 150,
-    minHeight: 130,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.sm,
-  },
-  emoji: {
-    fontSize: 44,
-  },
-  label: {
-    marginTop: spacing.xs,
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.bold,
-    color: colors.textPrimary,
-    textAlign: 'center',
   },
 });

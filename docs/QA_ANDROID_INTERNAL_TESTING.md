@@ -270,7 +270,7 @@ del formulario.
 ## 13. Mundo Sensorial
 
 - [ ] Se entra desde Inicio ("Sensorial") y desde Calma.
-- [ ] La entrada pregunta **"¿Qué necesitas ahora?"** con 5 opciones.
+- [ ] La entrada pregunta **"¿Qué necesitas ahora?"** con 7 opciones.
 - [ ] **"Terminar" está visible y funciona en TODAS las actividades.**
 - [ ] **Burbujas**: suben, se revientan al tocar, vibran suave al reventar.
 - [ ] **Respiración**: el círculo crece y se achica; el texto cambia entre
@@ -281,13 +281,24 @@ del formulario.
 - [ ] **Pintura**: se dibuja con el dedo; probar los 4 modos (Trazo,
       Partículas, Brillo, Formas); cambiar color; "Limpiar" borra todo.
 - [ ] **Causa y efecto**: cada toque genera una forma donde tocaste y vibra.
+- [ ] **Sonidos y ritmo** (Fase 7F): 6 pastillas de color; cada una suena
+      una nota distinta y pulsa al tocarla; tocar varias seguido no corta
+      el sonido de la anterior (pueden sonar superpuestas); funciona sin
+      conexión (los tonos están bundleados en la app, no se descargan).
+- [ ] **Acuario** (Fase 7F): tocar en cualquier parte hace aparecer un pez
+      que nada de un lado al otro y desaparece; sin límite de intentos;
+      no tiene sonido (a propósito).
 - [ ] Con "Vibración suave" apagada en ajustes, **no vibra** en ninguna.
-- [ ] Con "Reducir movimiento" activo, burbujas y objeto van más lento.
+- [ ] Con "Reducir movimiento" activo, burbujas, objeto, pastillas y peces
+      van/pulsan más lento.
 
 ⚠️ **La actividad de SONIDOS AMBIENTALES no existe** (lluvia, mar, viento,
-bosque, ruido blanco, agua). No aparece en el menú a propósito: requiere
-archivos de audio con licencia que el proyecto todavía no tiene. No lo
-reportes como falla.
+bosque, ruido blanco, agua) — **distinta de "Sonidos y ritmo"**, que sí
+existe desde la Fase 7F. Los sonidos ambientales no aparecen en el menú a
+propósito: requerirían grabaciones reales con licencia que el proyecto no
+tiene, mientras que "Sonidos y ritmo" usa tonos propios sintetizados por
+código (sin ninguna grabación de terceros involucrada). No reportes la
+ausencia de sonidos ambientales como falla.
 
 ## 14. Juegos
 

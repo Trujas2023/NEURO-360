@@ -1,12 +1,13 @@
 /** Tipos de dominio de "Mundo Sensorial": actividades de regulación. */
 
 /**
- * Actividades implementadas. `sounds` (sonidos ambientales) todavía no
- * está: necesita archivos de audio con licencia que el repositorio no
- * tiene (`assets/sounds/` está vacío). No se declara acá para que no
- * pueda aparecer en la navegación a medio hacer — ver README del módulo.
+ * Actividades implementadas. `soundRhythm` (Fase 7F) usa tonos propios,
+ * sintetizados en `assets/sounds/tone_*.wav` (escala pentatónica de Do,
+ * generados por código — sin ninguna grabación de terceros, así que no
+ * hay ninguna licencia que verificar). `aquarium` (Fase 7F) es puramente
+ * visual/táctil, sin audio.
  */
-export type SensoryActivityId = 'bubbles' | 'breathing' | 'tracking' | 'paint' | 'causeEffect';
+export type SensoryActivityId = 'bubbles' | 'breathing' | 'tracking' | 'paint' | 'causeEffect' | 'soundRhythm' | 'aquarium';
 
 /** Con qué frecuencia aparecen burbujas / cuánto estímulo hay en pantalla. */
 export type SensoryIntensity = 'low' | 'medium' | 'high';

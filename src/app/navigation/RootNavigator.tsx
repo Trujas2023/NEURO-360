@@ -24,9 +24,11 @@ import { ProfileSelectorScreen } from '@features/profiles/screens/ProfileSelecto
 import { BreathingScreen } from '@features/sensory-world/screens/BreathingScreen';
 import { BubblesScreen } from '@features/sensory-world/screens/BubblesScreen';
 import { CauseEffectScreen } from '@features/sensory-world/screens/CauseEffectScreen';
+import { SensoryAquariumScreen } from '@features/sensory-world/screens/SensoryAquariumScreen';
 import { SensoryHomeScreen } from '@features/sensory-world/screens/SensoryHomeScreen';
 import { SensoryPaintScreen } from '@features/sensory-world/screens/SensoryPaintScreen';
 import { SensorySettingsScreen } from '@features/sensory-world/screens/SensorySettingsScreen';
+import { SensorySoundRhythmScreen } from '@features/sensory-world/screens/SensorySoundRhythmScreen';
 import { VisualTrackingScreen } from '@features/sensory-world/screens/VisualTrackingScreen';
 import { colors } from '@shared/theme';
 
@@ -68,6 +70,8 @@ export function RootNavigator() {
       <Stack.Screen name="SensoryTracking" component={VisualTrackingScreen} />
       <Stack.Screen name="SensoryPaint" component={SensoryPaintScreen} />
       <Stack.Screen name="SensoryCauseEffect" component={CauseEffectScreen} />
+      <Stack.Screen name="SensorySoundRhythm" component={SensorySoundRhythmScreen} />
+      <Stack.Screen name="SensoryAquarium" component={SensoryAquariumScreen} />
       <Stack.Screen name="SensorySettings" component={SensorySettingsScreen} />
       <Stack.Screen name="GamesHome" component={GamesHomeScreen} />
       <Stack.Screen name="GameColors" component={ColorMatchScreen} />

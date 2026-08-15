@@ -28,6 +28,10 @@ export type RootStackParamList = {
   SensoryTracking: undefined;
   SensoryPaint: undefined;
   SensoryCauseEffect: undefined;
+  /** Mundo Sensorial: tonos propios sintetizados (sin audio de terceros). */
+  SensorySoundRhythm: undefined;
+  /** Mundo Sensorial: puramente visual/táctil, sin audio. */
+  SensoryAquarium: undefined;
   /** Modo Adulto: ajustes de Mundo Sensorial de un perfil concreto. */
   SensorySettings: { profileId: string };
   /** Juega & Regula: selector de juegos. */

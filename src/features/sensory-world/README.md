@@ -27,19 +27,23 @@ qué le está pasando.
 | Seguimiento visual | `VisualTrackingScreen` | Movimiento lineal y predecible a propósito |
 | Pintura | `SensoryPaintScreen` | `PanResponder` (nativo de RN) + `react-native-svg` |
 | Causa y efecto | `CauseEffectScreen` | Cada toque produce forma + vibración |
+| Sonidos y ritmo | `SensorySoundRhythmScreen` | Fase 7F. Tonos propios (ver abajo) |
+| Acuario | `SensoryAquariumScreen` | Fase 7F. `react-native-svg`, sin audio |
 
 Los ajustes por perfil (intensidad, patrón, velocidad, color, vibración,
 modo de pintura) viven en `storage/sensorySettingsRepository.ts`,
 registrado en `profileDataRegistry` para limpiarse si se borra el perfil.
 
-## Pendiente: sonidos ambientales
+## "Sonidos y ritmo" — tonos propios, no audio de terceros
 
-La sexta actividad del prompt maestro (lluvia, mar, viento, bosque, ruido
-blanco, agua) **no está implementada y no aparece en la navegación**, a
-propósito: necesita archivos de audio con licencia adecuada y
-`assets/sounds/` está vacío. Mostrarla vacía o con audio simulado sería
-exactamente el tipo de pantalla a medio hacer que el proyecto no quiere.
-
-Cuando haya audio real, la actividad necesita además la dependencia
-`expo-audio` (hoy sin instalar, para no arrastrar una librería nativa que
-no se usa) y la entrada "Sonidos" en `data/activities.ts`.
+Los 6 archivos de `assets/sounds/tone_*.wav` **no son grabaciones de
+nada**: son ondas sinusoidales sintetizadas por código (escala
+pentatónica de Do, con armónicos suaves y una envolvente tipo campana),
+generadas con un script de un solo uso al construir la actividad. No hay
+ninguna licencia que verificar porque no hay ninguna obra de terceros
+involucrada — es exactamente el motivo por el que esta actividad sí pudo
+construirse mientras que sonidos ambientales reales (lluvia, mar, viento,
+bosque) siguen sin poder agregarse: esos sí necesitarían audio grabado con
+licencia adecuada, y `assets/sounds/` no tiene ninguno. Si en el futuro se
+agregan sonidos ambientales reales, van aparte de estos tonos (que no se
+tocan) y necesitan su propia fuente verificada antes de escribir código.

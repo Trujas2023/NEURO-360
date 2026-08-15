@@ -22,6 +22,8 @@ export const SENSORY_NEEDS: SensoryNeed[] = [
   { id: 'look', label: 'Mirar', emoji: '👀', color: colors.lavender, activity: 'tracking' },
   { id: 'touch', label: 'Tocar', emoji: '🎨', color: colors.blush, activity: 'paint' },
   { id: 'move', label: 'Movimiento', emoji: '✨', color: colors.warning, activity: 'causeEffect' },
+  { id: 'listen', label: 'Escuchar', emoji: '🎵', color: colors.success, activity: 'soundRhythm' },
+  { id: 'explore', label: 'Explorar', emoji: '🐠', color: colors.secondary, activity: 'aquarium' },
 ];
 
 export const DEFAULT_SENSORY_SETTINGS: SensorySettings = {
