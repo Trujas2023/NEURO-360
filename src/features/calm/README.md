@@ -27,6 +27,12 @@ una pantalla suelta y pasó a ser un dominio propio.
 - `screens/CalmCommunicationScreen.tsx`: el panel principal (tab Calma).
 - `screens/PainFlowScreen.tsx`: dónde → cuánto → cómo se siente → frase.
 - `screens/OverwhelmFlowScreen.tsx`: qué te molesta → qué necesitas → frase.
+- `screens/CalmRestScreen.tsx` (Fase 7G): "Necesito un descanso" — un
+  toque directo, sin flujo guiado. Duración (1/2/5 min) + sonido de fondo
+  opcional, reutiliza `VisualTimer` de `daily-routine` tal cual. Los
+  sonidos ("Sonido suave"/"Brisa") son tonos propios sintetizados por
+  código en `assets/sounds/calm_*.wav` — mismo criterio que "Sonidos y
+  ritmo" de Mundo Sensorial, sin ninguna grabación de terceros.
 
 ## Criterios de interacción
 

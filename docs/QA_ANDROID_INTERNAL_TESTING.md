@@ -266,6 +266,22 @@ del formulario.
       → frase final ("Me molesta el ruido. Necesito mis audífonos.").
 - [ ] "Ir a Mundo Sensorial" abre el módulo real (ya no una pantalla
       "próximamente").
+- [ ] **"Necesito un descanso"** (Fase 7G) abre de inmediato (sin
+      preguntas previas, es un toque directo).
+  - [ ] Elegir 1 / 2 / 5 minutos cambia la duración del temporizador
+        visual (barra que se vacía).
+  - [ ] Con el sonido del perfil **activado**, aparecen las opciones
+        Silencio / Sonido suave / Brisa; elegir una la reproduce en bucle
+        de inmediato (sin tener que "Empezar" el temporizador primero).
+  - [ ] Cambiar de sonido mientras suena uno corta el anterior y arranca
+        el nuevo (nunca los dos a la vez).
+  - [ ] Con el sonido del perfil **desactivado**, no aparece ninguna
+        opción de sonido.
+  - [ ] "Empezar"/"Pausa"/"Reiniciar" del temporizador funcionan igual
+        que en Mi Día.
+  - [ ] "Volver" sale de la pantalla y corta el sonido si estaba sonando.
+  - [ ] Funciona sin conexión (los sonidos están bundleados, no se
+        descargan).
 
 ## 13. Mundo Sensorial
 

@@ -21,6 +21,8 @@ export type RootStackParamList = {
   CalmPain: undefined;
   /** Calma: flujo guiado "Tengo miedo / Estoy saturado" (qué te molesta / qué necesitas). */
   CalmOverwhelm: undefined;
+  /** Calma: "Necesito un descanso" — temporizador visual + sonido de fondo opcional. */
+  CalmRest: undefined;
   /** Mundo Sensorial: entrada por necesidad ("¿qué necesitas ahora?"). */
   SensoryHome: undefined;
   SensoryBubbles: undefined;

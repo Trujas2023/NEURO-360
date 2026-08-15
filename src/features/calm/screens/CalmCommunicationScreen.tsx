@@ -20,6 +20,9 @@ type Props = BottomTabScreenProps<MainTabParamList, 'Calma'>;
  * Dos frases ofrecen además un flujo guiado opcional ("Contar más") para
  * precisar qué pasa: dolor y saturación/miedo. Enlaza a Mundo Sensorial
  * sin modificar su lógica interna.
+ *
+ * "Necesito un descanso" (Fase 7G) es una acción directa de un toque, no
+ * un flujo guiado: un descanso no necesita un árbol de decisión.
  */
 export function CalmCommunicationScreen({ navigation }: Props) {
   const rootNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
@@ -41,6 +44,13 @@ export function CalmCommunicationScreen({ navigation }: Props) {
       />
 
       <View style={styles.footer}>
+        <BigButton
+          label="Necesito un descanso"
+          emoji="😴"
+          variant="secondary"
+          onPress={() => rootNavigation?.navigate('CalmRest')}
+        />
+        <View style={styles.spacer} />
         <BigButton
           label="Ir a Mundo Sensorial"
           emoji="🌈"
@@ -70,5 +80,8 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: spacing.lg,
     marginBottom: spacing.xl,
+  },
+  spacer: {
+    height: spacing.sm,
   },
 });
