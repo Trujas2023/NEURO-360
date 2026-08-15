@@ -1,7 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActionSheetIOS, ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
@@ -41,6 +42,52 @@ export function AacManagerScreen({ route, navigation }: Props) {
     ]);
   }
 
+  /**
+   * Antes eran 5 controles siempre visibles por tarjeta (favorito, mover
+   * arriba, mover abajo, Editar, Eliminar) — fila densa señalada en
+   * `docs/V7_PRODUCT_AUDIT.md` §6.9. Favorito queda como toque único (es
+   * la acción más frecuente); el resto vive en este menú, igual que el
+   * patrón ya usado en `AdultCenterScreen` para "Mi Voz".
+   */
+  function openMoreActions(card: AacCard, index: number, total: number) {
+    const options: { label: string; destructive?: boolean; onPress: () => void }[] = [];
+    if (index > 0) {
+      options.push({ label: 'Mover arriba', onPress: () => moveCard(card.id, 'up') });
+    }
+    if (index < total - 1) {
+      options.push({ label: 'Mover abajo', onPress: () => moveCard(card.id, 'down') });
+    }
+    options.push({
+      label: 'Editar',
+      onPress: () => navigation.navigate('AacCardForm', { profileId, cardId: card.id }),
+    });
+    options.push({ label: 'Eliminar', destructive: true, onPress: () => confirmDelete(card) });
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          title: card.label,
+          options: [...options.map((option) => option.label), 'Cancelar'],
+          destructiveButtonIndex: options.findIndex((option) => option.destructive),
+          cancelButtonIndex: options.length,
+        },
+        (buttonIndex) => {
+          options[buttonIndex]?.onPress();
+        },
+      );
+      return;
+    }
+
+    Alert.alert(card.label, undefined, [
+      ...options.map((option) => ({
+        text: option.label,
+        style: option.destructive ? ('destructive' as const) : undefined,
+        onPress: option.onPress,
+      })),
+      { text: 'Cancelar', style: 'cancel' as const },
+    ]);
+  }
+
   return (
     <ScreenContainer scrollable>
       <Text style={styles.title}>Comunicador AAC</Text>
@@ -72,37 +119,14 @@ export function AacManagerScreen({ route, navigation }: Props) {
                   <View style={styles.rowActions}>
                     <IconButton
                       label={card.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
-                      icon={card.isFavorite ? '⭐' : '☆'}
+                      icon={card.isFavorite ? 'star' : 'star-outline'}
                       onPress={() => toggleFavorite(card.id)}
                     />
                     <IconButton
-                      label="Mover arriba"
-                      icon="↑"
-                      onPress={() => moveCard(card.id, 'up')}
-                      disabled={index === 0}
+                      label={`Más acciones para "${card.label}"`}
+                      icon="ellipsis-vertical"
+                      onPress={() => openMoreActions(card, index, categoryCards.length)}
                     />
-                    <IconButton
-                      label="Mover abajo"
-                      icon="↓"
-                      onPress={() => moveCard(card.id, 'down')}
-                      disabled={index === categoryCards.length - 1}
-                    />
-                    <View style={styles.smallButton}>
-                      <BigButton
-                        label="Editar"
-                        variant="secondary"
-                        fullWidth={false}
-                        onPress={() => navigation.navigate('AacCardForm', { profileId, cardId: card.id })}
-                      />
-                    </View>
-                    <View style={styles.smallButton}>
-                      <BigButton
-                        label="Eliminar"
-                        variant="danger"
-                        fullWidth={false}
-                        onPress={() => confirmDelete(card)}
-                      />
-                    </View>
                   </View>
                 </View>
               ))}
@@ -128,25 +152,19 @@ function IconButton({
   label,
   icon,
   onPress,
-  disabled = false,
 }: {
   label: string;
-  icon: string;
+  icon: keyof typeof Ionicons.glyphMap;
   onPress: () => void;
-  disabled?: boolean;
 }) {
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}
-      style={({ pressed }) => [
-        styles.iconButton,
-        { opacity: disabled ? 0.3 : pressed ? 0.7 : 1 },
-      ]}
+      style={({ pressed }) => [styles.iconButton, { opacity: pressed ? 0.7 : 1 }]}
     >
-      <Text style={styles.iconButtonText}>{icon}</Text>
+      <Ionicons name={icon} size={22} color={colors.textPrimary} />
     </Pressable>
   );
 }
@@ -189,7 +207,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: spacing.sm,
     marginBottom: spacing.xs,
-    flexWrap: 'wrap',
   },
   rowLabel: {
     flex: 1,
@@ -201,9 +218,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginTop: spacing.xs,
-    width: '100%',
-    justifyContent: 'flex-end',
+    marginLeft: spacing.sm,
   },
   iconButton: {
     width: touchTargets.minimum,
@@ -214,12 +229,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  iconButtonText: {
-    fontSize: typography.sizes.md,
-  },
-  smallButton: {
-    marginLeft: spacing.xs,
   },
   actions: {
     marginTop: spacing.lg,
