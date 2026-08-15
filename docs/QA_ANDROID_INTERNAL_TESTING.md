@@ -377,12 +377,24 @@ Activar **modo avión** y verificar que todo sigue funcionando:
 
 ## 18. Rotación / orientación
 
-La app está fijada en **vertical** (`orientation: portrait`).
+La app está fijada en **vertical** (`orientation: portrait`). V7 decidió
+explícitamente **no** abrir soporte landscape ni adaptar layouts para
+tablet (`docs/V7_UX_ARCHITECTURE.md` §13.4) — lo que sigue pendiente de
+confirmar en dispositivo real es que el bloqueo a vertical funcione bien
+también en una pantalla grande, no que haya un layout distinto para ella.
 
 - [ ] Girar el teléfono: la app **se mantiene vertical**.
 - [ ] Girar durante una actividad sensorial no la rompe.
 - [ ] Con el teclado abierto (crear tarjeta) la pantalla sigue usable y
       los campos no quedan tapados.
+- [ ] **En una tablet Android**, en vertical: ninguna pantalla se ve
+      cortada, con texto solapado ni con tarjetas deformadas por el
+      ancho extra (las grillas escalan columnas, no estiran las
+      tarjetas — ver `cardWidthForBoardSize` en Mi Voz y el mismo patrón
+      en `EntityGridCard`).
+- [ ] **En una tablet Android**, los objetivos táctiles (botones,
+      tarjetas, íconos) siguen siendo cómodos de tocar con el dedo, no
+      diminutos en relación al tamaño de pantalla.
 
 ## 19. Rendimiento
 
@@ -473,3 +485,43 @@ Anotar para cada fallo: **qué pantalla**, **qué se hizo**, **qué pasó**,
 - [ ] Exportar un respaldo después de generar este historial, restaurarlo
       en el mismo dispositivo (o probar en otro) y verificar que las
       rutinas completadas y partidas jugadas se conservan.
+
+## 23. Accesibilidad — lector de pantalla y objetivo táctil (Fase 7J)
+
+Auditoría estática (código fuente, no dispositivo) ya confirmó: **cero**
+elementos `Pressable` sin `accessibilityLabel`/`accessibilityRole` en todo
+el código (`docs/V7_QA_ACCESSIBILITY.md` detalla el método), y **cero**
+tamaños de botón fijados por debajo de `touchTargets.minimum` (48dp). Lo
+que falta y esta sección cubre es la verificación con el lector de
+pantalla real de Android, que ningún análisis de código puede reemplazar
+— un `accessibilityLabel` correcto en el código puede igual sonar mal o
+en el orden equivocado al leerse en voz alta.
+
+**Activar TalkBack** (Ajustes → Accesibilidad → TalkBack) y recorrer, sin
+mirar la pantalla, con gestos de exploración:
+
+- [ ] En Mi Voz, cada tarjeta AAC anuncia su nombre al enfocarla (no
+      "botón" a secas ni el nombre del emoji/imagen).
+- [ ] En Modo Adulto → gestión de tarjetas, el botón de favorito anuncia
+      si la tarjeta ya es favorita o no (no solo "botón estrella").
+- [ ] En Mi Día, cada paso de una rutina anuncia si ya está hecho o no.
+- [ ] En los juegos de emparejar, cada opción anuncia su contenido (el
+      nombre del color/forma/emoción), no una descripción genérica.
+- [ ] La barra de tabs inferior anuncia el nombre de cada sección (no
+      solo el ícono).
+- [ ] Ningún control queda mudo (TalkBack no dice nada útil al
+      enfocarlo) en ninguna de las pantallas recorridas.
+- [ ] El orden de lectura al deslizar con el dedo sigue el orden visual
+      de la pantalla, no salta de forma confusa.
+
+**Objetivo táctil, con el dedo (no el mouse del emulador):**
+
+- [ ] Los íconos pequeños de Modo Adulto (favorito, más acciones, mover
+      arriba/abajo) son cómodos de tocar sin fallar al lado, incluso para
+      quien no tiene precisión fina.
+- [ ] Ningún botón de la app se siente "difícil de acertar" al usarlo con
+      el dedo, en ninguna de las pantallas de Modo Niño.
+
+Anotar para cada punto: modelo de teléfono, versión de Android y versión
+de TalkBack. Si algo falla, anotar la pantalla exacta y qué anunció (o no
+anunció) el lector de pantalla.
