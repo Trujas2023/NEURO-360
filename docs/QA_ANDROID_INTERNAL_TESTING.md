@@ -404,3 +404,51 @@ La app está fijada en **vertical** (`orientation: portrait`).
 
 Anotar para cada fallo: **qué pantalla**, **qué se hizo**, **qué pasó**,
 **modelo y versión de Android**.
+
+## 21. Centro Adulto (Fase 7H)
+
+- [ ] Entrar a Modo Adulto muestra el selector de perfil arriba (tarjetas
+      de perfil, la elegida queda marcada) y, debajo, una grilla "Ajustes
+      de {perfil}" con Mi Voz / Mundo Sensorial / Juega & Regula / Mi Día
+      / Estadísticas.
+- [ ] "Mi Voz" abre un menú con **Tarjetas** / **Ajustes de voz**, no dos
+      tarjetas sueltas.
+- [ ] La sección **"General"** (Accesibilidad, Respaldo) es visible sin
+      importar qué perfil esté elegido arriba.
+- [ ] **Agregar/Editar/Eliminar perfil** siguen funcionando igual que
+      antes, ahora desde el selector de arriba.
+
+**Accesibilidad**
+
+- [ ] Cambiar "Sonido activado" o "Reducir movimiento" tiene efecto de
+      inmediato (sin botón "Guardar" aparte) y es el mismo campo que en
+      "Editar perfil" — cambiarlo en un lado se refleja en el otro.
+- [ ] "Abrir ajustes de Mi Voz" lleva a `AacSettings` del mismo perfil.
+
+**Estadísticas**
+
+- [ ] Un perfil **sin actividad todavía** muestra el mensaje de vacío, no
+      números en cero ni una pantalla rota.
+- [ ] Después de tocar varias tarjetas AAC distintas desde Modo Niño,
+      "Más usadas" y "Usadas recientemente" reflejan lo tocado.
+- [ ] El total de "toques" y "tarjetas" es correcto.
+- [ ] Aparece la nota de que Mi Día y Juegos quedan pendientes (no se
+      inventan números para esos dos).
+
+**Respaldo**
+
+- [ ] "Exportar respaldo" abre el selector nativo de compartir/guardar de
+      Android con un archivo `.json`.
+- [ ] Guardar ese archivo y luego **crear una tarjeta nueva** de prueba en
+      Mi Voz (para tener algo que distinguir el antes/después).
+- [ ] "Restaurar desde un respaldo" → elegir el archivo guardado antes →
+      aparece la advertencia de que esto reemplaza los datos actuales →
+      confirmar.
+- [ ] Cerrar la app por completo y volver a abrirla: los datos son los
+      del momento del respaldo (la tarjeta de prueba creada después ya no
+      está, porque el respaldo es de antes de crearla).
+- [ ] Cancelar la restauración en la advertencia **no cambia nada**.
+- [ ] Elegir un archivo que no es un respaldo de esta app (por ejemplo,
+      cualquier otro `.json`) muestra un error claro, no cierra la app.
+- [ ] Todo el flujo de exportar/restaurar funciona **sin conexión a
+      internet**.

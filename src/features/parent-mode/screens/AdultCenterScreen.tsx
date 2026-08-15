@@ -19,11 +19,14 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AdultCenter'>;
  * (`AacManager`, `AacSettings`, `SensorySettings`, `GamesSettings`,
  * `RoutineManager`) no cambiaron: solo cambió cómo se llega a ellas.
  *
- * Accesibilidad, Estadísticas y Respaldo (las otras 3 secciones del
- * documento de arquitectura) todavía no existen — se agregan recién en la
- * Fase 7H. No se agregan tarjetas para ellas todavía a propósito: una
- * sección sin función real es exactamente el defecto que esta
- * reconstrucción se propuso eliminar (la vieja pantalla `ComingSoon`).
+ * Accesibilidad y Respaldo (Fase 7H) son transversales: viven en su
+ * propia sección "General", siempre visibles, sin depender de tener un
+ * perfil elegido arriba — Respaldo respalda todos los perfiles a la vez;
+ * Accesibilidad sí necesita uno para saber qué perfil editar, así que si
+ * todavía no existe ninguno lo avisa en vez de navegar a una pantalla
+ * rota. Estadísticas sí es por perfil (`docs/V7_UX_ARCHITECTURE.md` §9) y
+ * vive en la grilla de "Ajustes de {perfil}", igual que Mi Voz/Sensorial/
+ * Juegos/Mi Día.
  */
 export function AdultCenterScreen({ navigation }: Props) {
   const { profiles, deleteProfile } = useProfiles();
@@ -43,6 +46,14 @@ export function AdultCenterScreen({ navigation }: Props) {
       { text: 'Ajustes de voz', onPress: () => navigation.navigate('AacSettings', { profileId }) },
       { text: 'Cancelar', style: 'cancel' },
     ]);
+  }
+
+  function openAccessibility() {
+    if (!selected) {
+      Alert.alert('Primero un perfil', 'Crea un perfil para poder configurar su accesibilidad.');
+      return;
+    }
+    navigation.navigate('Accessibility', { profileId: selected.id });
   }
 
   return (
@@ -126,9 +137,37 @@ export function AdultCenterScreen({ navigation }: Props) {
               accessibilityLabel={`Administrar Mi Día de ${selected.name}`}
               onPress={() => navigation.navigate('RoutineManager', { profileId: selected.id })}
             />
+            <EntityGridCard
+              icon="stats-chart"
+              label="Estadísticas"
+              accentColor={colors.warning}
+              accessibilityLabel={`Ver estadísticas de ${selected.name}`}
+              accessibilityHint="Tarjetas más usadas y recientes de Mi Voz"
+              onPress={() => navigation.navigate('Statistics', { profileId: selected.id })}
+            />
           </View>
         </>
       ) : null}
+
+      <Text style={styles.sectionLabel}>General</Text>
+      <View style={styles.grid}>
+        <EntityGridCard
+          icon="accessibility"
+          label="Accesibilidad"
+          accentColor={colors.success}
+          accessibilityLabel="Accesibilidad"
+          accessibilityHint="Sonido, movimiento y ajustes de Mi Voz"
+          onPress={openAccessibility}
+        />
+        <EntityGridCard
+          icon="cloud-upload"
+          label="Respaldo"
+          accentColor={colors.blush}
+          accessibilityLabel="Respaldo"
+          accessibilityHint="Exportar o restaurar todos los datos del dispositivo"
+          onPress={() => navigation.navigate('Backup')}
+        />
+      </View>
 
       <View style={styles.actions}>
         <BigButton

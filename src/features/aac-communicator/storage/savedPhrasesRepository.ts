@@ -12,7 +12,7 @@ export async function getSavedPhrases(profileId: string): Promise<SavedPhrase[]>
   return (await getItem<SavedPhrase[]>(savedPhrasesKey(profileId))) ?? [];
 }
 
-async function saveSavedPhrases(profileId: string, phrases: SavedPhrase[]): Promise<void> {
+export async function saveSavedPhrases(profileId: string, phrases: SavedPhrase[]): Promise<void> {
   await setItem(savedPhrasesKey(profileId), phrases);
 }
 

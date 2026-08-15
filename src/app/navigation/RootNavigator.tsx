@@ -18,8 +18,11 @@ import { MemoryScreen } from '@features/games/screens/MemoryScreen';
 import { SequenceScreen } from '@features/games/screens/SequenceScreen';
 import { ShapeMatchScreen } from '@features/games/screens/ShapeMatchScreen';
 import { HelpScreen } from '@features/help/screens/HelpScreen';
+import { AccessibilityScreen } from '@features/parent-mode/screens/AccessibilityScreen';
 import { AdultCenterScreen } from '@features/parent-mode/screens/AdultCenterScreen';
+import { BackupScreen } from '@features/parent-mode/screens/BackupScreen';
 import { PinGateScreen } from '@features/parent-mode/screens/PinGateScreen';
+import { StatisticsScreen } from '@features/parent-mode/screens/StatisticsScreen';
 import { ProfileFormScreen } from '@features/profiles/screens/ProfileFormScreen';
 import { ProfileSelectorScreen } from '@features/profiles/screens/ProfileSelectorScreen';
 import { BreathingScreen } from '@features/sensory-world/screens/BreathingScreen';
@@ -83,6 +86,9 @@ export function RootNavigator() {
       <Stack.Screen name="GameMemory" component={MemoryScreen} />
       <Stack.Screen name="GameSequence" component={SequenceScreen} />
       <Stack.Screen name="GamesSettings" component={GamesSettingsScreen} />
+      <Stack.Screen name="Accessibility" component={AccessibilityScreen} />
+      <Stack.Screen name="Statistics" component={StatisticsScreen} />
+      <Stack.Screen name="Backup" component={BackupScreen} />
     </Stack.Navigator>
   );
 }

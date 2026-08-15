@@ -46,6 +46,12 @@ export type RootStackParamList = {
   GameSequence: undefined;
   /** Modo Adulto: ajustes de Juega & Regula de un perfil concreto. */
   GamesSettings: { profileId: string };
+  /** Centro Adulto: accesibilidad (sonido/movimiento) de un perfil concreto (Fase 7H). */
+  Accessibility: { profileId: string };
+  /** Centro Adulto: más usados/recientes de Mi Voz de un perfil concreto (Fase 7H). */
+  Statistics: { profileId: string };
+  /** Centro Adulto: exportar/restaurar respaldo local, global (Fase 7H). */
+  Backup: undefined;
 };
 
 /**
