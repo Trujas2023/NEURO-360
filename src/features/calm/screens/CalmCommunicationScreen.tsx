@@ -19,8 +19,7 @@ type Props = BottomTabScreenProps<MainTabParamList, 'Calma'>;
  *
  * Dos frases ofrecen además un flujo guiado opcional ("Contar más") para
  * precisar qué pasa: dolor y saturación/miedo. Enlaza a Mundo Sensorial
- * sin modificar su lógica interna (ese módulo todavía es un stub —
- * `ComingSoonScreen` — ver docs/V2_ARCHITECTURE_AUDIT.md).
+ * sin modificar su lógica interna.
  */
 export function CalmCommunicationScreen({ navigation }: Props) {
   const rootNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();

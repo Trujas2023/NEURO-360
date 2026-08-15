@@ -1,6 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { ComingSoonScreen } from '@app/screens/ComingSoonScreen';
 import { WelcomeScreen } from '@app/screens/WelcomeScreen';
 import { AacCardFormScreen } from '@features/aac-communicator/screens/AacCardFormScreen';
 import { AacManagerScreen } from '@features/aac-communicator/screens/AacManagerScreen';
@@ -18,7 +17,7 @@ import { MemoryScreen } from '@features/games/screens/MemoryScreen';
 import { SequenceScreen } from '@features/games/screens/SequenceScreen';
 import { ShapeMatchScreen } from '@features/games/screens/ShapeMatchScreen';
 import { HelpScreen } from '@features/help/screens/HelpScreen';
-import { AdultHomeScreen } from '@features/parent-mode/screens/AdultHomeScreen';
+import { AdultCenterScreen } from '@features/parent-mode/screens/AdultCenterScreen';
 import { PinGateScreen } from '@features/parent-mode/screens/PinGateScreen';
 import { ProfileFormScreen } from '@features/profiles/screens/ProfileFormScreen';
 import { ProfileSelectorScreen } from '@features/profiles/screens/ProfileSelectorScreen';
@@ -53,9 +52,8 @@ export function RootNavigator() {
       <Stack.Screen name="ProfileSelector" component={ProfileSelectorScreen} />
       <Stack.Screen name="ProfileForm" component={ProfileFormScreen} />
       <Stack.Screen name="MainTabs" component={MainTabs} />
-      <Stack.Screen name="ComingSoon" component={ComingSoonScreen} />
       <Stack.Screen name="PinGate" component={PinGateScreen} />
-      <Stack.Screen name="AdultHome" component={AdultHomeScreen} />
+      <Stack.Screen name="AdultCenter" component={AdultCenterScreen} />
       <Stack.Screen name="AacManager" component={AacManagerScreen} />
       <Stack.Screen name="AacCardForm" component={AacCardFormScreen} />
       <Stack.Screen name="AacSettings" component={AacSettingsScreen} />

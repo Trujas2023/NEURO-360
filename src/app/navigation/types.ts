@@ -4,9 +4,9 @@ export type RootStackParamList = {
   ProfileForm: { profileId?: string } | undefined;
   /** Shell de Modo Niño: barra inferior con Inicio/Mi Voz/Calma/Mi Día (ver `MainTabParamList`). */
   MainTabs: undefined;
-  ComingSoon: { title: string; emoji: string };
   PinGate: undefined;
-  AdultHome: undefined;
+  /** Centro Adulto: landing con secciones (Fase 7D). Reemplaza a la antigua `AdultHome`. */
+  AdultCenter: undefined;
   /** Modo Adulto: administración de tarjetas de un perfil concreto. */
   AacManager: { profileId: string };
   AacCardForm: { profileId: string; cardId?: string; categoryId?: string };

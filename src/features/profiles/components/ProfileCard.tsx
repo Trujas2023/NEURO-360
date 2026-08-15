@@ -7,16 +7,21 @@ import type { ChildProfile } from '@shared/types';
 export interface ProfileCardProps {
   profile: ChildProfile;
   onPress: () => void;
+  /** Marca la tarjeta como elegida (p. ej. el perfil que se está administrando en Centro Adulto). */
+  selected?: boolean;
+  /** Reemplaza el texto leído por accesibilidad; por defecto "Entrar como {nombre}". */
+  accessibilityLabel?: string;
 }
 
 /** Tarjeta grande y pulsable para elegir un perfil infantil. */
-export function ProfileCard({ profile, onPress }: ProfileCardProps) {
+export function ProfileCard({ profile, onPress, selected = false, accessibilityLabel }: ProfileCardProps) {
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Entrar como ${profile.name}`}
-      style={({ pressed }) => [styles.card, { opacity: pressed ? 0.85 : 1 }]}
+      accessibilityLabel={accessibilityLabel ?? `Entrar como ${profile.name}`}
+      accessibilityState={{ selected }}
+      style={({ pressed }) => [styles.card, selected && styles.cardSelected, { opacity: pressed ? 0.85 : 1 }]}
     >
       <ProfileAvatar
         name={profile.name}
@@ -40,6 +45,10 @@ const styles = StyleSheet.create({
     minWidth: 140,
     minHeight: 140,
     justifyContent: 'center',
+  },
+  cardSelected: {
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
   name: {
     marginTop: spacing.sm,

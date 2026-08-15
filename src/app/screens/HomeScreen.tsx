@@ -5,18 +5,21 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import type { MainTabParamList, RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { BigButton, ProfileAvatar, ScreenContainer } from '@shared/components';
+import { BigButton, EntityGridCard, ProfileAvatar, ScreenContainer } from '@shared/components';
 import { colors, spacing, typography } from '@shared/theme';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Inicio'>;
 
 /**
- * Raíz del tab "Inicio": saludo, acceso principal a "Mi Voz" y accesos
- * directos a Calma y Mi Día (además de siempre estar a un toque vía la
- * barra inferior). Mundo Sensorial y Juega & Regula todavía no tienen
- * módulo real (ver `docs/V2_ARCHITECTURE_AUDIT.md`), así que no se
- * muestran como botones aquí — solo una nota de que llegan más adelante,
- * para no dejar accesos "muertos" en la navegación principal.
+ * Raíz del tab "Inicio": saludo, acceso principal a "Mi Voz" y una grilla
+ * con los otros 4 sistemas (Calma, Sensorial, Jugar, Mi Día) con el mismo
+ * tratamiento visual entre sí — dos de ellos también son tabs de la barra
+ * inferior y dos no, pero ninguno se lee como "más importante" que los
+ * demás desde Inicio (corrige `docs/V7_PRODUCT_AUDIT.md` §6.6: antes
+ * Calma/Mi Día tenían un trato distinto al de Sensorial/Jugar). Los
+ * íconos reusan los mismos de `MainTabs`/`AdultCenterScreen` para el
+ * mismo destino, para que el lenguaje visual sea consistente en toda la
+ * app.
  */
 export function HomeScreen({ navigation }: Props) {
   const { activeProfile } = useProfiles();
@@ -54,45 +57,38 @@ export function HomeScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.grid}>
-        <View style={styles.gridItem}>
-          <BigButton
-            label="Calma"
-            emoji="😌"
-            variant="secondary"
-            onPress={() => navigation.navigate('Calma')}
-            accessibilityHint="Abre frases de comunicación rápida para momentos difíciles"
-          />
-        </View>
-        <View style={styles.gridItem}>
-          <BigButton
-            label="Sensorial"
-            emoji="🌈"
-            variant="secondary"
-            onPress={() => rootNavigation?.navigate('SensoryHome')}
-            accessibilityHint="Abre las actividades de regulación sensorial"
-          />
-        </View>
-      </View>
-
-      <View style={styles.grid}>
-        <View style={styles.gridItem}>
-          <BigButton
-            label="Jugar"
-            emoji="🎮"
-            variant="secondary"
-            onPress={() => rootNavigation?.navigate('GamesHome')}
-            accessibilityHint="Abre los juegos"
-          />
-        </View>
-        <View style={styles.gridItem}>
-          <BigButton
-            label="Mi Día"
-            emoji="📅"
-            variant="secondary"
-            onPress={() => navigation.navigate('MiDia')}
-            accessibilityHint="Abre la agenda visual de rutinas"
-          />
-        </View>
+        <EntityGridCard
+          icon="happy"
+          label="Calma"
+          accentColor={colors.warning}
+          accessibilityLabel="Calma"
+          accessibilityHint="Abre frases de comunicación rápida para momentos difíciles"
+          onPress={() => navigation.navigate('Calma')}
+        />
+        <EntityGridCard
+          icon="leaf"
+          label="Sensorial"
+          accentColor={colors.lavender}
+          accessibilityLabel="Mundo Sensorial"
+          accessibilityHint="Abre las actividades de regulación sensorial"
+          onPress={() => rootNavigation?.navigate('SensoryHome')}
+        />
+        <EntityGridCard
+          icon="game-controller"
+          label="Jugar"
+          accentColor={colors.accent}
+          accessibilityLabel="Juega y Regula"
+          accessibilityHint="Abre los juegos"
+          onPress={() => rootNavigation?.navigate('GamesHome')}
+        />
+        <EntityGridCard
+          icon="calendar"
+          label="Mi Día"
+          accentColor={colors.secondary}
+          accessibilityLabel="Mi Día"
+          accessibilityHint="Abre la agenda visual de rutinas"
+          onPress={() => navigation.navigate('MiDia')}
+        />
       </View>
 
       <View style={styles.helpAction}>
@@ -134,21 +130,14 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: spacing.md,
     marginTop: spacing.lg,
-  },
-  gridItem: {
-    flex: 1,
   },
   helpAction: {
     marginTop: spacing.lg,
     alignItems: 'center',
-  },
-  comingSoonNote: {
-    marginTop: spacing.lg,
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
-    textAlign: 'center',
   },
   footer: {
     marginTop: spacing.xl,

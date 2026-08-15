@@ -40,7 +40,7 @@ export function PinGateScreen({ navigation }: Props) {
       if (stage === 'enter') {
         const valid = await verifyAdultPin(value);
         if (valid) {
-          navigation.replace('AdultHome');
+          navigation.replace('AdultCenter');
         } else {
           setError('PIN incorrecto. Inténtalo de nuevo.');
           setValue('');
@@ -53,7 +53,7 @@ export function PinGateScreen({ navigation }: Props) {
       } else if (stage === 'create-step2') {
         if (value === firstPin) {
           await setAdultPin(value);
-          navigation.replace('AdultHome');
+          navigation.replace('AdultCenter');
         } else {
           setError('Los PIN no coinciden. Vuelve a crearlo.');
           setValue('');

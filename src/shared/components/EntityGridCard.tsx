@@ -1,9 +1,18 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, shadows, spacing, touchTargets, typography } from '@shared/theme';
 
 export interface EntityGridCardProps {
-  emoji: string;
+  /**
+   * Exactamente uno de `emoji`/`icon`. La mayoría del contenido (categorías,
+   * juegos, rutinas, actividades) ya trae su propio `emoji: string`; las
+   * secciones administrativas nuevas (Centro Adulto) no tienen ese dato y
+   * usan un ícono vectorial (`@expo/vector-icons`, mismo convenio que la
+   * barra inferior desde la Fase 7C) en su lugar.
+   */
+  emoji?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
   label: string;
   /** Texto secundario opcional, hasta 2 líneas (p. ej. la descripción de un juego). */
   description?: string;
@@ -25,6 +34,7 @@ export interface EntityGridCardProps {
  */
 export function EntityGridCard({
   emoji,
+  icon,
   label,
   description,
   accentColor,
@@ -48,7 +58,16 @@ export function EntityGridCard({
           </Text>
         </View>
       ) : null}
-      <Text style={styles.emoji}>{emoji}</Text>
+      {/* Ícono en textPrimary, no en accentColor: igual que los botones y
+          chips de la Fase 7C, ningún tono de la paleta pastel llega al
+          contraste mínimo (3:1) para un gráfico significativo sobre fondo
+          claro. accentColor queda para el borde, que es acento, no
+          contenido. */}
+      {icon ? (
+        <Ionicons name={icon} size={36} color={colors.textPrimary} />
+      ) : (
+        <Text style={styles.emoji}>{emoji}</Text>
+      )}
       <Text style={styles.label} numberOfLines={2}>
         {label}
       </Text>
