@@ -50,6 +50,16 @@ export interface DailyRoutine {
   createdAt: string;
   /** Se actualiza en cada cambio de la rutina o de sus pasos. */
   updatedAt?: string;
+  /**
+   * Cuántas veces se marcaron todos los pasos como hechos (Fase 7I, para
+   * Estadísticas). Suma solo en la transición de incompleta → completa,
+   * nunca al reordenar/editar pasos ni al alternar un paso que ya estaba
+   * en una rutina completa. Opcional por compatibilidad con rutinas
+   * guardadas antes de esta fase; se lee como `?? 0`.
+   */
+  completedCount?: number;
+  /** Fecha ISO de la última vez que se completó toda la rutina. */
+  lastCompletedAt?: string;
 }
 
 export type CreateRoutineInput = {

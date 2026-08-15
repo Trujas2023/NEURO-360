@@ -50,6 +50,7 @@ export function EmotionsScreen({ navigation }: Props) {
   return (
     <ChoiceGame
       title="😊 Emociones"
+      gameId="emotions"
       settings={settings}
       makeRound={makeRound}
       onExit={() => navigation.goBack()}

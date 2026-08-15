@@ -432,8 +432,8 @@ Anotar para cada fallo: **qué pantalla**, **qué se hizo**, **qué pasó**,
 - [ ] Después de tocar varias tarjetas AAC distintas desde Modo Niño,
       "Más usadas" y "Usadas recientemente" reflejan lo tocado.
 - [ ] El total de "toques" y "tarjetas" es correcto.
-- [ ] Aparece la nota de que Mi Día y Juegos quedan pendientes (no se
-      inventan números para esos dos).
+- [ ] Cada sección (Mi Voz / Mi Día / Juegos) aparece solo si ese perfil
+      tiene datos de esa sección; no aparecen las tres siempre.
 
 **Respaldo**
 
@@ -452,3 +452,24 @@ Anotar para cada fallo: **qué pantalla**, **qué se hizo**, **qué pasó**,
       cualquier otro `.json`) muestra un error claro, no cierra la app.
 - [ ] Todo el flujo de exportar/restaurar funciona **sin conexión a
       internet**.
+
+## 22. Historial de Mi Día y Juegos (Fase 7I)
+
+- [ ] En Modo Niño, completar **todos** los pasos de una rutina y luego ir
+      a Estadísticas: esa rutina aparece en "Rutinas completadas" con 1
+      vez.
+- [ ] Completar la misma rutina una segunda vez (tras "Reiniciar rutina")
+      suma a 2 veces, no reinicia el conteo.
+- [ ] Destocar y volver a tocar un paso de una rutina que **ya estaba
+      completa** no suma otra vez (el conteo solo sube en la transición
+      de incompleta a completa).
+- [ ] Reordenar o editar pasos de una rutina no cambia su conteo de
+      completadas.
+- [ ] Jugar una partida completa de **cada** juego (Colores, Formas,
+      Emociones, Clasificar, Memoria, Secuencias) y verificar que
+      Estadísticas → Juegos muestra 1 partida para cada uno.
+- [ ] Salir de un juego a mitad de partida (botón "Terminar" antes de
+      acabar) **no** suma una partida jugada.
+- [ ] Exportar un respaldo después de generar este historial, restaurarlo
+      en el mismo dispositivo (o probar en otro) y verificar que las
+      rutinas completadas y partidas jugadas se conservan.

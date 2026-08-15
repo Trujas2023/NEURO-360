@@ -54,6 +54,7 @@ export function ColorMatchScreen({ navigation }: Props) {
   return (
     <ChoiceGame
       title="🎨 Colores"
+      gameId="colors"
       settings={settings}
       makeRound={makeRound}
       onExit={() => navigation.goBack()}

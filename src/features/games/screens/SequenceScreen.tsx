@@ -13,6 +13,7 @@ import { GameFrame } from '../components/GameFrame';
 import type { GameFeedback } from '../components/GameFrame';
 import { GAME_TILE_COLORS } from '../data/gameContent';
 import { useGameSettings } from '../hooks/useGameSettings';
+import { recordGameSession } from '../storage/gameStatsRepository';
 import { ROUNDS_BY_LENGTH, SEQUENCE_LENGTH_BY_DIFFICULTY } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GameSequence'>;
@@ -98,6 +99,14 @@ export function SequenceScreen({ navigation }: Props) {
       timers.forEach(clearTimeout);
     };
   }, [phase, sequence, finished]);
+
+  // Registra una partida completada para Estadísticas (Fase 7I); solo
+  // vuelve a ejecutarse cuando `finished` cambia de valor.
+  useEffect(() => {
+    if (finished && activeProfile?.id) {
+      recordGameSession(activeProfile.id, 'sequence').catch(() => {});
+    }
+  }, [finished, activeProfile?.id]);
 
   function handleTile(tileIndex: number) {
     if (phase !== 'input') {

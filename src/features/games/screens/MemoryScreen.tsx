@@ -15,6 +15,7 @@ import { ShapeGlyph } from '../components/ShapeGlyph';
 import { GAME_SHAPES, GAME_TILE_COLORS, pickRandom, shuffle } from '../data/gameContent';
 import type { ShapeKind } from '../data/gameContent';
 import { useGameSettings } from '../hooks/useGameSettings';
+import { recordGameSession } from '../storage/gameStatsRepository';
 import { MEMORY_PAIRS_BY_DIFFICULTY } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GameMemory'>;
@@ -73,6 +74,14 @@ export function MemoryScreen({ navigation }: Props) {
     const timer = setTimeout(resetFlipped, FLIP_BACK_MS);
     return () => clearTimeout(timer);
   }, [awaitingFlipBack, resetFlipped]);
+
+  // Registra una partida completada para Estadísticas (Fase 7I); solo
+  // vuelve a ejecutarse cuando `finished` cambia de valor.
+  useEffect(() => {
+    if (finished && activeProfile?.id) {
+      recordGameSession(activeProfile.id, 'memory').catch(() => {});
+    }
+  }, [finished, activeProfile?.id]);
 
   function restart() {
     setCards(buildDeck(pairCount));

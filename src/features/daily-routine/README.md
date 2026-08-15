@@ -43,3 +43,12 @@ visual que funciona depende de la persona y no de la actividad:
 
 Pendiente: grabación de audio por paso (`RoutineStep.audioUri` está
 reservado); hoy los pasos se leen con texto a voz.
+
+## Historial de completadas (Fase 7I)
+
+`DailyRoutine.completedCount` / `lastCompletedAt` se actualizan en
+`useRoutines.ts` → `toggleStepDone`, y solo en la transición de
+incompleta a completa: tocar el último paso pendiente suma uno; seguir
+tocando pasos de una rutina que ya estaba completa, reordenar o editar
+pasos no suma nada, y `resetRoutine` tampoco resta. El Centro Adulto lo
+muestra en `parent-mode/screens/StatisticsScreen.tsx`.

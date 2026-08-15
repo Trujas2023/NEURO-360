@@ -7,6 +7,8 @@ import type { AacCard, SavedPhrase } from '@features/aac-communicator/types';
 import { getRoutines, saveRoutines } from '@features/daily-routine/storage/routinesRepository';
 import type { DailyRoutine } from '@features/daily-routine/types';
 import { getGameSettings, saveGameSettings } from '@features/games/storage/gameSettingsRepository';
+import { getGameStats, saveGameStats } from '@features/games/storage/gameStatsRepository';
+import type { GameStats } from '@features/games/storage/gameStatsRepository';
 import type { GameSettings } from '@features/games/types';
 import { getSensorySettings, saveSensorySettings } from '@features/sensory-world/storage/sensorySettingsRepository';
 import type { SensorySettings } from '@features/sensory-world/types';
@@ -41,6 +43,7 @@ interface ProfileBackupData {
   routines: DailyRoutine[] | null;
   sensorySettings: SensorySettings;
   gameSettings: GameSettings;
+  gameStats: GameStats;
 }
 
 interface BackupFile {
@@ -77,6 +80,7 @@ export async function exportBackup(): Promise<{ shared: boolean }> {
       routines: await getRoutines(profile.id),
       sensorySettings: await getSensorySettings(profile.id),
       gameSettings: await getGameSettings(profile.id),
+      gameStats: await getGameStats(profile.id),
     };
   }
 
@@ -143,6 +147,9 @@ export async function restoreBackup(backup: BackupFile): Promise<{ profileCount:
     }
     if (data.gameSettings) {
       await saveGameSettings(profile.id, data.gameSettings);
+    }
+    if (data.gameStats) {
+      await saveGameStats(profile.id, data.gameStats);
     }
   }
 

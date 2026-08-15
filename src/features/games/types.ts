@@ -2,6 +2,16 @@
 
 export type GameId = 'colors' | 'shapes' | 'memory' | 'sequence' | 'emotions' | 'categories';
 
+/** Emoji + nombre corto de cada juego, para mostrarlo fuera de su propia pantalla (p. ej. Estadísticas). */
+export const GAME_LABELS: Record<GameId, { emoji: string; label: string }> = {
+  colors: { emoji: '🎨', label: 'Colores' },
+  shapes: { emoji: '🔷', label: 'Formas' },
+  memory: { emoji: '🧠', label: 'Memoria' },
+  sequence: { emoji: '🔢', label: 'Secuencias' },
+  emotions: { emoji: '😊', label: 'Emociones' },
+  categories: { emoji: '🧺', label: 'Clasificar' },
+};
+
 export type GameDifficulty = 'easy' | 'medium' | 'hard';
 
 /**

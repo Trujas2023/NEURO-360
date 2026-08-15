@@ -54,6 +54,7 @@ export function ShapeMatchScreen({ navigation }: Props) {
   return (
     <ChoiceGame
       title="🔷 Formas"
+      gameId="shapes"
       settings={settings}
       makeRound={makeRound}
       onExit={() => navigation.goBack()}

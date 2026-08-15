@@ -10,8 +10,9 @@ import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { GameFrame } from './GameFrame';
 import type { GameFeedback } from './GameFrame';
+import { recordGameSession } from '../storage/gameStatsRepository';
 import { OPTIONS_BY_DIFFICULTY, ROUNDS_BY_LENGTH } from '../types';
-import type { GameSettings } from '../types';
+import type { GameId, GameSettings } from '../types';
 
 export interface GameChoice {
   id: string;
@@ -33,6 +34,8 @@ export interface GameRound {
 
 export interface ChoiceGameProps {
   title: string;
+  /** Identifica el juego para las estadísticas de Centro Adulto (Fase 7I). */
+  gameId: GameId;
   settings: GameSettings;
   /**
    * Debe ser una función estable — definirla a nivel de módulo, no dentro
@@ -58,8 +61,9 @@ const ADVANCE_DELAY_MS = 1000;
  *   para que el refuerzo táctil quede asociado solo al logro.
  * - No hay puntaje ni tiempo: solo "ronda X de Y".
  */
-export function ChoiceGame({ title, settings, makeRound, onExit }: ChoiceGameProps) {
+export function ChoiceGame({ title, gameId, settings, makeRound, onExit }: ChoiceGameProps) {
   const { activeProfile } = useProfiles();
+  const profileId = activeProfile?.id;
 
   const optionCount = OPTIONS_BY_DIFFICULTY[settings.difficulty];
   const totalRounds = ROUNDS_BY_LENGTH[settings.sessionLength];
@@ -85,6 +89,15 @@ export function ChoiceGame({ title, settings, makeRound, onExit }: ChoiceGamePro
     }
     speak(round.spokenPrompt, ttsOptions);
   }, [round, soundOn, finished, ttsOptions]);
+
+  // Registra una partida completada para Estadísticas (Fase 7I). Depende
+  // de `finished` para sumar una sola vez por partida, no en cada render
+  // mientras la pantalla de "¡Terminaste!" sigue montada.
+  useEffect(() => {
+    if (finished && profileId) {
+      recordGameSession(profileId, gameId).catch(() => {});
+    }
+  }, [finished, profileId, gameId]);
 
   const advance = useCallback(() => {
     setPendingAdvance(false);

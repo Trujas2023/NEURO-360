@@ -20,14 +20,15 @@
   `AacSettings` para tamaño de texto y qué mostrar en tarjeta en vez de
   repetir esos controles. Alto contraste queda pendiente: no hay ninguna
   paleta alternativa definida en el Design System todavía.
-- `screens/StatisticsScreen.tsx` (Fase 7H): más usados/recientes de Mi Voz
-  por perfil, con los datos que las tarjetas AAC ya venían acumulando
-  (`usageCount`/`lastUsedAt`). Rutinas completadas y partidas jugadas
-  quedan pendientes: `DailyRoutine`/`GameSettings` no guardan ningún
-  historial hoy, solo estado actual.
+- `screens/StatisticsScreen.tsx` (Fase 7H, ampliada en 7I): por perfil,
+  tres secciones independientes — Mi Voz (más usados/recientes, de
+  `usageCount`/`lastUsedAt` en cada tarjeta), Mi Día (rutinas completadas,
+  de `DailyRoutine.completedCount`) y Juegos (partidas jugadas, de
+  `games/storage/gameStatsRepository.ts`). Cada sección solo aparece si
+  tiene datos; el mensaje vacío cubre el caso de ningún dato en ninguna.
 - `screens/BackupScreen.tsx` (Fase 7H) + `services/backup/backupService.ts`:
-  exporta perfiles/tarjetas/frases guardadas/rutinas/ajustes de Mundo
-  Sensorial y Juegos de todos los perfiles a un único JSON (selector
+  exporta perfiles/tarjetas/frases guardadas/rutinas/ajustes y
+  estadísticas de Juegos de todos los perfiles a un único JSON (selector
   nativo de compartir/guardar de Android, nunca sube nada a un servidor
   propio), y restaura desde ese mismo archivo. No incluye grabaciones de
   voz (`audioUri` se conserva en el JSON, así que si el archivo ya no

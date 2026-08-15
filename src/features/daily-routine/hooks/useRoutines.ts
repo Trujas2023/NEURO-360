@@ -271,10 +271,23 @@ export function useRoutines(profileId: string | null): UseRoutinesResult {
   const toggleStepDone = useCallback(
     async (routineId: string, stepId: string) => {
       await persist(
-        withRoutine(routineId, (routine) => ({
-          ...routine,
-          steps: routine.steps.map((step) => (step.id === stepId ? { ...step, done: !step.done } : step)),
-        })),
+        withRoutine(routineId, (routine) => {
+          const steps = routine.steps.map((step) =>
+            step.id === stepId ? { ...step, done: !step.done } : step,
+          );
+          // Detecta la transición incompleta → completa (no al revés, ni al
+          // seguir tocando pasos de una rutina que ya estaba completa) para
+          // sumar `completedCount` una sola vez por vuelta (Fase 7I).
+          const wasComplete = routine.steps.length > 0 && routine.steps.every((step) => step.done);
+          const isComplete = steps.length > 0 && steps.every((step) => step.done);
+          const justCompleted = isComplete && !wasComplete;
+          return {
+            ...routine,
+            steps,
+            completedCount: justCompleted ? (routine.completedCount ?? 0) + 1 : routine.completedCount,
+            lastCompletedAt: justCompleted ? new Date().toISOString() : routine.lastCompletedAt,
+          };
+        }),
       );
     },
     [withRoutine, persist],

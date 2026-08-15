@@ -48,3 +48,14 @@ avanzar rondas de más.
 El sonido usa el texto a voz del dispositivo (`expo-speech`), no archivos
 de audio: lee la consigna y celebra los aciertos. Por eso los juegos no
 dependen de `assets/sounds/`, que sigue vacío.
+
+## Estadísticas (Fase 7I)
+
+`storage/gameStatsRepository.ts` guarda, por perfil, cuántas partidas
+completó cada juego y cuándo fue la última (`sessionsCompleted` /
+`lastPlayedAt`). Cada pantalla llama a `recordGameSession(profileId,
+gameId)` una sola vez, en el mismo efecto que detecta que la partida
+terminó (`finished`). No cuenta partidas abandonadas a mitad de camino,
+a propósito: solo interesa lo que el niño efectivamente logró. El Centro
+Adulto lo muestra en `parent-mode/screens/StatisticsScreen.tsx`, junto a
+las rutinas completadas de Mi Día y el uso de Mi Voz.

@@ -64,6 +64,7 @@ export function CategorySortScreen({ navigation }: Props) {
   return (
     <ChoiceGame
       title="🧺 Clasificar"
+      gameId="categories"
       settings={settings}
       makeRound={makeRound}
       onExit={() => navigation.goBack()}
