@@ -1,6 +1,6 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 
 import { usePhrase } from '../context/PhraseContext';
 
@@ -98,8 +98,8 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   deleteButton: {
-    minWidth: 44,
-    minHeight: 44,
+    minWidth: touchTargets.minimum,
+    minHeight: touchTargets.minimum,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -7,7 +7,7 @@ import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { speak, speakOptionsForPreferences } from '@services/audio/speech';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { COMMUNICATION_LEVELS, DEFAULT_COMMUNICATION_LEVEL, DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 import type { AacBoardSize, AacTextSize, ChildProfilePreferences, CommunicationLevel } from '@shared/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AacSettings'>;
@@ -254,6 +254,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   chip: {
+    minHeight: touchTargets.minimum,
+    justifyContent: 'center',
     borderWidth: 2,
     borderColor: colors.border,
     borderRadius: radius.pill,
@@ -271,7 +273,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   chipTextSelected: {
-    color: colors.onPrimary,
+    color: colors.textPrimary,
   },
   toggleRow: {
     flexDirection: 'row',

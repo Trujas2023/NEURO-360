@@ -7,7 +7,7 @@ import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 
 import { AacCardVisual } from '../components/AacCardVisual';
 import { ASSIGNABLE_CATEGORIES } from '../constants/categories';
@@ -206,8 +206,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: touchTargets.minimum,
+    height: touchTargets.minimum,
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',

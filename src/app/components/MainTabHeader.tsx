@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -25,7 +26,7 @@ export function MainTabHeader({ navigation }: BottomTabHeaderProps) {
         accessibilityHint="Abre frases rápidas de ayuda"
         style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
       >
-        <Text style={styles.emoji}>🆘</Text>
+        <Ionicons name="help-buoy" size={18} color={colors.danger} />
         <Text style={styles.label}>Ayuda</Text>
       </Pressable>
     </View>
@@ -51,9 +52,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.danger,
-  },
-  emoji: {
-    fontSize: typography.sizes.md,
   },
   label: {
     fontSize: typography.sizes.sm,

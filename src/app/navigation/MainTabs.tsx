@@ -1,5 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
 
 import { MainTabHeader } from '@app/components/MainTabHeader';
 import { HomeScreen } from '@app/screens/HomeScreen';
@@ -12,11 +12,20 @@ import type { MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-const TAB_CONFIG: Record<keyof MainTabParamList, { label: string; emoji: string }> = {
-  Inicio: { label: 'Inicio', emoji: '🏠' },
-  MiVoz: { label: 'Mi Voz', emoji: '🗣️' },
-  Calma: { label: 'Calma', emoji: '😌' },
-  MiDia: { label: 'Mi Día', emoji: '📅' },
+type IoniconName = keyof typeof Ionicons.glyphMap;
+
+/**
+ * Íconos vectoriales (`@expo/vector-icons`, ya incluido con Expo SDK 57):
+ * primer uso de la librería sancionada en el Design System de V7 (Fase
+ * 7C) para el chrome persistente de la app, en vez de emoji. Relleno
+ * cuando el tab está activo, contorno cuando no — convención estándar de
+ * barras de navegación inferior.
+ */
+const TAB_CONFIG: Record<keyof MainTabParamList, { label: string; icon: IoniconName; iconActive: IoniconName }> = {
+  Inicio: { label: 'Inicio', icon: 'home-outline', iconActive: 'home' },
+  MiVoz: { label: 'Mi Voz', icon: 'chatbubbles-outline', iconActive: 'chatbubbles' },
+  Calma: { label: 'Calma', icon: 'happy-outline', iconActive: 'happy' },
+  MiDia: { label: 'Mi Día', icon: 'calendar-outline', iconActive: 'calendar' },
 };
 
 /**
@@ -42,7 +51,11 @@ export function MainTabs() {
         },
         tabBarLabelStyle: { fontSize: typography.sizes.sm, fontWeight: typography.weights.bold },
         tabBarIcon: ({ focused }) => (
-          <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.7 }}>{TAB_CONFIG[route.name].emoji}</Text>
+          <Ionicons
+            name={focused ? TAB_CONFIG[route.name].iconActive : TAB_CONFIG[route.name].icon}
+            size={24}
+            color={focused ? colors.primary : colors.textSecondary}
+          />
         ),
         tabBarLabel: TAB_CONFIG[route.name].label,
         tabBarAccessibilityLabel: TAB_CONFIG[route.name].label,

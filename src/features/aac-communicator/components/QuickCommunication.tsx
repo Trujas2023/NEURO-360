@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { speak, speakOptionsForPreferences } from '@services/audio/speech';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 
 import type { QuickPhrase } from '../types';
 
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   detailButton: {
     marginTop: spacing.xs,
-    minHeight: 32,
+    minHeight: touchTargets.minimum,
     justifyContent: 'center',
     paddingHorizontal: spacing.sm,
     borderRadius: radius.pill,

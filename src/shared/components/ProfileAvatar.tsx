@@ -44,7 +44,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   initial: {
-    color: colors.onPrimary,
+    // Texto oscuro: los 6 colores de avatar son pasteles claros, ninguno
+    // llega a contraste WCAG AA con texto blanco encima.
+    color: colors.textPrimary,
     fontWeight: '700',
   },
 });

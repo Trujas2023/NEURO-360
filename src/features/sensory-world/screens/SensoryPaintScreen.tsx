@@ -7,7 +7,7 @@ import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { softTap } from '@services/haptics/haptics';
 import { BigButton } from '@shared/components';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 import { createId } from '@shared/utils/id';
 
 import { ActivityFrame } from '../components/ActivityFrame';
@@ -231,8 +231,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   swatch: {
-    width: 44,
-    height: 44,
+    width: touchTargets.minimum,
+    height: touchTargets.minimum,
     borderRadius: radius.pill,
     borderWidth: 3,
     borderColor: 'transparent',
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     borderColor: colors.textPrimary,
   },
   modeChip: {
-    minHeight: 44,
+    minHeight: touchTargets.minimum,
     justifyContent: 'center',
     paddingHorizontal: spacing.md,
     borderRadius: radius.pill,
@@ -259,6 +259,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   modeChipTextSelected: {
-    color: colors.onPrimary,
+    color: colors.textPrimary,
   },
 });

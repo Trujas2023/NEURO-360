@@ -1,8 +1,15 @@
 /**
- * Paleta provisional de Fase 1. Colores suaves y de bajo contraste agresivo,
- * pensados para evitar sobreestimulación visual. El diseño definitivo se
- * cierra en la Fase 10 (diseño definitivo); esta paleta solo fija los
- * tokens que el resto de la arquitectura puede consumir desde ya.
+ * Paleta definitiva V7. Colores suaves y de bajo contraste agresivo,
+ * pensados para evitar sobreestimulación visual — validada en la Fase 7C
+ * (Design System) mediante cálculo de contraste WCAG contra cada
+ * combinación de texto que la usa, no solo elegida por apariencia.
+ *
+ * Ningún tono de esta paleta es lo bastante oscuro para llevar texto
+ * blanco (`onPrimary`) encima con contraste aceptable — están pensados
+ * como fondo con texto oscuro (`textPrimary`) encima, nunca al revés.
+ * `onPrimary` se mantiene solo para el día que exista una superficie
+ * realmente oscura/saturada (no hay ninguna hoy); no debe volver a
+ * combinarse con ningún tono de esta lista.
  */
 export const colors = {
   background: '#FDF6EC',

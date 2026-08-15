@@ -1,7 +1,7 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { BigButton } from '@shared/components';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 
 import { usePhrase } from '../context/PhraseContext';
 
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
-    minHeight: 44,
+    minHeight: touchTargets.minimum,
   },
   chipText: {
     fontSize: typography.sizes.md,

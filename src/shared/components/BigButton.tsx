@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, minTouchTarget, radius, spacing, typography } from '@shared/theme';
 
@@ -10,15 +10,19 @@ export interface BigButtonProps {
   emoji?: string;
   variant?: BigButtonVariant;
   disabled?: boolean;
+  /** Reemplaza el contenido por un indicador de carga y bloquea el toque, sin cambiar el tamaño del botón. */
+  loading?: boolean;
   accessibilityHint?: string;
   fullWidth?: boolean;
 }
 
 const VARIANT_STYLES: Record<BigButtonVariant, { background: string; text: string }> = {
-  primary: { background: colors.primary, text: colors.onPrimary },
+  // Texto oscuro sobre los dos fondos pasteles: contraste WCAG AA real
+  // (~5:1 y ~4.5:1); texto blanco sobre estos tonos no llega a 3:1.
+  primary: { background: colors.primary, text: colors.textPrimary },
   secondary: { background: colors.surface, text: colors.textPrimary },
   ghost: { background: 'transparent', text: colors.textSecondary },
-  danger: { background: colors.danger, text: colors.onPrimary },
+  danger: { background: colors.danger, text: colors.textPrimary },
 };
 
 /**
@@ -31,34 +35,40 @@ export function BigButton({
   emoji,
   variant = 'primary',
   disabled = false,
+  loading = false,
   accessibilityHint,
   fullWidth = true,
 }: BigButtonProps) {
   const palette = VARIANT_STYLES[variant];
+  const isInteractive = !disabled && !loading;
 
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
+      disabled={!isInteractive}
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled: !isInteractive, busy: loading }}
       style={({ pressed }) => [
         styles.base,
         {
           backgroundColor: palette.background,
           borderColor: variant === 'secondary' ? colors.border : 'transparent',
           borderWidth: variant === 'secondary' ? 1 : 0,
-          opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
+          opacity: !isInteractive ? 0.5 : pressed ? 0.85 : 1,
           alignSelf: fullWidth ? 'stretch' : 'center',
         },
       ]}
     >
-      <View style={styles.content}>
-        {emoji ? <Text style={styles.emoji}>{emoji}</Text> : null}
-        <Text style={[styles.label, { color: palette.text }]}>{label}</Text>
-      </View>
+      {loading ? (
+        <ActivityIndicator color={palette.text} />
+      ) : (
+        <View style={styles.content}>
+          {emoji ? <Text style={styles.emoji}>{emoji}</Text> : null}
+          <Text style={[styles.label, { color: palette.text }]}>{label}</Text>
+        </View>
+      )}
     </Pressable>
   );
 }

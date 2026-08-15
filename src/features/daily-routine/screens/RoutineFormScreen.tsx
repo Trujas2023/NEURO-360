@@ -7,7 +7,7 @@ import type { RootStackParamList } from '@app/navigation/types';
 import { AacCardVisual } from '@features/aac-communicator/components/AacCardVisual';
 import { BigButton, ScreenContainer } from '@shared/components';
 import { AVATAR_COLORS as PALETTE_COLORS } from '@shared/constants/profiles';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 
 import { useRoutines } from '../hooks/useRoutines';
 import type { RoutineDisplayMode, RoutineStep } from '../types';
@@ -178,7 +178,7 @@ export function RoutineFormScreen({ route, navigation }: Props) {
         label={savedRoutineId ? 'Guardar cambios' : 'Guardar rutina'}
         emoji="✅"
         onPress={handleSaveDetails}
-        disabled={saving}
+        loading={saving}
       />
 
       {savedRoutineId ? (
@@ -321,8 +321,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   swatch: {
-    width: 40,
-    height: 40,
+    width: touchTargets.minimum,
+    height: touchTargets.minimum,
     borderRadius: radius.pill,
     borderWidth: 2,
     borderColor: 'transparent',
@@ -336,6 +336,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   modeChip: {
+    minHeight: touchTargets.minimum,
+    justifyContent: 'center',
     borderWidth: 2,
     borderColor: colors.border,
     borderRadius: radius.pill,
@@ -353,7 +355,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   modeChipTextSelected: {
-    color: colors.onPrimary,
+    color: colors.textPrimary,
   },
   modeHint: {
     marginTop: spacing.xs,
@@ -401,7 +403,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   durationChip: {
-    minHeight: 40,
+    minHeight: touchTargets.minimum,
     justifyContent: 'center',
     paddingHorizontal: spacing.sm,
     borderRadius: radius.pill,
@@ -415,8 +417,8 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: touchTargets.minimum,
+    height: touchTargets.minimum,
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',

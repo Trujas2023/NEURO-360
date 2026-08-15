@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { BigButton, ScreenContainer } from '@shared/components';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 
 import { SENSORY_PALETTE } from '../data/activities';
 import { useSensorySettings } from '../hooks/useSensorySettings';
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     backgroundColor: colors.surface,
-    minHeight: 44,
+    minHeight: touchTargets.minimum,
     justifyContent: 'center',
   },
   chipSelected: {
@@ -200,11 +200,11 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   chipTextSelected: {
-    color: colors.onPrimary,
+    color: colors.textPrimary,
   },
   swatch: {
-    width: 44,
-    height: 44,
+    width: touchTargets.minimum,
+    height: touchTargets.minimum,
     borderRadius: radius.pill,
     borderWidth: 3,
     borderColor: 'transparent',

@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   badge: {
     alignSelf: 'flex-start',
     backgroundColor: colors.primary,
-    color: colors.onPrimary,
+    color: colors.textPrimary,
     fontSize: typography.sizes.sm,
     fontWeight: typography.weights.bold,
     paddingHorizontal: spacing.sm,

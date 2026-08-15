@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { BigButton, ScreenContainer } from '@shared/components';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 
 import { useGameSettings } from '../hooks/useGameSettings';
 import { ROUNDS_BY_LENGTH } from '../types';
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     backgroundColor: colors.surface,
-    minHeight: 44,
+    minHeight: touchTargets.minimum,
     justifyContent: 'center',
   },
   chipSelected: {
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   chipTextSelected: {
-    color: colors.onPrimary,
+    color: colors.textPrimary,
   },
   toggleRow: {
     flexDirection: 'row',

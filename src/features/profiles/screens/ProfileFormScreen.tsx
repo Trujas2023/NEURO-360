@@ -7,7 +7,7 @@ import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { BigButton, ProfileAvatar, ScreenContainer } from '@shared/components';
 import { AVATAR_COLORS, DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { colors, radius, spacing, touchTargets, typography } from '@shared/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProfileForm'>;
 
@@ -140,7 +140,7 @@ export function ProfileFormScreen({ route, navigation }: Props) {
       </View>
 
       <View style={styles.actions}>
-        <BigButton label="Guardar" emoji="✅" onPress={handleSave} disabled={saving} />
+        <BigButton label="Guardar" emoji="✅" onPress={handleSave} loading={saving} />
         <View style={styles.spacer} />
         <BigButton label="Cancelar" variant="ghost" onPress={() => navigation.goBack()} disabled={saving} />
       </View>
@@ -180,8 +180,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   swatch: {
-    width: 40,
-    height: 40,
+    width: touchTargets.minimum,
+    height: touchTargets.minimum,
     borderRadius: radius.pill,
     borderWidth: 2,
     borderColor: 'transparent',
