@@ -5,8 +5,9 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
 import { speak } from '@services/audio/speech';
-import { BigButton, ChildModeShell, EmptyState } from '@shared/components';
-import { colors, radius, spacing, typography } from '@shared/theme';
+import { BigButton, ChildModeShell, EmptyState, useConfirmDialog } from '@shared/components';
+import { useReduceMotion } from '@shared/hooks';
+import { colors, minTouchTarget, radius, spacing, typography } from '@shared/theme';
 
 import { useRoutines } from '../hooks/useRoutines';
 import type { RoutineStep } from '../types';
@@ -20,6 +21,8 @@ export function MyDayScreen({ navigation }: Props) {
     activeProfile?.id ?? null,
   );
   const [selectedRoutineId, setSelectedRoutineId] = useState<string | null>(null);
+  const reduceMotion = useReduceMotion(activeProfile?.preferences.reduceMotion);
+  const { confirm, dialog } = useConfirmDialog(reduceMotion);
 
   const selectedRoutine = routines.find((routine) => routine.id === selectedRoutineId) ?? null;
   const soundEnabled = activeProfile?.preferences.soundEnabled ?? true;
@@ -27,6 +30,21 @@ export function MyDayScreen({ navigation }: Props) {
   function handleStepPress(step: RoutineStep) {
     if (soundEnabled) {
       speak(step.label);
+    }
+  }
+
+  // R2: "Reiniciar rutina" borraba todo el progreso del día sin avisar —
+  // era la única acción destructiva de toda la app sin ningún tipo de
+  // confirmación (ni siquiera detrás de `confirmBeforeDelete`).
+  async function handleResetRoutine(routineId: string) {
+    const ok = await confirm({
+      title: 'Reiniciar rutina',
+      message: 'Todos los pasos marcados como hechos van a desmarcarse.',
+      confirmLabel: 'Reiniciar',
+      destructive: true,
+    });
+    if (ok) {
+      resetRoutine(routineId);
     }
   }
 
@@ -95,9 +113,11 @@ export function MyDayScreen({ navigation }: Props) {
             label="Reiniciar rutina"
             variant="secondary"
             emoji="🔄"
-            onPress={() => resetRoutine(selectedRoutine.id)}
+            onPress={() => handleResetRoutine(selectedRoutine.id)}
           />
         </View>
+
+        {dialog}
       </ChildModeShell>
     );
   }
@@ -249,8 +269,8 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   doneButton: {
-    minHeight: 44,
-    minWidth: 44,
+    minHeight: minTouchTarget,
+    minWidth: minTouchTarget,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,

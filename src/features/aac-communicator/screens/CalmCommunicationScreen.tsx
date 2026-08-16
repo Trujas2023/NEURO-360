@@ -49,10 +49,10 @@ export function CalmCommunicationScreen({ navigation }: Props) {
       <View style={styles.footer}>
         <BigButton
           label="Ir a Mundo Sensorial"
-          emoji="🌈"
+          emoji="🎮"
           variant="secondary"
           onPress={() =>
-            parentNavigation?.navigate('ComingSoon', { title: 'Mundo Sensorial', emoji: '🌈' })
+            parentNavigation?.navigate('ComingSoon', { title: 'Mundo Sensorial', emoji: '🎮' })
           }
         />
       </View>

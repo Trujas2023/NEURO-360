@@ -1,15 +1,18 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { BigButton, ProfileAvatar, ScreenContainer } from '@shared/components';
+import { BigButton, ProfileAvatar, ScreenContainer, useConfirmDialog } from '@shared/components';
 import { AVATAR_COLORS, DEFAULT_PROFILE_PREFERENCES } from '@shared/constants/profiles';
+import { useReduceMotion } from '@shared/hooks';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProfileForm'>;
+
+const SWATCH_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 };
 
 export function ProfileFormScreen({ route, navigation }: Props) {
   const { profiles, createProfile, updateProfile } = useProfiles();
@@ -18,16 +21,48 @@ export function ProfileFormScreen({ route, navigation }: Props) {
     [profiles, route.params?.profileId],
   );
 
-  const [name, setName] = useState(editingProfile?.name ?? '');
-  const [avatarUri, setAvatarUri] = useState<string | undefined>(editingProfile?.avatarUri);
-  const [avatarColor, setAvatarColor] = useState(editingProfile?.avatarColor ?? AVATAR_COLORS[0]);
-  const [soundEnabled, setSoundEnabled] = useState(
-    editingProfile?.preferences.soundEnabled ?? DEFAULT_PROFILE_PREFERENCES.soundEnabled,
-  );
-  const [reduceMotion, setReduceMotion] = useState(
-    editingProfile?.preferences.reduceMotion ?? DEFAULT_PROFILE_PREFERENCES.reduceMotion,
-  );
+  const initialName = editingProfile?.name ?? '';
+  const initialAvatarUri = editingProfile?.avatarUri;
+  const initialAvatarColor = editingProfile?.avatarColor ?? AVATAR_COLORS[0];
+  const initialSoundEnabled =
+    editingProfile?.preferences.soundEnabled ?? DEFAULT_PROFILE_PREFERENCES.soundEnabled;
+  const initialReduceMotionPref =
+    editingProfile?.preferences.reduceMotion ?? DEFAULT_PROFILE_PREFERENCES.reduceMotion;
+
+  const [name, setName] = useState(initialName);
+  const [avatarUri, setAvatarUri] = useState<string | undefined>(initialAvatarUri);
+  const [avatarColor, setAvatarColor] = useState(initialAvatarColor);
+  const [soundEnabled, setSoundEnabled] = useState(initialSoundEnabled);
+  const [reduceMotionPref, setReduceMotionPref] = useState(initialReduceMotionPref);
   const [saving, setSaving] = useState(false);
+  // Guarda contra doble envío: `saving` (estado) deshabilita el botón, pero
+  // un doble toque muy rápido puede disparar dos onPress antes de que React
+  // vuelva a renderizar. Este ref se lee/escribe de forma síncrona.
+  const savingRef = useRef(false);
+  const reduceMotion = useReduceMotion(reduceMotionPref);
+  const { confirm, dialog } = useConfirmDialog(reduceMotion);
+
+  const isDirty =
+    name !== initialName ||
+    avatarUri !== initialAvatarUri ||
+    avatarColor !== initialAvatarColor ||
+    soundEnabled !== initialSoundEnabled ||
+    reduceMotionPref !== initialReduceMotionPref;
+
+  async function handleCancel() {
+    if (isDirty) {
+      const discard = await confirm({
+        title: 'Descartar cambios',
+        message: 'Todavía no guardaste. Si sales ahora, se pierden los cambios.',
+        confirmLabel: 'Descartar',
+        destructive: true,
+      });
+      if (!discard) {
+        return;
+      }
+    }
+    navigation.goBack();
+  }
 
   async function pickFromLibrary() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -63,22 +98,32 @@ export function ProfileFormScreen({ route, navigation }: Props) {
   }
 
   async function handleSave() {
+    if (savingRef.current) {
+      return;
+    }
     const trimmedName = name.trim();
     if (!trimmedName) {
       Alert.alert('Falta el nombre', 'Escribe el nombre del niño o niña antes de guardar.');
       return;
     }
 
+    savingRef.current = true;
     setSaving(true);
-    const preferences = { soundEnabled, reduceMotion };
+    const preferences = { soundEnabled, reduceMotion: reduceMotionPref };
     try {
       if (editingProfile) {
-        await updateProfile(editingProfile.id, { name: trimmedName, avatarUri, avatarColor, preferences });
+        await updateProfile(editingProfile.id, {
+          name: trimmedName,
+          avatarUri,
+          avatarColor,
+          preferences,
+        });
       } else {
         await createProfile({ name: trimmedName, avatarUri, avatarColor, preferences });
       }
       navigation.goBack();
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
@@ -88,7 +133,12 @@ export function ProfileFormScreen({ route, navigation }: Props) {
       <Text style={styles.title}>{editingProfile ? 'Editar perfil' : 'Nuevo perfil'}</Text>
 
       <View style={styles.avatarPreview}>
-        <ProfileAvatar name={name || '?'} avatarUri={avatarUri} avatarColor={avatarColor} size={100} />
+        <ProfileAvatar
+          name={name || '?'}
+          avatarUri={avatarUri}
+          avatarColor={avatarColor}
+          size={100}
+        />
       </View>
 
       <View style={styles.photoButtons}>
@@ -100,7 +150,12 @@ export function ProfileFormScreen({ route, navigation }: Props) {
         </View>
       </View>
       {avatarUri ? (
-        <BigButton label="Quitar foto" variant="ghost" fullWidth={false} onPress={() => setAvatarUri(undefined)} />
+        <BigButton
+          label="Quitar foto"
+          variant="ghost"
+          fullWidth={false}
+          onPress={() => setAvatarUri(undefined)}
+        />
       ) : null}
 
       <Text style={styles.label}>Color del avatar</Text>
@@ -109,8 +164,10 @@ export function ProfileFormScreen({ route, navigation }: Props) {
           <Pressable
             key={color}
             onPress={() => setAvatarColor(color)}
+            hitSlop={SWATCH_HIT_SLOP}
             accessibilityRole="button"
             accessibilityLabel={`Elegir color de avatar ${color}`}
+            accessibilityState={{ selected: color === avatarColor }}
             style={[
               styles.swatch,
               { backgroundColor: color },
@@ -132,18 +189,28 @@ export function ProfileFormScreen({ route, navigation }: Props) {
 
       <View style={styles.preferenceRow}>
         <Text style={styles.preferenceLabel}>Sonido activado</Text>
-        <Switch value={soundEnabled} onValueChange={setSoundEnabled} accessibilityLabel="Sonido activado" />
+        <Switch
+          value={soundEnabled}
+          onValueChange={setSoundEnabled}
+          accessibilityLabel="Sonido activado"
+        />
       </View>
       <View style={styles.preferenceRow}>
         <Text style={styles.preferenceLabel}>Reducir movimiento</Text>
-        <Switch value={reduceMotion} onValueChange={setReduceMotion} accessibilityLabel="Reducir movimiento" />
+        <Switch
+          value={reduceMotionPref}
+          onValueChange={setReduceMotionPref}
+          accessibilityLabel="Reducir movimiento"
+        />
       </View>
 
       <View style={styles.actions}>
-        <BigButton label="Guardar" emoji="✅" onPress={handleSave} disabled={saving} />
+        <BigButton label="Guardar" emoji="✅" onPress={handleSave} loading={saving} />
         <View style={styles.spacer} />
-        <BigButton label="Cancelar" variant="ghost" onPress={() => navigation.goBack()} disabled={saving} />
+        <BigButton label="Cancelar" variant="ghost" onPress={handleCancel} disabled={saving} />
       </View>
+
+      {dialog}
     </ScreenContainer>
   );
 }

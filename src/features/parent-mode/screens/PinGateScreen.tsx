@@ -13,11 +13,19 @@ type Props = NativeStackScreenProps<RootStackParamList, 'PinGate'>;
 
 type Stage = 'checking' | 'enter' | 'create-step1' | 'create-step2';
 
+/** Intentos fallidos consecutivos permitidos antes de una pausa (R2: cierra el hallazgo "sin bloqueo" de la auditoría de Centro de Adultos). */
+const MAX_ATTEMPTS = 5;
+/** Duración de la pausa tras agotar los intentos. Se reinicia al cerrar/reabrir la app (barrera parental, no un mecanismo de seguridad persistente — ver services/storage/pinRepository.ts). */
+const LOCKOUT_MS = 30_000;
+
 export function PinGateScreen({ navigation }: Props) {
   const [stage, setStage] = useState<Stage>('checking');
   const [value, setValue] = useState('');
   const [firstPin, setFirstPin] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -31,19 +39,49 @@ export function PinGateScreen({ navigation }: Props) {
     };
   }, []);
 
+  // Cuenta regresiva de la pausa por intentos fallidos.
   useEffect(() => {
-    if (value.length < ADULT_PIN_LENGTH) {
+    if (!lockedUntil) {
+      return;
+    }
+    function tick() {
+      const remaining = Math.max(0, Math.ceil(((lockedUntil ?? 0) - Date.now()) / 1000));
+      setRemainingSeconds(remaining);
+      if (remaining <= 0) {
+        setLockedUntil(null);
+        setFailedAttempts(0);
+        setError(null);
+      }
+    }
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [lockedUntil]);
+
+  useEffect(() => {
+    if (value.length < ADULT_PIN_LENGTH || lockedUntil) {
       return;
     }
 
     (async () => {
       if (stage === 'enter') {
         const valid = await verifyAdultPin(value);
+        setValue('');
         if (valid) {
+          setFailedAttempts(0);
           navigation.replace('AdultHome');
+          return;
+        }
+        const nextAttempts = failedAttempts + 1;
+        if (nextAttempts >= MAX_ATTEMPTS) {
+          setFailedAttempts(0);
+          setError(null);
+          setLockedUntil(Date.now() + LOCKOUT_MS);
         } else {
-          setError('PIN incorrecto. Inténtalo de nuevo.');
-          setValue('');
+          setFailedAttempts(nextAttempts);
+          setError(
+            `PIN incorrecto. Inténtalo de nuevo (${MAX_ATTEMPTS - nextAttempts} ${MAX_ATTEMPTS - nextAttempts === 1 ? 'intento' : 'intentos'} antes de una pausa).`,
+          );
         }
       } else if (stage === 'create-step1') {
         setFirstPin(value);
@@ -62,7 +100,7 @@ export function PinGateScreen({ navigation }: Props) {
         }
       }
     })();
-  }, [value, stage, firstPin, navigation]);
+  }, [value, stage, firstPin, navigation, lockedUntil, failedAttempts]);
 
   if (stage === 'checking') {
     return (
@@ -89,11 +127,30 @@ export function PinGateScreen({ navigation }: Props) {
     <ScreenContainer centered>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {lockedUntil ? (
+        <Text style={styles.error} accessibilityLiveRegion="polite">
+          Demasiados intentos. Espera {remainingSeconds}{' '}
+          {remainingSeconds === 1 ? 'segundo' : 'segundos'}.
+        </Text>
+      ) : error ? (
+        <Text style={styles.error} accessibilityLiveRegion="polite">
+          {error}
+        </Text>
+      ) : null}
 
-      <PinPad value={value} onChange={setValue} length={ADULT_PIN_LENGTH} />
+      <PinPad
+        value={value}
+        onChange={setValue}
+        length={ADULT_PIN_LENGTH}
+        disabled={!!lockedUntil}
+      />
 
-      <BigButton label="Volver" variant="ghost" fullWidth={false} onPress={() => navigation.goBack()} />
+      <BigButton
+        label="Volver"
+        variant="ghost"
+        fullWidth={false}
+        onPress={() => navigation.goBack()}
+      />
     </ScreenContainer>
   );
 }

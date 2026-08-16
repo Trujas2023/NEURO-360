@@ -3,7 +3,13 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
 import { useProfiles } from '@features/profiles/context/ProfilesContext';
-import { BigButton, ProfileAvatar, ScreenContainer, useConfirmDialog } from '@shared/components';
+import {
+  BigButton,
+  EmptyState,
+  ProfileAvatar,
+  ScreenContainer,
+  useConfirmDialog,
+} from '@shared/components';
 import { useReduceMotion } from '@shared/hooks';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
@@ -15,9 +21,20 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AdultHome'>;
  * habilitados.
  */
 export function AdultHomeScreen({ navigation }: Props) {
-  const { profiles, deleteProfile } = useProfiles();
+  const { profiles, activeProfile, deleteProfile } = useProfiles();
   const reduceMotion = useReduceMotion();
   const { confirm, dialog } = useConfirmDialog(reduceMotion);
+
+  // "Salir de Modo Adulto" (R2, corrige un bug de navegación de R1): si hay
+  // un perfil activo (se entró desde el candado de Home), volver ahí
+  // directamente. Si no hay ninguno (se entró desde ProfileSelector antes
+  // de elegir perfil), ir a ProfileSelector — ir a Home en ese caso
+  // generaría una pantalla intermedia redundante en la pila de navegación
+  // (Home se autorredirige a ProfileSelector, pero deja una instancia
+  // duplicada en el historial).
+  function exitAdultMode() {
+    navigation.navigate(activeProfile ? 'Home' : 'ProfileSelector');
+  }
 
   async function confirmDelete(id: string, name: string) {
     const ok = await confirm({
@@ -37,7 +54,11 @@ export function AdultHomeScreen({ navigation }: Props) {
       <Text style={styles.subtitle}>Perfiles infantiles</Text>
 
       {profiles.length === 0 ? (
-        <Text style={styles.empty}>Aún no creaste ningún perfil.</Text>
+        <EmptyState
+          emoji="👋"
+          title="Aún no creaste ningún perfil."
+          message={'Tocá "Agregar perfil" para crear el primero.'}
+        />
       ) : (
         profiles.map((profile) => (
           <View key={profile.id} style={styles.row}>
@@ -101,7 +122,8 @@ export function AdultHomeScreen({ navigation }: Props) {
         <BigButton
           label="Salir de Modo Adulto"
           variant="ghost"
-          onPress={() => navigation.navigate('ProfileSelector')}
+          onPress={exitAdultMode}
+          accessibilityHint="Vuelve a donde estabas antes de entrar a Modo Adulto"
         />
       </View>
 

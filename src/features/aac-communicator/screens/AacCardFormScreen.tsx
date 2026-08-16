@@ -1,11 +1,12 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
-import { BigButton, ScreenContainer } from '@shared/components';
+import { BigButton, ScreenContainer, useConfirmDialog } from '@shared/components';
 import { AVATAR_COLORS as PALETTE_COLORS } from '@shared/constants/profiles';
+import { useReduceMotion } from '@shared/hooks';
 import { colors, radius, spacing, typography } from '@shared/theme';
 
 import { AacCardVisual } from '../components/AacCardVisual';
@@ -13,6 +14,8 @@ import { ASSIGNABLE_CATEGORIES, getCategory } from '../constants/categories';
 import { useAacCards } from '../hooks/useAacCards';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AacCardForm'>;
+
+const SWATCH_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 };
 
 /**
  * Modo Adulto: crear o editar una tarjeta. Nunca se navega aquí desde
@@ -22,17 +25,53 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AacCardForm'>;
 export function AacCardFormScreen({ route, navigation }: Props) {
   const { profileId, cardId, categoryId: initialCategoryId } = route.params;
   const { cards, createCard, updateCard } = useAacCards(profileId);
-  const editingCard = useMemo(() => cards.find((card) => card.id === cardId) ?? null, [cards, cardId]);
+  const editingCard = useMemo(
+    () => cards.find((card) => card.id === cardId) ?? null,
+    [cards, cardId],
+  );
 
-  const defaultCategoryId = editingCard?.categoryId ?? initialCategoryId ?? ASSIGNABLE_CATEGORIES[0].id;
+  const defaultCategoryId =
+    editingCard?.categoryId ?? initialCategoryId ?? ASSIGNABLE_CATEGORIES[0].id;
+  const initialEmoji = editingCard?.emoji ?? getCategory(defaultCategoryId)?.emoji ?? '🙂';
+  const initialColor =
+    editingCard?.color ?? getCategory(defaultCategoryId)?.color ?? PALETTE_COLORS[0];
+  const initialLabel = editingCard?.label ?? '';
+  const initialImageUri = editingCard?.imageUri;
+  const initialIsFavorite = editingCard?.isFavorite ?? false;
 
   const [categoryId, setCategoryId] = useState(defaultCategoryId);
-  const [label, setLabel] = useState(editingCard?.label ?? '');
-  const [emoji, setEmoji] = useState(editingCard?.emoji ?? getCategory(defaultCategoryId)?.emoji ?? '🙂');
-  const [imageUri, setImageUri] = useState<string | undefined>(editingCard?.imageUri);
-  const [color, setColor] = useState(editingCard?.color ?? getCategory(defaultCategoryId)?.color ?? PALETTE_COLORS[0]);
-  const [isFavorite, setIsFavorite] = useState(editingCard?.isFavorite ?? false);
+  const [label, setLabel] = useState(initialLabel);
+  const [emoji, setEmoji] = useState(initialEmoji);
+  const [imageUri, setImageUri] = useState<string | undefined>(initialImageUri);
+  const [color, setColor] = useState(initialColor);
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const reduceMotion = useReduceMotion();
+  const { confirm, dialog } = useConfirmDialog(reduceMotion);
+
+  const isDirty =
+    categoryId !== defaultCategoryId ||
+    label !== initialLabel ||
+    emoji !== initialEmoji ||
+    imageUri !== initialImageUri ||
+    color !== initialColor ||
+    isFavorite !== initialIsFavorite;
+
+  async function handleCancel() {
+    if (isDirty) {
+      const discard = await confirm({
+        title: 'Descartar cambios',
+        message: 'Todavía no guardaste esta tarjeta. Si sales ahora, se pierden los cambios.',
+        confirmLabel: 'Descartar',
+        destructive: true,
+      });
+      if (!discard) {
+        return;
+      }
+    }
+    navigation.goBack();
+  }
 
   function handleSelectCategory(nextCategoryId: string) {
     setCategoryId(nextCategoryId);
@@ -66,19 +105,27 @@ export function AacCardFormScreen({ route, navigation }: Props) {
       Alert.alert('Permiso necesario', 'Activa el acceso a la cámara para tomar una foto.');
       return;
     }
-    const result = await ImagePicker.launchCameraAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.6 });
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.6,
+    });
     if (!result.canceled && result.assets[0]) {
       setImageUri(result.assets[0].uri);
     }
   }
 
   async function handleSave() {
+    if (savingRef.current) {
+      return;
+    }
     const trimmedLabel = label.trim();
     if (!trimmedLabel) {
       Alert.alert('Falta la palabra o frase', 'Escribe el texto de la tarjeta antes de guardar.');
       return;
     }
 
+    savingRef.current = true;
     setSaving(true);
     try {
       if (editingCard) {
@@ -102,6 +149,7 @@ export function AacCardFormScreen({ route, navigation }: Props) {
       }
       navigation.goBack();
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
@@ -123,7 +171,12 @@ export function AacCardFormScreen({ route, navigation }: Props) {
         </View>
       </View>
       {imageUri ? (
-        <BigButton label="Quitar foto" variant="ghost" fullWidth={false} onPress={() => setImageUri(undefined)} />
+        <BigButton
+          label="Quitar foto"
+          variant="ghost"
+          fullWidth={false}
+          onPress={() => setImageUri(undefined)}
+        />
       ) : null}
 
       <Text style={styles.label}>Palabra o frase</Text>
@@ -173,23 +226,35 @@ export function AacCardFormScreen({ route, navigation }: Props) {
           <Pressable
             key={swatch}
             onPress={() => setColor(swatch)}
+            hitSlop={SWATCH_HIT_SLOP}
             accessibilityRole="button"
             accessibilityLabel={`Elegir color ${swatch}`}
-            style={[styles.swatch, { backgroundColor: swatch }, swatch === color && styles.swatchSelected]}
+            accessibilityState={{ selected: swatch === color }}
+            style={[
+              styles.swatch,
+              { backgroundColor: swatch },
+              swatch === color && styles.swatchSelected,
+            ]}
           />
         ))}
       </View>
 
       <View style={styles.preferenceRow}>
         <Text style={styles.preferenceLabel}>Favorita</Text>
-        <Switch value={isFavorite} onValueChange={setIsFavorite} accessibilityLabel="Marcar como favorita" />
+        <Switch
+          value={isFavorite}
+          onValueChange={setIsFavorite}
+          accessibilityLabel="Marcar como favorita"
+        />
       </View>
 
       <View style={styles.actions}>
-        <BigButton label="Guardar" emoji="✅" onPress={handleSave} disabled={saving} />
+        <BigButton label="Guardar" emoji="✅" onPress={handleSave} loading={saving} />
         <View style={styles.spacer} />
-        <BigButton label="Cancelar" variant="ghost" onPress={() => navigation.goBack()} disabled={saving} />
+        <BigButton label="Cancelar" variant="ghost" onPress={handleCancel} disabled={saving} />
       </View>
+
+      {dialog}
     </ScreenContainer>
   );
 }

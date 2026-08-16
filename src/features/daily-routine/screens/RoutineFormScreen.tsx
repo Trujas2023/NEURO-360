@@ -1,9 +1,15 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { RootStackParamList } from '@app/navigation/types';
-import { BigButton, IconButton, ScreenContainer, useConfirmDialog } from '@shared/components';
+import {
+  BigButton,
+  EmptyState,
+  IconButton,
+  ScreenContainer,
+  useConfirmDialog,
+} from '@shared/components';
 import { AVATAR_COLORS as PALETTE_COLORS } from '@shared/constants/profiles';
 import { useReduceMotion } from '@shared/hooks';
 import { colors, radius, spacing, typography } from '@shared/theme';
@@ -11,6 +17,8 @@ import { colors, radius, spacing, typography } from '@shared/theme';
 import { useRoutines } from '../hooks/useRoutines';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RoutineForm'>;
+
+const SWATCH_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 };
 
 /**
  * Modo Adulto: crear o editar una rutina de Mi Día y sus pasos. Los pasos
@@ -33,18 +41,49 @@ export function RoutineFormScreen({ route, navigation }: Props) {
   const [stepLabel, setStepLabel] = useState('');
   const [stepEmoji, setStepEmoji] = useState('⭐');
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
   const [savedRoutineId, setSavedRoutineId] = useState(editingRoutine?.id ?? null);
 
   const currentRoutine = routines.find((routine) => routine.id === savedRoutineId) ?? null;
   const steps = currentRoutine ? [...currentRoutine.steps].sort((a, b) => a.order - b.order) : [];
 
+  // "Dirty" respecto a lo último guardado: los pasos se persisten al toque
+  // (addStep/deleteStep/moveStep), pero título/emoji/color de la rutina
+  // solo se guardan al tocar "Guardar rutina/cambios" — sin este chequeo,
+  // "Volver" descartaba esos campos en silencio (R2: bug de pérdida de
+  // datos encontrado en la auditoría).
+  const isDirty =
+    title !== (currentRoutine?.title ?? '') ||
+    emoji !== (currentRoutine?.emoji ?? '🗓️') ||
+    color !== (currentRoutine?.color ?? PALETTE_COLORS[0]);
+
+  async function handleBack() {
+    if (isDirty) {
+      const discard = await confirm({
+        title: 'Descartar cambios',
+        message:
+          'El nombre, emoji o color de la rutina todavía no se guardaron. Si sales ahora, se pierden.',
+        confirmLabel: 'Descartar',
+        destructive: true,
+      });
+      if (!discard) {
+        return;
+      }
+    }
+    navigation.goBack();
+  }
+
   async function handleSaveDetails() {
+    if (savingRef.current) {
+      return;
+    }
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
       Alert.alert('Falta el nombre', 'Escribe el nombre de la rutina antes de guardar.');
       return;
     }
 
+    savingRef.current = true;
     setSaving(true);
     try {
       if (savedRoutineId) {
@@ -62,6 +101,7 @@ export function RoutineFormScreen({ route, navigation }: Props) {
         setSavedRoutineId(routine.id);
       }
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
@@ -113,8 +153,10 @@ export function RoutineFormScreen({ route, navigation }: Props) {
           <Pressable
             key={swatch}
             onPress={() => setColor(swatch)}
+            hitSlop={SWATCH_HIT_SLOP}
             accessibilityRole="button"
             accessibilityLabel={`Elegir color ${swatch}`}
+            accessibilityState={{ selected: swatch === color }}
             style={[
               styles.swatch,
               { backgroundColor: swatch },
@@ -128,7 +170,7 @@ export function RoutineFormScreen({ route, navigation }: Props) {
         label={savedRoutineId ? 'Guardar cambios' : 'Guardar rutina'}
         emoji="✅"
         onPress={handleSaveDetails}
-        disabled={saving}
+        loading={saving}
       />
 
       {savedRoutineId ? (
@@ -136,7 +178,7 @@ export function RoutineFormScreen({ route, navigation }: Props) {
           <Text style={styles.stepsTitle}>Pasos</Text>
 
           {steps.length === 0 ? (
-            <Text style={styles.empty}>Todavía no hay pasos.</Text>
+            <EmptyState emoji="⭐" title="Todavía no hay pasos." />
           ) : (
             steps.map((step, index) => (
               <View key={step.id} style={styles.stepRow}>
@@ -202,7 +244,7 @@ export function RoutineFormScreen({ route, navigation }: Props) {
       ) : null}
 
       <View style={styles.actions}>
-        <BigButton label="Volver" variant="ghost" onPress={() => navigation.goBack()} />
+        <BigButton label="Volver" variant="ghost" onPress={handleBack} disabled={saving} />
       </View>
 
       {dialog}
@@ -256,11 +298,6 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.lg,
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  empty: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   stepRow: {

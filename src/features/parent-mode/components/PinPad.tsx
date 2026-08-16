@@ -8,12 +8,14 @@ export interface PinPadProps {
   value: string;
   onChange: (value: string) => void;
   length: number;
+  /** Bloquea todo el teclado (p. ej. tras demasiados intentos fallidos, ver PinGateScreen). */
+  disabled?: boolean;
 }
 
 /** Puntos de progreso + teclado numérico grande para introducir el PIN de adulto. */
-export function PinPad({ value, onChange, length }: PinPadProps) {
+export function PinPad({ value, onChange, length, disabled = false }: PinPadProps) {
   function handleKeyPress(key: string) {
-    if (key === '') {
+    if (key === '' || disabled) {
       return;
     }
     if (key === 'del') {
@@ -42,13 +44,15 @@ export function PinPad({ value, onChange, length }: PinPadProps) {
           <Pressable
             key={`${key}-${index}`}
             onPress={() => handleKeyPress(key)}
-            disabled={key === ''}
+            disabled={key === '' || disabled}
             accessibilityRole="button"
             accessibilityLabel={key === 'del' ? 'Borrar' : key === '' ? undefined : `Dígito ${key}`}
+            accessibilityState={{ disabled: key === '' || disabled }}
             style={({ pressed }) => [
               styles.key,
               key === '' && styles.keyEmpty,
-              pressed && key !== '' ? styles.keyPressed : null,
+              disabled && key !== '' ? styles.keyDisabled : null,
+              pressed && key !== '' && !disabled ? styles.keyPressed : null,
             ]}
           >
             <Text style={styles.keyLabel}>{key === 'del' ? '⌫' : key}</Text>
@@ -96,6 +100,9 @@ const styles = StyleSheet.create({
   keyEmpty: {
     backgroundColor: 'transparent',
     borderWidth: 0,
+  },
+  keyDisabled: {
+    opacity: 0.35,
   },
   keyPressed: {
     opacity: 0.7,

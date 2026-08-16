@@ -30,16 +30,26 @@ export function AacSettingsScreen({ route, navigation }: Props) {
 
   if (!profile) {
     return (
-      <ScreenContainer centered>
-        <Text style={styles.empty}>No se encontró el perfil.</Text>
-        <BigButton label="Volver" variant="ghost" onPress={() => navigation.goBack()} />
+      <ScreenContainer
+        centered
+        error={{
+          title: 'No se encontró el perfil',
+          message: 'Puede que se haya eliminado desde otra pantalla.',
+          onRetry: () => navigation.goBack(),
+          retryLabel: 'Volver',
+        }}
+      >
+        <View />
       </ScreenContainer>
     );
   }
 
   const prefs: ChildProfilePreferences = { ...DEFAULT_PROFILE_PREFERENCES, ...profile.preferences };
 
-  function setPref<K extends keyof ChildProfilePreferences>(key: K, value: ChildProfilePreferences[K]) {
+  function setPref<K extends keyof ChildProfilePreferences>(
+    key: K,
+    value: ChildProfilePreferences[K],
+  ) {
     updateProfile(profileId, { preferences: { ...prefs, [key]: value } });
   }
 
@@ -51,7 +61,12 @@ export function AacSettingsScreen({ route, navigation }: Props) {
       <Section title="Tamaño del tablero">
         <View style={styles.chipRow}>
           {BOARD_SIZES.map((size) => (
-            <Chip key={size} label={size} selected={prefs.boardSize === size} onPress={() => setPref('boardSize', size)} />
+            <Chip
+              key={size}
+              label={size}
+              selected={prefs.boardSize === size}
+              onPress={() => setPref('boardSize', size)}
+            />
           ))}
         </View>
       </Section>
@@ -84,13 +99,41 @@ export function AacSettingsScreen({ route, navigation }: Props) {
       </Section>
 
       <Section title="Qué mostrar en el comunicador">
-        <ToggleRow label="Texto en las tarjetas" value={prefs.showCardText ?? true} onValueChange={(value) => setPref('showCardText', value)} />
-        <ToggleRow label="Imagen o pictograma" value={prefs.showCardImage ?? true} onValueChange={(value) => setPref('showCardImage', value)} />
-        <ToggleRow label="Colores de categoría" value={prefs.showCardColor ?? true} onValueChange={(value) => setPref('showCardColor', value)} />
-        <ToggleRow label="Favoritos" value={prefs.showFavorites ?? true} onValueChange={(value) => setPref('showFavorites', value)} />
-        <ToggleRow label="Más usados" value={prefs.showMostUsed ?? true} onValueChange={(value) => setPref('showMostUsed', value)} />
-        <ToggleRow label="Barra de frase" value={prefs.showPhraseBar ?? true} onValueChange={(value) => setPref('showPhraseBar', value)} />
-        <ToggleRow label="Categorías" value={prefs.showCategories ?? true} onValueChange={(value) => setPref('showCategories', value)} />
+        <ToggleRow
+          label="Texto en las tarjetas"
+          value={prefs.showCardText ?? true}
+          onValueChange={(value) => setPref('showCardText', value)}
+        />
+        <ToggleRow
+          label="Imagen o pictograma"
+          value={prefs.showCardImage ?? true}
+          onValueChange={(value) => setPref('showCardImage', value)}
+        />
+        <ToggleRow
+          label="Colores de categoría"
+          value={prefs.showCardColor ?? true}
+          onValueChange={(value) => setPref('showCardColor', value)}
+        />
+        <ToggleRow
+          label="Favoritos"
+          value={prefs.showFavorites ?? true}
+          onValueChange={(value) => setPref('showFavorites', value)}
+        />
+        <ToggleRow
+          label="Más usados"
+          value={prefs.showMostUsed ?? true}
+          onValueChange={(value) => setPref('showMostUsed', value)}
+        />
+        <ToggleRow
+          label="Barra de frase"
+          value={prefs.showPhraseBar ?? true}
+          onValueChange={(value) => setPref('showPhraseBar', value)}
+        />
+        <ToggleRow
+          label="Categorías"
+          value={prefs.showCategories ?? true}
+          onValueChange={(value) => setPref('showCategories', value)}
+        />
       </Section>
 
       <View style={styles.actions}>
@@ -109,7 +152,15 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function Chip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+function Chip({
+  label,
+  selected,
+  onPress,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
   return (
     <Pressable
       onPress={onPress}
@@ -158,11 +209,6 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.md,
     color: colors.textSecondary,
     textAlign: 'center',
-  },
-  empty: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    marginBottom: spacing.md,
   },
   section: {
     marginBottom: spacing.lg,
