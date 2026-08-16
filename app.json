@@ -2,6 +2,7 @@
   "expo": {
     "name": "Sense & Play Adventures 360",
     "slug": "sense-play-adventures-360",
+    "owner": "senses-and-play360",
     "description": "Comunicador AAC y juegos sensoriales offline-first para niños neurodivergentes.",
     "version": "7.0.0",
     "orientation": "portrait",
