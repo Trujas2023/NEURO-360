@@ -3,7 +3,7 @@
     "name": "Sense & Play Adventures 360",
     "slug": "sense-play-adventures-360",
     "description": "Comunicador AAC y juegos sensoriales offline-first para niños neurodivergentes.",
-    "version": "0.1.0",
+    "version": "7.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,7 +19,7 @@
     },
     "android": {
       "package": "com.senseplayadventures.app",
-      "versionCode": 1,
+      "versionCode": 7,
       "predictiveBackGestureEnabled": false,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",

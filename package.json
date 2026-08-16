@@ -1,6 +1,6 @@
 {
   "name": "sense-play-adventures-360",
-  "version": "0.1.0",
+  "version": "7.0.0",
   "description": "Comunicador AAC y juegos sensoriales offline-first para niños neurodivergentes.",
   "main": "index.ts",
   "dependencies": {
