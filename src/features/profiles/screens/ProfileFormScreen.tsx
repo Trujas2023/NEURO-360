@@ -122,6 +122,11 @@ export function ProfileFormScreen({ route, navigation }: Props) {
         await createProfile({ name: trimmedName, avatarUri, avatarColor, preferences });
       }
       navigation.goBack();
+    } catch (error) {
+      // R3: un fallo real de almacenamiento antes fallaba en silencio — el
+      // botón dejaba de girar pero nada avisaba que no se guardó nada.
+      console.warn('[ProfileForm] No se pudo guardar el perfil', error);
+      Alert.alert('No se pudo guardar', 'Ocurrió un problema al guardar el perfil. Intenta de nuevo.');
     } finally {
       savingRef.current = false;
       setSaving(false);

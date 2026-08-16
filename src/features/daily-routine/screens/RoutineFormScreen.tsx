@@ -100,6 +100,9 @@ export function RoutineFormScreen({ route, navigation }: Props) {
         });
         setSavedRoutineId(routine.id);
       }
+    } catch (error) {
+      console.warn('[RoutineForm] No se pudo guardar la rutina', error);
+      Alert.alert('No se pudo guardar', 'Ocurrió un problema al guardar la rutina. Intenta de nuevo.');
     } finally {
       savingRef.current = false;
       setSaving(false);
@@ -118,9 +121,14 @@ export function RoutineFormScreen({ route, navigation }: Props) {
     if (!trimmedLabel) {
       return;
     }
-    await addStep(savedRoutineId, { label: trimmedLabel, emoji: stepEmoji.trim() || '⭐' });
-    setStepLabel('');
-    setStepEmoji('⭐');
+    try {
+      await addStep(savedRoutineId, { label: trimmedLabel, emoji: stepEmoji.trim() || '⭐' });
+      setStepLabel('');
+      setStepEmoji('⭐');
+    } catch (error) {
+      console.warn('[RoutineForm] No se pudo agregar el paso', error);
+      Alert.alert('No se pudo agregar', 'Ocurrió un problema al agregar el paso. Intenta de nuevo.');
+    }
   }
 
   return (

@@ -148,6 +148,9 @@ export function AacCardFormScreen({ route, navigation }: Props) {
         });
       }
       navigation.goBack();
+    } catch (error) {
+      console.warn('[AacCardForm] No se pudo guardar la tarjeta', error);
+      Alert.alert('No se pudo guardar', 'Ocurrió un problema al guardar la tarjeta. Intenta de nuevo.');
     } finally {
       savingRef.current = false;
       setSaving(false);

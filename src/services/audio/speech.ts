@@ -31,7 +31,17 @@ export function speak(text: string, options: SpeakOptions = {}): void {
     .catch(() => {})
     .then(async () => {
       await Speech.stop();
-      Speech.speak(trimmed, { language });
+      // R3: antes, un fallo del motor de TTS del dispositivo (p. ej. sin
+      // voces instaladas) quedaba completamente silencioso — ni siquiera
+      // un log. `onError` no evita el fallo (no hay nada que la app pueda
+      // hacer sin un TTS nativo), pero deja evidencia diagnosticable en
+      // vez de que el comunicador "no pase nada" sin ninguna pista.
+      Speech.speak(trimmed, {
+        language,
+        onError: (error) => {
+          console.warn('[speech] expo-speech falló al reproducir', error);
+        },
+      });
     });
 }
 
